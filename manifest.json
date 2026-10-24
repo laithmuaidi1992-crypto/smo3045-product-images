@@ -1,0 +1,513 @@
+[
+ {
+  "product_id": "P_MO1X5XL4",
+  "barcode": "304571547625",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304571547625.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304571547625.webp"
+ },
+ {
+  "product_id": "P-moj26mcg-vl1bz",
+  "barcode": "6253811730213",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6253811730213.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6253811730213.webp"
+ },
+ {
+  "product_id": "P-moyka18y-cyzfw",
+  "barcode": "6253501560212",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6253501560212.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6253501560212.webp"
+ },
+ {
+  "product_id": "P-mp1mp6z2-dxe1h",
+  "barcode": "6251977009600",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6251977009600.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6251977009600.webp"
+ },
+ {
+  "product_id": "P-mp1mp7hm-057vs",
+  "barcode": "6251977009099",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6251977009099.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6251977009099.webp"
+ },
+ {
+  "product_id": "P-mp1mp7zp-18u19",
+  "barcode": "6251977008993",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6251977008993.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6251977008993.webp"
+ },
+ {
+  "product_id": "P-mpibh02m-shsi1",
+  "barcode": "304538553847",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304538553847.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304538553847.webp"
+ },
+ {
+  "product_id": "P-mpiog6eh-5abvi",
+  "barcode": "2154565654326",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/2154565654326.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/2154565654326.webp"
+ },
+ {
+  "product_id": "P-mpiul75h-2kirx",
+  "barcode": "304570354725",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304570354725.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304570354725.webp"
+ },
+ {
+  "product_id": "P-mpiul7o5-emv2y",
+  "barcode": "304570502549",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304570502549.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304570502549.webp"
+ },
+ {
+  "product_id": "P-mr2cxlqp-y037",
+  "barcode": "6266013400020",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6266013400020.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6266013400020.webp"
+ },
+ {
+  "product_id": "P-mrhtu3s6-rmcv",
+  "barcode": "3045861170858",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045861170858.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045861170858.webp"
+ },
+ {
+  "product_id": "P-mro5mzbn-o9tx",
+  "barcode": "8000500423127",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/8000500423127.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/8000500423127.webp"
+ },
+ {
+  "product_id": "P-mrug4qvm-dzcf",
+  "barcode": "6253341430980",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6253341430980.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6253341430980.webp"
+ },
+ {
+  "product_id": "P-mrw87vmc-fp1d",
+  "barcode": "3045733420832",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045733420832.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045733420832.webp"
+ },
+ {
+  "product_id": "P-mtltqjf4-13m1",
+  "barcode": "3045456677379",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045456677379.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045456677379.webp"
+ },
+ {
+  "product_id": "P-mtr30wkg-9rmg",
+  "barcode": "6974729810087",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6974729810087.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6974729810087.webp"
+ },
+ {
+  "product_id": "P-mtufwe3y-fk2q",
+  "barcode": "3045978790643",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045978790643.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045978790643.webp"
+ },
+ {
+  "product_id": "P-mtvs4qfa-42qq",
+  "barcode": "7622201118761",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/7622201118761.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/7622201118761.webp"
+ },
+ {
+  "product_id": "P-mtz0haof-y896",
+  "barcode": "3045255351123",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045255351123.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045255351123.webp"
+ },
+ {
+  "product_id": "P-mu48ghsg-6j2i",
+  "barcode": "3045570562021",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045570562021.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045570562021.webp"
+ },
+ {
+  "product_id": "P-mu48gi0t-p1ix",
+  "barcode": "3045570914554",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045570914554.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045570914554.webp"
+ },
+ {
+  "product_id": "P-muelrpbo-73y5",
+  "barcode": "3045197722650",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045197722650.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045197722650.webp"
+ },
+ {
+  "product_id": "P-mufl7inq-b89y",
+  "barcode": "8858145010369",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/8858145010369.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/8858145010369.webp"
+ },
+ {
+  "product_id": "P-muky3jul-b8mr",
+  "barcode": "3045581571733",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045581571733.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045581571733.webp"
+ },
+ {
+  "product_id": "P-muvrlbyb-6q8m",
+  "barcode": "6154052210543",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6154052210543.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6154052210543.webp"
+ },
+ {
+  "product_id": "P-muwf5vqh-olg6",
+  "barcode": "6253363102469",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6253363102469.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6253363102469.webp"
+ },
+ {
+  "product_id": "P-muzajftv-plhg",
+  "barcode": "3045449038031",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045449038031.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045449038031.webp"
+ },
+ {
+  "product_id": "P-mvl6exas-q3nk",
+  "barcode": "3045772192004",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/3045772192004.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/3045772192004.webp"
+ },
+ {
+  "product_id": "Smnvjijsv",
+  "barcode": "4033100039485",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/4033100039485.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/4033100039485.webp"
+ },
+ {
+  "product_id": "Smnvmbiak",
+  "barcode": "76149276",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/76149276.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/76149276.webp"
+ },
+ {
+  "product_id": "Smnxaw2kb",
+  "barcode": "4305615688398",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/4305615688398.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/4305615688398.webp"
+ },
+ {
+  "product_id": "Smnz9p2qt",
+  "barcode": "304510074710",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304510074710.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304510074710.webp"
+ },
+ {
+  "product_id": "Smo0fgyvh",
+  "barcode": "304580322295",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304580322295.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304580322295.webp"
+ },
+ {
+  "product_id": "Smog8fyu4",
+  "barcode": "304535929287",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304535929287.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304535929287.webp"
+ },
+ {
+  "product_id": "Smohtx4az",
+  "barcode": "304532479939",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304532479939.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304532479939.webp"
+ },
+ {
+  "product_id": "Smoixkom4",
+  "barcode": "304599109673",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304599109673.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304599109673.webp"
+ },
+ {
+  "product_id": "Smphdf5bc",
+  "barcode": "304581715678",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304581715678.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304581715678.webp"
+ },
+ {
+  "product_id": "Smphdxd1u",
+  "barcode": "304582436837",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304582436837.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304582436837.webp"
+ },
+ {
+  "product_id": "Smphe5fyf",
+  "barcode": "304582570277",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304582570277.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304582570277.webp"
+ },
+ {
+  "product_id": "Smphe8n4v",
+  "barcode": "304583007241",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304583007241.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304583007241.webp"
+ },
+ {
+  "product_id": "Smpheai8e",
+  "barcode": "304583039484",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304583039484.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304583039484.webp"
+ },
+ {
+  "product_id": "Smpheeznr",
+  "barcode": "304583239558",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304583239558.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304583239558.webp"
+ },
+ {
+  "product_id": "Smpmxinbq",
+  "barcode": "6253501560403",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6253501560403.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6253501560403.webp"
+ },
+ {
+  "product_id": "Smrkx5khs",
+  "barcode": "6253503550013",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/6253503550013.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/6253503550013.webp"
+ },
+ {
+  "product_id": "Smtn3ra33",
+  "barcode": "304535269160",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304535269160.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304535269160.webp"
+ },
+ {
+  "product_id": "Smu43g15n",
+  "barcode": "304562685634",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304562685634.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304562685634.webp"
+ },
+ {
+  "product_id": "Smuiri61x",
+  "barcode": "304549621105",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/304549621105.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/304549621105.webp"
+ },
+ {
+  "product_id": "TMOGFPEM4",
+  "barcode": "QM-001",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOGFPEM4.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOGFPEM4.webp"
+ },
+ {
+  "product_id": "TMOGFPZUG",
+  "barcode": "QM-003",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOGFPZUG.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOGFPZUG.webp"
+ },
+ {
+  "product_id": "TMOGFQ4LQ",
+  "barcode": "QM-004",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOGFQ4LQ.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOGFQ4LQ.webp"
+ },
+ {
+  "product_id": "TMOGFQDU8",
+  "barcode": "QM-006",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOGFQDU8.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOGFQDU8.webp"
+ },
+ {
+  "product_id": "TMOGFQJH4",
+  "barcode": "QM-008",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOGFQJH4.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOGFQJH4.webp"
+ },
+ {
+  "product_id": "TMOGFQOIQ",
+  "barcode": "QM-010",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOGFQOIQ.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOGFQOIQ.webp"
+ },
+ {
+  "product_id": "TMOGFQR38",
+  "barcode": "QM-011",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOGFQR38.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOGFQR38.webp"
+ },
+ {
+  "product_id": "TMOGGEGPV",
+  "barcode": "QM-014",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOGGEGPV.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOGGEGPV.webp"
+ },
+ {
+  "product_id": "TMOGGFRCF",
+  "barcode": "QM-015",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOGGFRCF.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOGGFRCF.webp"
+ },
+ {
+  "product_id": "TMOHWL3UK",
+  "barcode": "QM-016",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMOHWL3UK.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMOHWL3UK.webp"
+ },
+ {
+  "product_id": "TMP79TOIE",
+  "barcode": "QM-020",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMP79TOIE.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMP79TOIE.webp"
+ },
+ {
+  "product_id": "TMTHVB4JH",
+  "barcode": "QM-025",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMTHVB4JH.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMTHVB4JH.webp"
+ },
+ {
+  "product_id": "TMTKCMMF9",
+  "barcode": "QM-026",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMTKCMMF9.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMTKCMMF9.webp"
+ },
+ {
+  "product_id": "TMTQCD4PB",
+  "barcode": "QM-027",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMTQCD4PB.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMTQCD4PB.webp"
+ },
+ {
+  "product_id": "TMTQDVTK8",
+  "barcode": "QM-028",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMTQDVTK8.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMTQDVTK8.webp"
+ },
+ {
+  "product_id": "TMU04MDHD",
+  "barcode": "QM-029",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMU04MDHD.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMU04MDHD.webp"
+ },
+ {
+  "product_id": "TMU06RJX5",
+  "barcode": "QM-030",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMU06RJX5.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMU06RJX5.webp"
+ },
+ {
+  "product_id": "TMU073XVB",
+  "barcode": "QM-031",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMU073XVB.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMU073XVB.webp"
+ },
+ {
+  "product_id": "TMUBL8TKV",
+  "barcode": "QM-032",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMUBL8TKV.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMUBL8TKV.webp"
+ },
+ {
+  "product_id": "TMUBLBEK9",
+  "barcode": "QM-033",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMUBLBEK9.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMUBLBEK9.webp"
+ },
+ {
+  "product_id": "TMUBLHL7Z",
+  "barcode": "QM-034",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMUBLHL7Z.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMUBLHL7Z.webp"
+ },
+ {
+  "product_id": "TMUBNVPFW",
+  "barcode": "QM-035",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMUBNVPFW.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMUBNVPFW.webp"
+ },
+ {
+  "product_id": "TMUBO2QVJ",
+  "barcode": "QM-036",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMUBO2QVJ.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMUBO2QVJ.webp"
+ },
+ {
+  "product_id": "TMUBO8H0N",
+  "barcode": "QM-037",
+  "mode": "kept",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMUBO8H0N.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMUBO8H0N.webp"
+ },
+ {
+  "product_id": "TMUBO94C6",
+  "barcode": "QM-038",
+  "mode": "cut",
+  "image_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/cleaned/TMUBO94C6.webp",
+  "thumb_url": "https://raw.githubusercontent.com/laithmuaidi1992-crypto/smo3045-product-images/main/thumbs/TMUBO94C6.webp"
+ }
+]
