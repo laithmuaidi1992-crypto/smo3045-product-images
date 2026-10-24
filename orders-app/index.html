@@ -245,6 +245,10 @@ a{color:var(--navy);text-decoration:none}
 .pin .ic{width:36px;height:36px;border-radius:10px;background:#FFFFFF;border:1px solid var(--line);color:var(--navy);display:grid;place-items:center;flex:none}
 .pin div{flex:1;min-width:0;display:flex;flex-direction:column}
 .pin b{font-size:13.5px;font-weight:700}.pin small{font-size:11.5px;color:var(--muted)}
+.pickmap{height:300px;background:#F3F5FB;flex:none;border-bottom:1px solid var(--line);position:relative;z-index:0}
+.pickmap .leaflet-control-attribution{font-size:9px}
+.pickbar{display:flex;gap:8px;padding:10px 16px 0;align-items:center}
+.pickbar .ghost{flex:1;justify-content:center}
 .mapbox{position:relative;height:330px;background:#FFFFFF;overflow:hidden;flex:none;border-bottom:1px solid var(--line)}
 .mapbox>svg{display:block;width:100%;height:100%}
 .mapbox .fab{position:absolute;top:14px;inset-inline-start:14px;width:40px;height:40px;border-radius:12px;background:#FFFFFF;border:1px solid var(--line);color:var(--navy);box-shadow:var(--shadow-sm);display:grid;place-items:center}
@@ -552,16 +556,47 @@ V.otp=()=>`<div class="hd"><button class="icon-btn" data-back aria-label="رجو
   <div class="alert amber">${ICON.info}<span>نسخة تجريبية: لا تُرسل رسائل SMS بعد. الرمز هو <b>3045</b>.</span></div><div id="authErr"></div>
   <button class="cta" type="submit" style="justify-content:center">تأكيد</button><button type="button" class="link" data-go="welcome" style="align-self:center">تغيير الرقم</button></form>`;
 V.signup=()=>{const c=S.customer||{};return head('إكمال الحساب')+`<form class="body" id="signupForm" style="gap:16px"><div class="field"><label for="nameIn">الاسم</label><input id="nameIn" value="${esc(c.name||'')}" autocomplete="name" placeholder="اسمك كما يناديك المندوب"></div><div class="field"><label>رقم الهاتف</label><input value="${esc(S.pendingPhone||c.phone||'')}" disabled style="direction:ltr;text-align:right"></div><div id="authErr"></div></form><div class="ft"><button class="cta" id="signupBtn" style="justify-content:center">متابعة إلى العنوان</button></div>`};
-V.address=()=>{const a=(S.customer&&S.customer.address)||{};return head('تحديد العنوان','داخل نطاق التوصيل · إربد')+`<div class="body flush"><div class="mapbox">${mapSVG(0,false)}<a class="tag" href="${gmapsView(STORE_LL())}" target="_blank" rel="noopener" style="text-decoration:none">${ICON.pin} المتجر على خرائط Google</a></div>
-  <form id="addrForm" style="padding:16px;display:flex;flex-direction:column;gap:14px"><div class="field"><label for="areaIn">الحي / المنطقة</label><input id="areaIn" list="areas" value="${esc(a.area||'')}" placeholder="مثال: حي الحصن"><datalist id="areas">${AREAS.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></div>
+V.address=()=>{const a=(S.customer&&S.customer.address)||{};const ll=S.pickLL||addrLL(a);return head('تحديد العنوان','داخل نطاق التوصيل · إربد')+`<div class="body flush"><div id="pickMap" class="pickmap"></div>
+  <div class="pickbar"><button class="ghost" type="button" data-geo>${ICON.pin} استخدم موقعي الحالي</button></div>
+  <p class="hint" style="margin:6px 16px 0">اسحب الدبوس إلى باب بيتك، أو اضغط على الخريطة في المكان الصحيح. يصل المندوب إلى النقطة نفسها.</p>
+  <div id="gmapStatus" style="padding:8px 16px 0">${ll?`<div class="alert green">${ICON.info}<span>الموقع محدّد · يبعد ${kmBetween(ll,STORE_LL()).toFixed(1)} كم عن المتجر · <a href="${gmapsView(ll)}" target="_blank" rel="noopener"><b>عرض على خرائط Google</b></a></span></div>`:`<div class="alert amber">${ICON.info}<span>لم يُحدَّد موقعك بعد — اضغط «استخدم موقعي الحالي» أو حرّك الدبوس.</span></div>`}</div>
+  <form id="addrForm" style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:14px"><div class="field"><label for="areaIn">الحي / المنطقة</label><input id="areaIn" list="areas" value="${esc(a.area||'')}" placeholder="مثال: حي الحصن"><datalist id="areas">${AREAS.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></div>
   <div class="field"><label for="streetIn">الشارع والبناية</label><input id="streetIn" value="${esc(a.street||'')}" placeholder="شارع الجامعة، بناية 12، طابق 3"></div>
   <div class="field"><label for="landIn">أقرب معلم (اختياري)</label><input id="landIn" value="${esc(a.landmark||'')}" placeholder="مقابل صيدلية…"></div>
-  <div class="card" style="gap:10px"><div class="t">📍 موقعك على خرائط Google</div><p class="hint" style="margin:0">افتح خرائط Google، اضغط مطوّلاً على باب بيتك، ثم «مشاركة» وانسخ الرابط والصقه هنا. يصل المندوب إلى النقطة نفسها.</p>
-  <a class="ghost" href="${gmapsPick()}" target="_blank" rel="noopener" style="text-decoration:none">${ICON.pin} فتح خرائط Google</a>
-  <div class="field"><label for="gmapIn">رابط الموقع أو الإحداثيات</label><input id="gmapIn" value="${a.lat?esc(a.lat+', '+a.lng):''}" placeholder="https://maps.app.goo.gl/… أو 32.55, 35.85" style="direction:ltr;text-align:left"></div>
-  <div id="gmapStatus">${addrLL(a)?`<div class="alert green">${ICON.info}<span>الموقع محدّد · يبعد ${kmBetween(addrLL(a),STORE_LL()).toFixed(1)} كم عن المتجر · <a href="${gmapsView(addrLL(a))}" target="_blank" rel="noopener"><b>عرض على الخريطة</b></a></span></div>`:''}</div></div>
+  <details><summary class="hint" style="cursor:pointer">أو الصق رابط موقع من خرائط Google</summary><div class="field" style="margin-top:8px"><input id="gmapIn" value="${ll?esc(ll.lat+', '+ll.lng):''}" placeholder="https://maps.app.goo.gl/… أو 32.55, 35.85" style="direction:ltr;text-align:left"></div></details>
   <div id="authErr"></div></form></div>
   <div class="ft"><button class="cta" id="addrBtn" style="justify-content:center">حفظ العنوان</button></div>`};
+/* map picker: Google Maps when settings.gmaps_key is set, otherwise Leaflet + OpenStreetMap (no key needed) */
+function loadOnce(id,make){return new Promise((res,rej)=>{if(document.getElementById(id))return res();const el=make();el.id=id;el.onload=()=>res();el.onerror=()=>rej(new Error('load '+id));document.head.appendChild(el)})}
+function setPick(ll,src){S.pickLL={lat:+(+ll.lat).toFixed(6),lng:+(+ll.lng).toFixed(6)};const inp=$('#gmapIn');if(inp)inp.value=S.pickLL.lat+', '+S.pickLL.lng;const st=$('#gmapStatus');if(st){const km=kmBetween(S.pickLL,STORE_LL());st.innerHTML=km>12?`<div class="alert red">${ICON.info}<span>هذا الموقع يبعد ${km.toFixed(0)} كم عن المتجر، خارج نطاق التوصيل.</span></div>`:`<div class="alert green">${ICON.info}<span>الموقع محدّد · يبعد ${km.toFixed(1)} كم عن المتجر · <a href="${gmapsView(S.pickLL)}" target="_blank" rel="noopener"><b>عرض على خرائط Google</b></a></span></div>`}
+  if(src!=='map'&&S.pickMap){if(S.pickMap.kind==='g'){S.pickMap.marker.setPosition(S.pickLL);S.pickMap.map.panTo(S.pickLL)}else{S.pickMap.marker.setLatLng(S.pickLL);S.pickMap.map.panTo(S.pickLL)}}}
+async function mountPicker(){const el=$('#pickMap');if(!el||el.dataset.ready)return;el.dataset.ready='1';
+  const a=(S.customer&&S.customer.address)||{};const start=S.pickLL||addrLL(a)||STORE_LL();const key=S.settings&&S.settings.gmaps_key;
+  try{
+    if(key){
+      await loadOnce('gmapsjs',()=>{const sc=document.createElement('script');sc.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(key)+'&language=ar&region=JO&loading=async';sc.async=true;return sc});
+      await new Promise(r=>{const t=()=>window.google&&google.maps&&google.maps.Map?r():setTimeout(t,50);t()});
+      const map=new google.maps.Map(el,{center:start,zoom:16,disableDefaultUI:true,zoomControl:true,gestureHandling:'greedy',clickableIcons:false});
+      const marker=new google.maps.Marker({position:start,map,draggable:true,title:'باب بيتك'});
+      marker.addListener('dragend',()=>{const p=marker.getPosition();setPick({lat:p.lat(),lng:p.lng()},'map')});
+      map.addListener('click',e=>{marker.setPosition(e.latLng);setPick({lat:e.latLng.lat(),lng:e.latLng.lng()},'map')});
+      new google.maps.Marker({position:STORE_LL(),map,title:'سمو 3045',icon:{path:google.maps.SymbolPath.CIRCLE,scale:7,fillColor:'#C80828',fillOpacity:1,strokeColor:'#FFF',strokeWeight:2}});
+      S.pickMap={kind:'g',map,marker};
+    }else{
+      await loadOnce('leafletcss',()=>{const l=document.createElement('link');l.rel='stylesheet';l.href='vendor/leaflet/leaflet.css';return l});
+      await loadOnce('leafletjs',()=>{const sc=document.createElement('script');sc.src='vendor/leaflet/leaflet.js';return sc});
+      const map=L.map(el,{zoomControl:true,attributionControl:true}).setView([start.lat,start.lng],16);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+      L.circleMarker([STORE_LL().lat,STORE_LL().lng],{radius:7,color:'#FFF',weight:2,fillColor:'#C80828',fillOpacity:1}).addTo(map).bindTooltip('سمو 3045');
+      const marker=L.marker([start.lat,start.lng],{draggable:true,title:'باب بيتك'}).addTo(map);
+      marker.on('dragend',()=>{const p=marker.getLatLng();setPick({lat:p.lat,lng:p.lng},'map')});
+      map.on('click',e=>{marker.setLatLng(e.latlng);setPick({lat:e.latlng.lat,lng:e.latlng.lng},'map')});
+      S.pickMap={kind:'l',map,marker};setTimeout(()=>map.invalidateSize(),200);
+    }
+  }catch(e){el.innerHTML=`<div class="alert amber" style="margin:16px">${ICON.info}<span>تعذّر تحميل الخريطة. استخدم «موقعي الحالي» أو الصق رابط خرائط Google.</span></div>`}
+}
+function useMyLocation(){if(!navigator.geolocation){toast('المتصفح لا يدعم تحديد الموقع');return}toast('جارٍ تحديد موقعك…');
+  navigator.geolocation.getCurrentPosition(pos=>{setPick({lat:pos.coords.latitude,lng:pos.coords.longitude});toast('تم تحديد موقعك')},err=>{toast(err.code===1?'اسمح للمتصفح بالوصول إلى الموقع ثم أعد المحاولة':'تعذّر تحديد الموقع')},{enableHighAccuracy:true,timeout:12000,maximumAge:30000})}
 V.home=()=>{const c=S.customer;const addr=c&&c.address?`${c.address.area}${c.address.street?'، '+c.address.street:''}`:'حدّد عنوان التوصيل';
   const parents=S.cats.filter(x=>!x.parent).slice(0,8);
   return `<div class="hd green"><div class="brandline"><span class="logo-sm-wrap">${logoSVG('logo-sm')}</span><div class="open"><i></i>مفتوح 24 ساعة</div></div>
@@ -768,6 +803,7 @@ function render(){
   el.innerHTML=(V[S.screen]||V.home)();
   const b=$('.body',el);if(b&&S._keepScroll)b.scrollTop=scroll;S._keepScroll=false;
   queueImages();
+  if(S.screen==='address')mountPicker();else S.pickMap=null;
   if(keep){const n=$('#'+CSS.escape(keep.id));if(n){n.focus({preventScroll:true});try{if(keep.s!=null)n.setSelectionRange(keep.s,keep.e)}catch{}}}
 }
 const rerender=()=>{S._keepScroll=true;render()};
@@ -797,6 +833,7 @@ document.addEventListener('click',async e=>{
   if(d.serv){S.chef.servings=Math.max(1,Math.min(30,S.chef.servings+Number(d.serv)));applyServings();rerender();return}
   if(d.chefAdd!==undefined){const r=S.chef.result;let n=0;r.items.forEach((it,i)=>{const p=(it.cands||[])[S.chef.pick[i]||0];if(p&&!S.chef.off[i]){const q=Math.max(1,Math.min(S.chef.qty[i]||1,p.stock));S.cart[p.id]=Math.min(p.stock,(S.cart[p.id]||0)+q);if(!S.cartMeta[p.id])S.cartMeta[p.id]={dish:r.dish};n++}});ls.set('smo_cart',S.cart);ls.set('smo_cartmeta',S.cartMeta);toast(`أُضيف ${n} أصناف للسلة`);S.stack=[];go('cart',{},true);return}
   if(d.chefReset!==undefined){S.chef={msgs:[],result:null,servings:4,baseServings:4,off:{},pick:{},qty:{},manual:{}};render();return}
+  if(d.geo!==undefined){useMyLocation();return}
   if(d.track){go('track',{order_no:d.track});return}
   if(d.refreshTrack!==undefined)return refreshTrack(false);
   if(d.refreshMine!==undefined)return loadMine();
@@ -808,12 +845,12 @@ document.addEventListener('click',async e=>{
   if(d.copy){try{await navigator.clipboard.writeText(d.copy);toast('نُسخ الرقم')}catch{toast(d.copy)}return}
   if(b.id==='signupBtn'){const n=$('#nameIn').value.trim();if(n.length<2){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>اكتب اسمك.</span></div>`;return}S.customer={...(S.customer||{}),name:n,phone:S.pendingPhone||(S.customer||{}).phone};ls.set('smo_customer',S.customer);go('address',{},true);return}
   if(b.id==='addrBtn'){const area=$('#areaIn').value.trim(),street=$('#streetIn').value.trim(),landmark=$('#landIn').value.trim(),gm=$('#gmapIn').value.trim();if(!area||street.length<4){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>اكتب الحي والشارع/البناية حتى يصل المندوب.</span></div>`;return}
-    let ll=null;if(gm){ll=parseLatLng(gm);if(!ll){if(/goo\.gl|maps\.app/.test(gm)){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>الرابط المختصر لا يحمل الإحداثيات. افتحه في المتصفح ثم انسخ الرابط الكامل من شريط العنوان (يحتوي على @32.5…,35.8…)، أو الصق الإحداثيات مباشرة.</span></div>`}else{$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>لم أتعرّف على الموقع. الصق رابط خرائط Google الكامل أو إحداثيات مثل 32.55, 35.85.</span></div>`}return}
+    let ll=S.pickLL||null;if(gm){ll=parseLatLng(gm)||ll;if(!ll){if(/goo\.gl|maps\.app/.test(gm)){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>الرابط المختصر لا يحمل الإحداثيات. افتحه في المتصفح ثم انسخ الرابط الكامل من شريط العنوان (يحتوي على @32.5…,35.8…)، أو الصق الإحداثيات مباشرة.</span></div>`}else{$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>لم أتعرّف على الموقع. الصق رابط خرائط Google الكامل أو إحداثيات مثل 32.55, 35.85.</span></div>`}return}
       const km=kmBetween(ll,STORE_LL());if(km>12){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>هذا الموقع يبعد ${km.toFixed(0)} كم عن المتجر، خارج نطاق التوصيل. تأكد من الرابط.</span></div>`;return}}
-    S.customer={...(S.customer||{}),address:{area,street,landmark,lat:ll?ll.lat:undefined,lng:ll?ll.lng:undefined}};ls.set('smo_customer',S.customer);toast('تم حفظ العنوان');const next=S.afterAuth||'home';S.afterAuth=null;S.stack=[];go(next,{},true);return}
+    S.customer={...(S.customer||{}),address:{area,street,landmark,lat:ll?ll.lat:undefined,lng:ll?ll.lng:undefined}};S.pickLL=null;ls.set('smo_customer',S.customer);toast('تم حفظ العنوان');const next=S.afterAuth||'home';S.afterAuth=null;S.stack=[];go(next,{},true);return}
 });
 document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;
-  if(f.id==='welcomeForm'){let v=$('#phoneIn').value.replace(/\D/g,'');if(v.startsWith('962'))v=v.slice(3);if(v.startsWith('0'))v=v.slice(1);if(!/^7\d{8}$/.test(v)){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>أدخل رقماً أردنياً صحيحاً مثل 79 123 4567</span></div>`;return}S.pendingPhone='0'+v;S.otp='';go('otp');setTimeout(()=>{const o=$('#otp0');if(o)o.focus()},50)}
+  if(f.id==='welcomeForm'){let v=$('#phoneIn').value.replace(/\D/g,'');if(v.startsWith('962'))v=v.slice(3);if(v.startsWith('0'))v=v.slice(1);if(!/^7\d{8}$/.test(v)){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>أدخل رقماً أردنياً صحيحاً مثل 79 123 4567</span></div>`;return}S.pendingPhone='0'+v;const c=S.customer||{};S.customer={...c,phone:S.pendingPhone};ls.set('smo_customer',S.customer);if(S.customer.name&&S.customer.address){S.stack=[];go(S.afterAuth||'home',{},true);S.afterAuth=null}else go('signup',{},true)}
   else if(f.id==='otpForm'){const code=[0,1,2,3].map(i=>$('#otp'+i).value).join('');if(code!=='3045'){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>الرمز غير صحيح. في النسخة التجريبية الرمز 3045.</span></div>`;return}
     const c=S.customer||{};S.customer={...c,phone:S.pendingPhone};ls.set('smo_customer',S.customer);if(S.customer.name&&S.customer.address){S.stack=[];go(S.afterAuth||'home',{},true);S.afterAuth=null}else go('signup',{},true)}
   else if(f.id==='chefForm'){const v=$('#chefIn').value.trim();if(v){$('#chefIn').value='';chefAsk(v)}}
@@ -824,7 +861,7 @@ document.addEventListener('input',e=>{const t=e.target;
   if(t.id==='homeQ'){const v=t.value;if(v.trim().length>=2){S.q=v;S.catParent=null;S.catSub=null;S.shown=60;go('category');setTimeout(()=>{const i=$('#catQ');if(i){i.focus();i.setSelectionRange(v.length,v.length)}},0)}}
   else if(t.id==='catQ'){S.q=t.value;S.shown=60;rerender()}
   else if(t.id==='schedIn'){S.schedule=t.value}
-  else if(t.id==='gmapIn'){const ll=parseLatLng(t.value);const st=$('#gmapStatus');if(st)st.innerHTML=ll?`<div class="alert green">${ICON.info}<span>تم التعرّف على الموقع · يبعد ${kmBetween(ll,STORE_LL()).toFixed(1)} كم عن المتجر · <a href="${gmapsView(ll)}" target="_blank" rel="noopener"><b>عرض على الخريطة</b></a></span></div>`:''}
+  else if(t.id==='gmapIn'){const ll=parseLatLng(t.value);if(ll){const v=t.value;setPick(ll);t.value=v}}
   else if(t.id==='notesIn'){S.notes=t.value}
   else if(/^otp\d$/.test(t.id)){t.value=t.value.replace(/\D/g,'').slice(-1);const i=Number(t.id.slice(3));if(t.value&&i<3)$('#otp'+(i+1)).focus();if(i===3&&t.value){const all=[0,1,2,3].every(k=>$('#otp'+k).value);if(all)$('#otpForm').requestSubmit()}}
 });
