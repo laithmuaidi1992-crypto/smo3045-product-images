@@ -386,6 +386,8 @@ async function rpc(action,args){
   if(!r.ok){let j=null;try{j=await r.json()}catch{}const msg=(j&&(j.message||j.hint))||('HTTP '+r.status);if(/bad_pin/.test(msg))throw{code:'bad_pin',message:msg};if(r.status>=500||r.status===429)throw{code:'server_unavailable',message:msg};throw{code:'tool_error',message:msg}}
   return r.json();
 }
+function registerCustomer(){const c=S.customer;if(!c||!c.phone)return;const a=c.address||{};rpc('register',{phone:c.phone,name:c.name||null,area:a.area||null,street:a.street||null,landmark:a.landmark||null,lat:a.lat||null,lng:a.lng||null,source:'web'}).catch(()=>{})}
+function heartbeat(){const c=S.customer;if(!c||!c.phone)return;const last=ls.get('smo_seen',0);if(Date.now()-last<6*3600*1000)return;ls.set('smo_seen',Date.now());rpc('seen',{phone:c.phone,source:'web'}).catch(()=>{})}
 function staffPin(){let p=ls.get('smo_staff_pin','');if(!p){p=prompt('رمز الموظفين:')||'';if(p)ls.set('smo_staff_pin',p)}return p}
 async function staffRpc(action,args){try{return await rpc(action,{...(args||{}),pin:staffPin()})}catch(e){if(e&&e.code==='bad_pin')ls.set('smo_staff_pin','');throw e}}
 function errText(e){
@@ -845,11 +847,11 @@ document.addEventListener('click',async e=>{
   if(d.drv)return setDriver(d.drv);
   if(d.logout!==undefined){S.customer=null;ls.set('smo_customer',null);render();return}
   if(d.copy){try{await navigator.clipboard.writeText(d.copy);toast('نُسخ الرقم')}catch{toast(d.copy)}return}
-  if(b.id==='signupBtn'){const n=$('#nameIn').value.trim();if(n.length<2){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>اكتب اسمك.</span></div>`;return}S.customer={...(S.customer||{}),name:n,phone:S.pendingPhone||(S.customer||{}).phone};ls.set('smo_customer',S.customer);go('address',{},true);return}
+  if(b.id==='signupBtn'){const n=$('#nameIn').value.trim();if(n.length<2){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>اكتب اسمك.</span></div>`;return}S.customer={...(S.customer||{}),name:n,phone:S.pendingPhone||(S.customer||{}).phone};ls.set('smo_customer',S.customer);registerCustomer();go('address',{},true);return}
   if(b.id==='addrBtn'){const area=$('#areaIn').value.trim(),street=$('#streetIn').value.trim(),landmark=$('#landIn').value.trim(),gm=$('#gmapIn').value.trim();if(!area||street.length<4){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>اكتب الحي والشارع/البناية حتى يصل المندوب.</span></div>`;return}
     let ll=S.pickLL||null;if(gm){ll=parseLatLng(gm)||ll;if(!ll){if(/goo\.gl|maps\.app/.test(gm)){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>الرابط المختصر لا يحمل الإحداثيات. افتحه في المتصفح ثم انسخ الرابط الكامل من شريط العنوان (يحتوي على @32.5…,35.8…)، أو الصق الإحداثيات مباشرة.</span></div>`}else{$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>لم أتعرّف على الموقع. الصق رابط خرائط Google الكامل أو إحداثيات مثل 32.55, 35.85.</span></div>`}return}
       const km=kmBetween(ll,STORE_LL());if(km>12){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>هذا الموقع يبعد ${km.toFixed(0)} كم عن المتجر، خارج نطاق التوصيل. تأكد من الرابط.</span></div>`;return}}
-    S.customer={...(S.customer||{}),address:{area,street,landmark,lat:ll?ll.lat:undefined,lng:ll?ll.lng:undefined}};S.pickLL=null;ls.set('smo_customer',S.customer);toast('تم حفظ العنوان');const next=S.afterAuth||'home';S.afterAuth=null;S.stack=[];go(next,{},true);return}
+    S.customer={...(S.customer||{}),address:{area,street,landmark,lat:ll?ll.lat:undefined,lng:ll?ll.lng:undefined}};S.pickLL=null;ls.set('smo_customer',S.customer);registerCustomer();toast('تم حفظ العنوان');const next=S.afterAuth||'home';S.afterAuth=null;S.stack=[];go(next,{},true);return}
 });
 document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;
   if(f.id==='welcomeForm'){let v=$('#phoneIn').value.replace(/\D/g,'');if(v.startsWith('962'))v=v.slice(3);if(v.startsWith('0'))v=v.slice(1);if(!/^7\d{8}$/.test(v)){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>أدخل رقماً أردنياً صحيحاً مثل 79 123 4567</span></div>`;return}S.pendingPhone='0'+v;const c=S.customer||{};S.customer={...c,phone:S.pendingPhone};ls.set('smo_customer',S.customer);if(S.customer.name&&S.customer.address){S.stack=[];go(S.afterAuth||'home',{},true);S.afterAuth=null}else go('signup',{},true)}
@@ -877,7 +879,7 @@ if(['home','cats','chef','cart','account','staff'].includes(h))S.screen=h;else S
 render();
 (async()=>{
   S.mcp=true;S.sample=true;S.booted=true;
-  loadLocalImages();
+  loadLocalImages();heartbeat();
   if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js')}catch{}}
   await loadCatalog(false);
   if(S.screen==='account')loadMine();if(S.screen==='staff')loadStaff();
