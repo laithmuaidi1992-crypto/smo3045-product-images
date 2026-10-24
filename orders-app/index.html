@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>تطبيق سمو 3045</title>
+<title>تطبيق 3045</title>
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="سمو 3045">
+<meta name="apple-mobile-web-app-title" content="3045">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -438,8 +438,10 @@ async function loadCatalog(force){
 }
 
 /* ---------- product images: small copies in storage (direct URLs, browser-cached); base64 via rpc for the rest ---------- */
-function imgSrc(p){if(p.sm)return IMG_BASE+p.sm;return S.img.get(p.id)||null}
-function tileHTML(p,cls,extra){const im=imgSrc(p);return `<div class="tile ${cls||''}" ${p.sm?'':`data-pid="${esc(p.id)}"`}>${im?`<img src="${im}" alt="" loading="lazy" decoding="async">`:esc(p.emoji)}${extra||''}</div>`}
+const LOCAL_IMG=new Map(); // product id → version, for pictures mirrored into img/ on this site (img/manifest.json): served from the site's own CDN
+function imgSrc(p){const v=LOCAL_IMG.get(p.id);if(v)return 'img/'+encodeURIComponent(p.id)+'.jpg?v='+encodeURIComponent(v);if(p.sm)return IMG_BASE+p.sm;return S.img.get(p.id)||null}
+async function loadLocalImages(){try{const r=await fetch('img/manifest.json',{cache:'no-cache'});if(!r.ok)return;const m=await r.json();if(m&&typeof m==='object'&&!Array.isArray(m)){Object.entries(m).forEach(([id,v])=>LOCAL_IMG.set(id,String(v).replace(/[^\w.-]/g,'').slice(-24)));if(LOCAL_IMG.size)render()}}catch{}}
+function tileHTML(p,cls,extra){const im=imgSrc(p);return `<div class="tile ${cls||''}" ${im?'':`data-pid="${esc(p.id)}"`}>${im?`<img src="${im}" alt="" loading="lazy" decoding="async">`:esc(p.emoji)}${extra||''}</div>`}
 /* thumbs persist in IndexedDB so the second visit is instant; the first visit fetches only what is near the viewport, small tiles first */
 const IDB={db:null,open(){if(this.db)return Promise.resolve(this.db);return new Promise(res=>{try{const r=indexedDB.open('smo_thumbs',1);r.onupgradeneeded=()=>r.result.createObjectStore('t');r.onsuccess=()=>{this.db=r.result;res(this.db)};r.onerror=()=>res(null)}catch{res(null)}})},
   async getMany(ids){const db=await this.open();if(!db)return new Map();return new Promise(res=>{const out=new Map();try{const st=db.transaction('t','readonly').objectStore('t');let n=ids.length;if(!n)return res(out);ids.forEach(id=>{const q=st.get(id);q.onsuccess=()=>{if(q.result)out.set(id,q.result);if(--n===0)res(out)};q.onerror=()=>{if(--n===0)res(out)}})}catch{res(out)}})},
@@ -547,7 +549,7 @@ function logoSVG(cls){return `<img class="${cls||''}" src="${LOGO}" alt="3045 Su
 const V={};
 V.welcome=()=>`<div class="auth"><div class="logo">${logoSVG('')}</div>
   <div class="morse" aria-hidden="true"><span><i class="d"></i><i class="d"></i><i class="d"></i><i class="h"></i><i class="h"></i></span><span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i></span><span><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="h"></i></span><span><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i></span></div>
-  <h1>أهلاً بك في سمو 3045</h1><p>سوبرماركت حيّك في إربد، مفتوح 24 ساعة. أدخل رقم هاتفك لنوصل طلبك إلى باب بيتك.</p></div>
+  <h1>أهلاً بك في 3045</h1><p>سوبرماركت حيّك في إربد، مفتوح 24 ساعة. أدخل رقم هاتفك لنوصل طلبك إلى باب بيتك.</p></div>
   <form class="authft" id="welcomeForm"><div class="phonein"><b>+962</b><input id="phoneIn" inputmode="numeric" placeholder="7X XXX XXXX" value="${esc(S.pendingPhone.replace(/^0/,''))}" autocomplete="tel-national"></div>
   <div id="authErr"></div><button class="cta" type="submit" style="justify-content:center">متابعة</button><button type="button" class="link" data-skip style="align-self:center;padding:6px">تصفّح المتجر أولاً</button></form>`;
 V.otp=()=>`<div class="hd"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button></div>
@@ -580,14 +582,14 @@ async function mountPicker(){const el=$('#pickMap');if(!el||el.dataset.ready)ret
       const marker=new google.maps.Marker({position:start,map,draggable:true,title:'باب بيتك'});
       marker.addListener('dragend',()=>{const p=marker.getPosition();setPick({lat:p.lat(),lng:p.lng()},'map')});
       map.addListener('click',e=>{marker.setPosition(e.latLng);setPick({lat:e.latLng.lat(),lng:e.latLng.lng()},'map')});
-      new google.maps.Marker({position:STORE_LL(),map,title:'سمو 3045',icon:{path:google.maps.SymbolPath.CIRCLE,scale:7,fillColor:'#C80828',fillOpacity:1,strokeColor:'#FFF',strokeWeight:2}});
+      new google.maps.Marker({position:STORE_LL(),map,title:'3045',icon:{path:google.maps.SymbolPath.CIRCLE,scale:7,fillColor:'#C80828',fillOpacity:1,strokeColor:'#FFF',strokeWeight:2}});
       S.pickMap={kind:'g',map,marker};
     }else{
       await loadOnce('leafletcss',()=>{const l=document.createElement('link');l.rel='stylesheet';l.href='vendor/leaflet/leaflet.css';return l});
       await loadOnce('leafletjs',()=>{const sc=document.createElement('script');sc.src='vendor/leaflet/leaflet.js';return sc});
       const map=L.map(el,{zoomControl:true,attributionControl:true}).setView([start.lat,start.lng],16);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
-      L.circleMarker([STORE_LL().lat,STORE_LL().lng],{radius:7,color:'#FFF',weight:2,fillColor:'#C80828',fillOpacity:1}).addTo(map).bindTooltip('سمو 3045');
+      L.circleMarker([STORE_LL().lat,STORE_LL().lng],{radius:7,color:'#FFF',weight:2,fillColor:'#C80828',fillOpacity:1}).addTo(map).bindTooltip('3045');
       const marker=L.marker([start.lat,start.lng],{draggable:true,title:'باب بيتك'}).addTo(map);
       marker.on('dragend',()=>{const p=marker.getLatLng();setPick({lat:p.lat,lng:p.lng},'map')});
       map.on('click',e=>{marker.setLatLng(e.latlng);setPick({lat:e.latlng.lat,lng:e.latlng.lng},'map')});
@@ -631,7 +633,7 @@ V.chef=()=>{const ch=S.chef;const msgs=ch.msgs.map(m=>m.role==='me'?`<div class=
       return `<div class="ing${off?' off':''}"><input type="checkbox" data-ing="${i}" ${!off?'checked':''} ${!p?'disabled':''}>${p?tileHTML(p):`<span class="tile" style="color:var(--muted)">∅</span>`}<div class="mid"><div class="nm">${esc(it.name)}${it.optional?' <small class="hint">(اختياري)</small>':''}</div><div class="u">${esc(scaleQtyText(it.qty,ch.servings/(ch.baseServings||ch.servings)))}${p?` · ${esc(p.name)}`:' · غير متوفر في المتجر حالياً'}</div>${cands.length>1?`<button class="alt" data-alt="${i}">بديل آخر (${pk+1}/${cands.length})</button>`:''}</div>${p?`<div class="qcol"><div class="step lite"><button data-cq="${i}" data-d="-1" aria-label="تقليل">−</button><span>${q}</span><button data-cq="${i}" data-d="1" aria-label="زيادة">+</button></div>${jd(p.price*q)}</div>`:''}</div>`}).join('');
     result=`<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div><h2 style="font-size:16px">${esc(r.dish)}</h2><div class="hint">${count} من ${r.items.length} أصناف مختارة${r.perPerson===false?'':` · الكميات لـ ${ch.servings} أشخاص`}</div></div>${r.perPerson===false?'':`<div class="servings"><button data-serv="-1" aria-label="تقليل">−</button><span>${ch.servings} أشخاص</span><button data-serv="1" aria-label="زيادة">+</button></div>`}</div><div class="hr"></div><div class="${S.view==='grid'?'ing-grid':''}" style="display:flex;flex-direction:column;gap:6px">${rows}</div><div class="alert amber">${ICON.info}<span>أزل علامة أي صنف موجود عندك في البيت، اختر بديلاً إذا لم يناسبك المنتج المقترح، وعدّل عدد القطع من كل صنف بالعدّاد.</span></div></div>
     <button class="cta" data-chef-add ${count?'':'disabled'}><span>أضف ${count} أصناف للسلة</span>${jd(total)}</button><button class="link" data-chef-reset style="align-self:center;padding:8px">احتياج آخر؟</button>`;}
-  return `<div class="hd"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button><span style="width:40px;height:40px;border-radius:50%;background:var(--amber);color:#FFF;display:grid;place-items:center;flex:none">${ICON.spark}</span><div style="flex:1;min-width:0"><h1 style="font-size:17px">المساعد الذكي</h1><div class="sub" style="color:var(--green);font-weight:500">يعرف كل ما في رفوف سمو 3045</div></div>${viewToggle()}</div>
+  return `<div class="hd"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button><span style="width:40px;height:40px;border-radius:50%;background:var(--amber);color:#FFF;display:grid;place-items:center;flex:none">${ICON.spark}</span><div style="flex:1;min-width:0"><h1 style="font-size:17px">المساعد الذكي</h1><div class="sub" style="color:var(--green);font-weight:500">يعرف كل ما في رفوف 3045</div></div>${viewToggle()}</div>
   <div class="body"><div class="bub">أهلاً! قل لي ما تحتاجه اليوم — طبخة، ضيافة، تنظيف، أطفال، فطور، رحلة… — ولكم شخصاً، وأنا أرتّب لك قائمة المشتريات من رفوف المتجر مباشرة.</div>
   ${ch.msgs.length?'':`<div class="sugg">${['أريد أن أطبخ مقلوبة','ضيافة لـ 6 أشخاص','تنظيف البيت','فطور عائلي','مستلزمات رضيع','سهرة مباراة'].map(s=>`<button data-chef-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>`}
   ${msgs}${result}${!S.ready?`<div class="alert amber">${ICON.info}<span>يحتاج المساعد إلى تحميل منتجات المتجر أولاً.</span></div>`:''}</div>
@@ -649,7 +651,7 @@ async function chefAsk(text){
   render();scrollBody();
   let r=null;
   if(S.sample){try{
-    r=await askAssistant(`أنت مساعد تسوّق في سوبرماركت أردني (سمو 3045 في إربد). المستخدم كتب احتياجه: «${text}». قد يكون طبخة، أو ضيافة/عزومة، أو تنظيف البيت، أو مستلزمات رضيع/أطفال، أو فطور، أو رحلة، أو مرض/زكام، أو سهرة، أو عودة للمدارس، أو أي احتياج يومي آخر. أعد JSON فقط بالشكل:
+    r=await askAssistant(`أنت مساعد تسوّق في سوبرماركت أردني (3045 في إربد). المستخدم كتب احتياجه: «${text}». قد يكون طبخة، أو ضيافة/عزومة، أو تنظيف البيت، أو مستلزمات رضيع/أطفال، أو فطور، أو رحلة، أو مرض/زكام، أو سهرة، أو عودة للمدارس، أو أي احتياج يومي آخر. أعد JSON فقط بالشكل:
 {"dish":"عنوان القائمة بالعربية","intro":"جملة ترحيب قصيرة","perPerson":true,"items":[{"name":"اسم الصنف","qty":"الكمية لـ ${ch.servings} أشخاص مثل: 2 كغم أو عبوة واحدة","pieces":1,"search":["كلمة","كلمة بديلة"],"optional":false}]}
 قواعد: perPerson = true فقط إذا كانت الكميات تتغير بعدد الأشخاص (طعام، ضيافة)، و false للاحتياجات الثابتة (تنظيف، أدوات). pieces = عدد العبوات/القطع التي تُشترى من المتجر (عدد صحيح ≥1)؛ 6 إلى 12 صنفاً؛ أسماء بضائع تُباع في سوبرماركت؛ search كلمات عربية قصيرة بلا تشكيل تطابق أسماء المنتجات الشائعة في الأردن (مثل: "أرز بسمتي"، "جميد"، "كلوركس"، "حفاضات"). إن لم يكن النص احتياجاً يمكن تلبيته من سوبرماركت أعد {"dish":"","intro":"سبب","items":[]}.`);
   }catch(e){r=null;if(e&&e.code==='no_key')S.sample=null}}
@@ -738,7 +740,7 @@ V.track=()=>{const o=S.track;if(!o)return head('تتبع الطلب')+`<div clas
   <div style="padding:0 16px 20px;margin-top:-24px;display:flex;flex-direction:column;gap:12px">
   <div class="card" style="border-radius:20px;padding:16px;gap:14px;box-shadow:var(--shadow)"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div><div class="hint">${eta[0]}</div><div style="font-family:var(--display);font-weight:800;font-size:22px">${eta[1]}</div></div><span class="pill ${esc(st)}">${esc(STATUS[st]||st)}</span></div>
   ${st==='cancelled'?'':`<div class="stages">${stages.map(([l,tm],i)=>`${i?`<div class="stgline${i<=idx?' done':''}"></div>`:''}<div class="stg${i<idx?' done':i===idx?' now':''}"><div class="dot">${i<idx||st==='delivered'?ICON.check:i===idx?ICON.bike:''}</div><b>${l}</b><small>${tm||'—'}</small></div>`).join('')}</div>`}</div>
-  <div class="card"><div class="driver"><span class="av">${ICON.user}</span><div><b>${o.assigned_driver?esc(o.assigned_driver):'مندوب سمو 3045'}</b><small>${o.assigned_driver?'دراجة نارية · يحمل طلبك':'يُعيَّن المندوب عند بدء التجهيز'}</small></div>${S.settings.store_phone?`<button class="copybtn" data-copy="${esc(S.settings.store_phone)}" aria-label="نسخ رقم المتجر">${ICON.copy}</button>`:''}</div>${S.settings.store_phone?`<div class="hint">هاتف المتجر: <span style="direction:ltr;unicode-bidi:isolate">${esc(S.settings.store_phone)}</span></div>`:''}</div>
+  <div class="card"><div class="driver"><span class="av">${ICON.user}</span><div><b>${o.assigned_driver?esc(o.assigned_driver):'مندوب 3045'}</b><small>${o.assigned_driver?'دراجة نارية · يحمل طلبك':'يُعيَّن المندوب عند بدء التجهيز'}</small></div>${S.settings.store_phone?`<button class="copybtn" data-copy="${esc(S.settings.store_phone)}" aria-label="نسخ رقم المتجر">${ICON.copy}</button>`:''}</div>${S.settings.store_phone?`<div class="hint">هاتف المتجر: <span style="direction:ltr;unicode-bidi:isolate">${esc(S.settings.store_phone)}</span></div>`:''}</div>
   <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div class="t">ملخص الطلب</div><span class="hint">${esc(fmtDate(o.created_at))}</span></div>${dishes.length?`<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)"><span style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:#FFF;display:grid;place-items:center;flex:none">${ICON.spark}</span><span>${esc(dishes.join('، '))}</span></div>`:''}<div class="ocard items" style="padding:0;border:0">${items.map(i=>`<span>${esc(i.name)} ×${i.qty}</span>`).join('، ')}</div><div class="hint">${ICON.pin} ${esc(o.customer_address||'')}${o.customer_location_lat?` · <a href="${gmapsView({lat:o.customer_location_lat,lng:o.customer_location_lng})}" target="_blank" rel="noopener"><b>موقعك على خرائط Google</b></a>`:''}</div>${o.customer_notes?`<div class="hint">${esc(o.customer_notes)}</div>`:''}<div class="sum total"><span>الإجمالي</span><span>${fmt(o.total)} د.أ</span></div></div>
   <button class="ghost" data-refresh-track>تحديث الحالة</button><button class="link" data-go="home" style="align-self:center;padding:8px">العودة إلى المتجر</button></div></div>`;
 }
@@ -774,7 +776,7 @@ V.account=()=>{const c=S.customer;return `<div class="hd"><h1>حسابي</h1>${v
   <div class="sec"><div class="sec-h"><h2>طلباتي</h2><button class="link" data-refresh-mine>تحديث</button></div><div class="${S.view==='grid'?'grid2 ocard-grid':'list'}" id="myOrders">${S.myLoading?`<div class="empty">جارٍ التحميل…</div>`:S.myOrders.length?S.myOrders.map(o=>orderCard(o,false)).join(''):`<div class="empty"><h3>لا توجد طلبات بعد</h3>${S.myErr?esc(S.myErr):'طلباتك من هذا الجهاز تظهر هنا.'}</div>`}</div>
   <form id="lookupForm" style="display:flex;gap:8px"><input id="lookupIn" placeholder="متابعة طلب آخر برقمه (ON-…)" style="flex:1;border:1.5px solid var(--hair);border-radius:12px;padding:10px 12px;background:#FFF;min-width:0"><button class="chip" type="submit">متابعة</button></form></div>
   <div class="card"><div class="t">للمتجر</div><button class="pin" data-go="staff" style="border:0;padding:4px 0"><span class="ic">${ICON.grid}</span><div><b>لوحة الطلبات</b><small>استقبال الطلبات وتغيير حالتها وتعيين المندوب</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button><button class="pin" data-reload style="border:0;padding:4px 0"><span class="ic">${ICON.refresh}</span><div><b>تحديث المنتجات والأسعار</b><small>${S.ready?'آخر تحميل: '+fmtDate((ls.get('smo_catalog7',{})||{}).ts||Date.now()):'غير محمّلة'}</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button></div>
-  <p class="hint" style="text-align:center">سمو 3045 · إربد · مفتوح 24 ساعة</p></div>`+navHTML('account')};
+  <p class="hint" style="text-align:center">3045 · إربد · مفتوح 24 ساعة</p></div>`+navHTML('account')};
 async function loadMine(extra){const nos=[...new Set([...(extra?[extra]:[]),...S.mine])];if(!nos.length){S.myOrders=[];render();return}
   S.myLoading=true;S.myErr='';render();
   try{const rows=await rpc('my_orders',{nos});S.myOrders=Array.isArray(rows)?rows:[];
@@ -875,6 +877,7 @@ if(['home','cats','chef','cart','account','staff'].includes(h))S.screen=h;else S
 render();
 (async()=>{
   S.mcp=true;S.sample=true;S.booted=true;
+  loadLocalImages();
   if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js')}catch{}}
   await loadCatalog(false);
   if(S.screen==='account')loadMine();if(S.screen==='staff')loadStaff();

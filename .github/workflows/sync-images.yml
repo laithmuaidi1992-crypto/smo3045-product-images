@@ -1,0 +1,27 @@
+# Mirrors product thumbnails from Supabase storage into orders-app/img/ (served by Netlify's CDN).
+# Runs daily and on demand; commits only when something changed.
+name: Sync product thumbnails
+on:
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: sync-images
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/sync-images.mjs
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A orders-app/img
+          if git diff --cached --quiet; then echo "no changes"; else git commit -m "Sync product thumbnails" && git push; fi
