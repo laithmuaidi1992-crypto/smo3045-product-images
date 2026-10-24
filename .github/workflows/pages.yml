@@ -2,10 +2,7 @@
 # One-time setup in the repo: Settings → Pages → Source: "GitHub Actions".
 name: Deploy orders app to GitHub Pages
 on:
-  push:
-    branches: [main]
-    paths: ['orders-app/**', '.github/workflows/pages.yml']
-  workflow_dispatch:
+  workflow_dispatch:  # manual only — the live site is on Netlify; enable Pages first if you want this too
 permissions:
   contents: read
   pages: write
