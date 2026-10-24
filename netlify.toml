@@ -1,0 +1,4 @@
+# Netlify: the customer ordering web app lives in orders-app/ (static, no build step)
+[build]
+  publish = "orders-app"
+  command = ""

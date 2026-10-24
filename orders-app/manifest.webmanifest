@@ -1,0 +1,17 @@
+{
+  "name": "سمو 3045 — طلبات وتوصيل",
+  "short_name": "سمو 3045",
+  "description": "سوبرماركت سمو 3045 في إربد — اطلب وتوصل لباب بيتك، مفتوح 24 ساعة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

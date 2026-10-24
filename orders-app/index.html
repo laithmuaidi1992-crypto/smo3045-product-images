@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تطبيق سمو 3045</title>
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="سمو 3045">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Playfair+Display:wght@700&family=Montserrat:wght@600&display=swap">
+<style>
+/* Layout: white-paper app — the 390×844 phone (framed on desktop, full screen on mobile); every surface is white, structure comes from hairline rules, navy type and the logo's red bar. Single light theme by design. */
+:root{
+  color-scheme:light;
+  --navy:#002068; --navy-2:#00174D; --navy-ink:#0E1230; --red:#C80828; --red-2:#A50620;
+  --bg:#FFFFFF; --surface:#FFFFFF; --fg:#0E1230; --muted:#6A6F80; --line:#E6E8F0; --line-2:#F0F1F5; --hair:#D8DCE8;
+  --navy-tint:#F3F5FB; --red-tint:#FFF3F5; --ok:#1F8A4C; --ok-tint:#EEF8F1;
+  --shadow:0 10px 30px rgba(0,32,104,.10); --shadow-sm:0 2px 8px rgba(0,32,104,.08);
+  --display:'Cairo','IBM Plex Sans Arabic',system-ui,sans-serif; --body:'IBM Plex Sans Arabic',system-ui,sans-serif; --serif:'Playfair Display',Georgia,serif; --caps:'Montserrat',sans-serif;
+  /* legacy aliases used by markup */
+  --green:var(--navy); --green-2:var(--navy-2); --green-soft:var(--navy-tint); --green-on:#FFFFFF; --green-dot:#2ECC71;
+  --amber:var(--red); --amber-soft:var(--red-tint); --amber-line:#F3C9D1; --amber-text:var(--red-2);
+  --red-soft:var(--red-tint); --soft:#FFFFFF;
+  --blue:var(--navy); --blue-soft:#FFFFFF; --sand:var(--navy); --sand-soft:#FFFFFF; --violet:var(--navy); --violet-soft:#FFFFFF; --teal:var(--navy); --teal-soft:#FFFFFF;
+  --map:#FFFFFF; --map-road:#E9EBF2; --map-park:#F1F6F2; --map-water:#EAF1FB; --map-bldg:#F3F4F8; --map-dash:#C9CDDB;
+  --frame:#0E1230;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:#FFFFFF;color:var(--fg);font-family:var(--body);font-size:14px;line-height:1.5;direction:rtl;text-align:right;font-variant-numeric:tabular-nums;overflow:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#FFFFFF}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:right}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+input,textarea,select{font:inherit;color:inherit}
+h1,h2,h3{margin:0;font-family:var(--display);font-weight:800;line-height:1.3;text-wrap:balance;color:var(--navy)}
+a{color:var(--navy);text-decoration:none}
+.money{font-family:var(--display);font-weight:800;white-space:nowrap;color:var(--navy)}
+
+/* Phone frame */
+.stage{height:100%;display:flex;align-items:center;justify-content:center;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));padding-block:0;background:#FFFFFF}
+.phone{position:relative;width:100%;height:100%;background:#FFFFFF;overflow:hidden;display:flex;flex-direction:column}
+@media (min-width:640px) and (min-height:700px){
+  .stage{padding-block:20px;background:#FFFFFF}
+  .phone{width:390px;height:min(844px,100%);border-radius:44px;border:10px solid var(--frame);box-shadow:0 40px 90px rgba(14,18,48,.22)}
+}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:#FFFFFF}
+.screen[hidden]{display:none}
+.hd{background:#FFFFFF;border-bottom:1px solid var(--line);padding:14px 16px 12px;display:flex;align-items:center;gap:12px;flex:none}
+.hd.green{background:#FFFFFF;color:var(--fg);border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:14px;padding:12px 20px 14px}
+.hd h1{font-size:18px;flex:1;min-width:0}
+.hd .sub{font-size:11.5px;color:var(--muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{width:40px;height:40px;border-radius:12px;background:#FFFFFF;border:1px solid var(--line);display:grid;place-items:center;color:var(--navy);flex:none}
+.body{flex:1;min-height:0;overflow-y:auto;padding:16px 16px 20px;display:flex;flex-direction:column;gap:16px;background:#FFFFFF}
+.body.flush{padding:0}
+.body>*{flex:none}
+.ft{background:#FFFFFF;border-top:1px solid var(--line);padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));flex:none;display:flex;flex-direction:column;gap:8px}
+.cta{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#FFF;border-radius:16px;padding:14px 18px;min-height:56px;font-weight:700;font-size:15px;width:100%;box-shadow:0 8px 20px rgba(0,32,104,.22)}
+.cta .money{color:#FFF}
+.cta:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.ghost{display:flex;align-items:center;justify-content:center;border:1.5px solid var(--navy);background:#FFFFFF;color:var(--navy);border-radius:14px;padding:12px 16px;font-weight:700;min-height:48px;width:100%}
+.link{color:var(--navy);font-weight:700;font-size:12.5px}
+
+/* Bottom nav */
+.nav{background:#FFFFFF;border-top:1px solid var(--line);padding:10px 12px calc(16px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;align-items:end;flex:none}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:10.5px;font-weight:600;padding:6px 0;min-height:44px;position:relative;text-align:center}
+.nav button[aria-current="page"]{color:var(--navy)}
+.nav button[aria-current="page"]:not(.chef)::after{content:"";width:18px;height:3px;border-radius:2px;background:var(--red);margin-top:2px}
+.nav .chef{color:var(--red);font-weight:700;padding:0}
+.nav .chef span.orb{width:58px;height:58px;margin-top:-32px;border-radius:50%;background:var(--red);border:4px solid #FFFFFF;display:grid;place-items:center;color:#FFF;box-shadow:0 8px 20px rgba(200,8,40,.35)}
+.badge{position:absolute;top:2px;inset-inline-start:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--red);color:#FFF;font-size:10.5px;font-weight:700;display:grid;place-items:center;padding:0 5px}
+
+/* Home */
+.brandline{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brandline .wordmark{font-family:var(--display);font-size:13px;color:var(--navy);font-weight:800}
+.logo-sm-wrap{display:inline-flex}
+.logo-sm{display:block;height:52px;width:auto}
+.addr{display:flex;align-items:center;gap:8px;color:var(--fg);min-width:0}
+.addr div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.addr small{font-size:11px;color:var(--muted)}
+.addr b{font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.open{display:flex;align-items:center;gap:6px;background:#FFFFFF;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;white-space:nowrap;color:var(--navy)}
+.open i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;box-shadow:0 0 0 3px var(--ok-tint)}
+.search{display:flex;align-items:center;gap:10px;background:#FFFFFF;border-radius:14px;padding:0 14px;min-height:48px;color:var(--muted);border:1.5px solid var(--hair)}
+.search:focus-within{border-color:var(--navy)}
+.hd.green .search{background:#FFFFFF}
+.search input{flex:1;border:0;outline:0;background:transparent;font-size:14px;color:var(--fg);padding:0;min-width:0;height:46px}
+.chefcard{display:flex;align-items:center;gap:14px;background:#FFFFFF;border:1.5px solid var(--red);border-radius:22px;padding:16px;color:var(--fg);width:100%;position:relative;overflow:hidden}
+.chefcard::before{content:"";position:absolute;inset-inline-start:-34px;top:-34px;width:130px;height:130px;border-radius:50%;background:var(--red-tint)}
+.chefcard .orb{width:52px;height:52px;border-radius:16px;background:var(--red);display:grid;place-items:center;color:#FFF;flex:none;position:relative}
+.chefcard div{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;position:relative}
+.chefcard h2{font-size:17px;color:var(--red-2)}
+.chefcard p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5}
+.sec{display:flex;flex-direction:column;gap:12px}
+.sec-h{display:flex;align-items:center;justify-content:space-between}
+.sec-h h2{font-size:17px;position:relative;padding-bottom:6px}
+.sec-h h2::after{content:"";position:absolute;inset-inline-start:0;bottom:0;width:34px;height:3px;border-radius:2px;background:var(--red)}
+.cat4{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 10px}
+.cat4 button{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--navy);font-size:11.5px;font-weight:700;text-align:center}
+.cat4 button small{font-weight:500}
+.cat4 .ic img,.ic img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.cat4 .ic{overflow:hidden;padding:0}
+.cat4 .ic{width:72px;height:72px;border-radius:20px;display:grid;place-items:center;font-size:30px;line-height:1;background:#FFFFFF!important;color:var(--navy)!important;border:1.5px solid var(--hair)}
+.ing-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important}
+.ing-grid .ing{flex-direction:column;align-items:stretch;border:1px solid var(--line);border-radius:14px;padding:10px;gap:6px;position:relative}
+.ing-grid .ing input{position:absolute;top:10px;inset-inline-start:10px}
+.ing-grid .ing .tile{width:100%;height:64px;font-size:30px}
+.ing-grid .ing .mid{text-align:center;align-items:center}
+.ing-grid .ing .money{text-align:center}
+.cline-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px 14px!important}
+.cline-grid .cline{flex-direction:column;align-items:stretch;border:1px solid var(--line);border-radius:14px;padding:10px;gap:6px;text-align:center}
+.cline-grid .cline .tile{width:100%;height:60px;font-size:28px}
+.cline-grid .cline .mid{align-items:center}
+.cline-grid .cline .step{align-self:center}
+.cline-grid .cline .money{text-align:center;min-width:0}
+.ocard-grid .ocard{padding:10px;gap:6px;font-size:12px}
+.vt{display:inline-flex;border:1.5px solid var(--hair);border-radius:12px;padding:2px;gap:2px;background:#FFF}
+.vt button{width:34px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--muted)}
+.vt button[aria-pressed="true"]{background:var(--navy);color:#FFF}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pcard{background:#FFFFFF;border:1px solid var(--line);border-radius:20px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0;box-shadow:var(--shadow-sm)}
+.tile img{width:100%;height:100%;object-fit:contain;border-radius:inherit;display:block;background:#FFF}
+.tile{overflow:hidden}
+.pcard .tile{height:108px;border-radius:14px;display:grid;place-items:center;font-size:46px;line-height:1;position:relative;background:#FFFFFF!important;border:1px solid var(--line-2)}
+.pcard .nm{font-size:13px;font-weight:700;line-height:1.4;min-height:2.8em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--fg)}
+.pcard .u{font-size:11.5px;color:var(--muted)}
+.pcard .row{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.pcard .step{padding:2px}.pcard .step button{width:26px;height:26px;font-size:16px}.pcard .step span{min-width:16px;font-size:12.5px}
+.pcard .money{font-size:15px}
+.plus{width:36px;height:36px;border-radius:12px;background:var(--navy);color:#FFF;font-size:22px;line-height:1;display:grid;place-items:center;flex:none;text-align:center}
+.low{position:absolute;top:6px;inset-inline-start:6px;font-size:10px;background:#FFFFFF;border:1px solid var(--red);color:var(--red);padding:2px 6px;border-radius:6px;font-weight:700}
+.step{display:inline-flex;align-items:center;gap:2px;background:var(--navy);color:#FFF;border-radius:12px;padding:3px}
+.step button{width:30px;height:30px;border-radius:9px;color:inherit;font-size:18px;display:grid;place-items:center;text-align:center}
+.step span{min-width:18px;text-align:center;font-size:13px;font-weight:700}
+.step.lite{background:#FFFFFF;border:1.5px solid var(--navy);color:var(--navy);padding:2px}
+.step.lite button{width:28px;height:28px;font-size:16px}
+
+/* Chips / list rows */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1.5px solid var(--hair);background:#FFFFFF;color:var(--navy);border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:700;min-height:36px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--navy);color:#FFF;border-color:var(--navy)}
+.prow{background:#FFFFFF;border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;align-items:center;gap:12px}
+.prow .tile{width:72px;height:72px;border-radius:16px;display:grid;place-items:center;font-size:34px;line-height:1;flex:none;position:relative;background:#FFFFFF!important;border:1px solid var(--line-2)}
+.prow .mid{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.prow .nm{font-size:13.5px;font-weight:700;line-height:1.4}
+.prow .u{font-size:11.5px;color:var(--muted)}
+.prow .money{font-size:15px;margin-top:2px}
+.plus.lg{width:40px;height:40px;font-size:24px}
+.list{display:flex;flex-direction:column;gap:10px}
+.more{align-self:center;color:var(--navy);font-weight:700;font-size:13px;padding:10px 18px;border:1.5px solid var(--navy);border-radius:999px}
+.empty{padding:36px 12px;text-align:center;color:var(--muted);font-size:13.5px}
+.empty h3{color:var(--navy);font-size:17px;margin-bottom:6px}
+.skel{background:var(--line-2);border-radius:12px;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Cards / forms */
+.card{background:#FFFFFF;border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.card .t{font-size:13.5px;font-weight:800;color:var(--navy);font-family:var(--display)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12.5px;font-weight:700;color:var(--navy)}
+.field input,.field textarea,.field select{border:1.5px solid var(--hair);background:#FFFFFF;border-radius:14px;padding:12px 14px;width:100%;min-height:48px}
+.field input:focus,.field textarea:focus{border-color:var(--navy)}
+.field textarea{min-height:72px;resize:vertical}
+.hint{font-size:12px;color:var(--muted)}
+.alert{border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.6;display:flex;gap:8px;align-items:flex-start;background:#FFFFFF;border:1px solid var(--line)}
+.alert.amber{border-color:var(--red);color:var(--red-2)}
+.alert.red{border-color:var(--red);color:var(--red)}
+.alert.green{border-color:var(--navy);color:var(--navy)}
+.sum{display:flex;justify-content:space-between;font-size:13px}
+.sum span:first-child{color:var(--muted)}
+.sum.total{font-family:var(--display);font-weight:800;font-size:16px;color:var(--navy)}.sum.total span:first-child{color:var(--navy)}
+.hr{height:1px;background:var(--line)}
+.opt2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.opt{border:1.5px solid var(--hair);background:#FFFFFF;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:2px;align-items:flex-start;min-height:56px;color:var(--fg)}
+.opt b{font-size:13px;font-weight:700}.opt small{font-size:11px;color:var(--muted)}
+.opt[aria-pressed="true"]{border:2px solid var(--navy);color:var(--navy)}
+.opt[aria-pressed="true"] small{color:var(--red);font-weight:700}
+.radio{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer;font-size:13px}
+.radio input{width:18px;height:18px;accent-color:var(--navy);margin:0}
+.radio span{flex:1}.radio small{color:var(--muted);font-size:11px}
+.cline{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-2)}
+.cline:last-child{border-bottom:0}
+.cline .tile{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:20px;flex:none;background:#FFFFFF!important;border:1px solid var(--line-2)}
+.cline .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.cline .nm{font-size:13px;font-weight:600}
+.cline .u{font-size:11px;color:var(--muted)}
+.cline .money{font-size:13px;min-width:52px;text-align:left}
+.grouph{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#FFFFFF;border-bottom:1px solid var(--line)}
+.grouph .orb{width:28px;height:28px;border-radius:50%;background:var(--red);color:#FFF;display:grid;place-items:center;flex:none}
+.grouph div{flex:1;display:flex;flex-direction:column;gap:1px}
+.grouph b{font-size:13.5px;font-weight:700;color:var(--navy)}.grouph small{font-size:11px;color:var(--red-2)}
+
+/* Chat (chef) */
+.bub{max-width:300px;background:#FFFFFF;border:1px solid var(--line);border-radius:18px 18px 18px 4px;padding:12px 14px;font-size:13.5px;line-height:1.6;align-self:flex-start}
+.bub.me{align-self:flex-end;background:var(--navy);color:#FFF;border:0;border-radius:18px 18px 4px 18px;max-width:280px}
+.sugg{display:flex;flex-wrap:wrap;gap:8px;align-self:flex-start}
+.sugg button{border:1.5px solid var(--red);background:#FFFFFF;color:var(--red-2);border-radius:999px;padding:9px 14px;font-size:13px;font-weight:700;min-height:40px}
+.ing{display:flex;align-items:center;gap:10px;min-height:44px}
+.ing input{width:20px;height:20px;accent-color:var(--navy);margin:0;flex:none}
+.ing .tile{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none;background:#FFFFFF!important;border:1px solid var(--line-2)}
+.ing .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ing .nm{font-size:13px;font-weight:700}
+.ing .u{font-size:11.5px;color:var(--muted)}
+.ing .money{font-size:13.5px}
+.ing .qcol{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.ing .step.lite button{width:26px;height:26px;font-size:15px}.ing .step.lite span{min-width:16px;font-size:12.5px}
+.ing-grid .ing .qcol{align-items:center;width:100%}
+.ing.off{opacity:.45}.ing.off .nm{text-decoration:line-through}
+.ing .alt{font-size:11px;color:var(--red);font-weight:700;padding:4px 0}
+.chatform{display:flex;align-items:center;gap:10px}
+.chatform label{flex:1;display:flex;align-items:center;background:#FFFFFF;border:1.5px solid var(--hair);border-radius:14px;padding:0 14px;min-height:48px}
+.chatform label:focus-within{border-color:var(--navy)}
+.chatform input{flex:1;border:0;outline:0;background:transparent;font-size:14px;color:var(--fg);padding:0;min-width:0}
+.chatform button{width:48px;height:48px;border-radius:14px;background:var(--red);color:#FFF;display:grid;place-items:center;flex:none}
+.servings{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:12px;padding:4px;background:#FFFFFF}
+.servings button{width:34px;height:34px;border-radius:9px;background:#FFFFFF;border:1px solid var(--line);color:var(--navy);font-size:18px;display:grid;place-items:center;text-align:center}
+.servings span{min-width:62px;text-align:center;font-size:12.5px;font-weight:700}
+.typing{display:inline-flex;gap:4px}.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:pulse 1s infinite}.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+
+/* Auth */
+.auth{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px 24px 16px;color:var(--fg);background:#FFFFFF;text-align:center}
+.auth .logo{width:260px;max-width:100%;display:grid;place-items:center;background:#FFFFFF}
+.auth .logo img{width:100%;height:auto;display:block}
+.morse{display:flex;gap:7px;align-items:center;justify-content:center}
+.morse span{display:flex;gap:2px}
+.morse i{display:block;height:3px;border-radius:2px;background:var(--navy);opacity:.6}
+.morse .d{width:3px}.morse .h{width:9px}
+.auth h1{font-size:24px;color:var(--navy)}
+.auth p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.6;max-width:300px}
+.authft{background:#FFFFFF;padding:12px 24px calc(26px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.phonein{display:flex;align-items:center;gap:8px;direction:ltr;border:1.5px solid var(--hair);border-radius:14px;padding:0 14px;min-height:52px;background:#FFFFFF}
+.phonein:focus-within{border-color:var(--navy)}
+.phonein b{font-size:14px;color:var(--navy);direction:ltr;font-family:var(--caps)}
+.phonein input{flex:1;border:0;outline:0;background:transparent;font-size:16px;direction:ltr;text-align:left;min-width:0;letter-spacing:1px}
+.otp{display:flex;gap:8px;direction:ltr;justify-content:center}
+.otp input{width:46px;height:56px;border:1.5px solid var(--hair);border-radius:14px;text-align:center;font-family:var(--serif);font-weight:700;font-size:22px;background:#FFFFFF;color:var(--navy)}
+.otp input:focus{border-color:var(--navy)}
+.pin{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line-2);width:100%}
+.pin .ic{width:36px;height:36px;border-radius:10px;background:#FFFFFF;border:1px solid var(--line);color:var(--navy);display:grid;place-items:center;flex:none}
+.pin div{flex:1;min-width:0;display:flex;flex-direction:column}
+.pin b{font-size:13.5px;font-weight:700}.pin small{font-size:11.5px;color:var(--muted)}
+.mapbox{position:relative;height:330px;background:#FFFFFF;overflow:hidden;flex:none;border-bottom:1px solid var(--line)}
+.mapbox>svg{display:block;width:100%;height:100%}
+.mapbox .fab{position:absolute;top:14px;inset-inline-start:14px;width:40px;height:40px;border-radius:12px;background:#FFFFFF;border:1px solid var(--line);color:var(--navy);box-shadow:var(--shadow-sm);display:grid;place-items:center}
+.mapbox .tag{position:absolute;bottom:14px;inset-inline-start:14px;background:#FFFFFF;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:11.5px;font-weight:700;color:var(--navy);box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:6px}
+
+/* Tracking */
+.stages{display:flex;align-items:flex-start}
+.stg{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.stg .dot{width:28px;height:28px;border-radius:50%;background:#FFFFFF;color:#FFF;display:grid;place-items:center;border:2px solid var(--hair)}
+.stg.done .dot{background:var(--navy);border-color:var(--navy)}
+.stg.now .dot{background:var(--red);border-color:var(--red);box-shadow:0 0 0 5px var(--red-tint)}
+.stg b{font-size:10.5px;font-weight:700}.stg small{font-size:10px;color:var(--muted)}
+.stg.now b{color:var(--red)}
+.stgline{height:2px;background:var(--hair);flex:1;margin-top:13px}
+.stgline.done{background:var(--navy)}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;background:#FFFFFF;border:1px solid var(--hair);color:var(--muted)}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.pending{border-color:var(--red);color:var(--red)}
+.pill.confirmed,.pill.preparing,.pill.out_for_delivery{border-color:var(--navy);color:var(--navy)}
+.pill.delivered{border-color:var(--ok);color:var(--ok)}
+.pill.cancelled{border-color:var(--hair);color:var(--muted)}
+.driver{display:flex;align-items:center;gap:12px}
+.driver .av{width:48px;height:48px;border-radius:50%;background:#FFFFFF;border:1.5px solid var(--navy);color:var(--navy);display:grid;place-items:center;flex:none}
+.driver div{flex:1;min-width:0}
+.driver b{display:block;font-size:13.5px;font-weight:700}.driver small{font-size:11.5px;color:var(--muted)}
+.copybtn{width:44px;height:44px;border-radius:14px;background:#FFFFFF;border:1.5px solid var(--navy);color:var(--navy);display:grid;place-items:center;flex:none}
+
+/* Orders & staff */
+.ocard{background:#FFFFFF;border:1px solid var(--line);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px;width:100%;text-align:right;color:var(--fg)}
+.ocard .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ocard .no{font-family:var(--serif);font-weight:700;direction:ltr;unicode-bidi:isolate;font-size:16px;color:var(--navy)}
+.ocard .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.ocard .who{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.ocard .who b{font-weight:700}.ocard .who .ph{direction:ltr;unicode-bidi:isolate;color:var(--navy);font-weight:600}.ocard .who .tm{color:var(--muted);font-size:12px;margin-inline-start:auto}
+.ocard .line-ic{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;line-height:1.5}
+.ocard .line-ic .ic{flex:none;color:var(--red);width:18px;display:grid;place-items:center;font-size:14px}
+.ocard .line-ic .tx{flex:1;min-width:0;overflow-wrap:anywhere}
+.ocard .line-ic.note .tx{color:var(--muted)}
+.ocard .mapbtn{flex:none;border:1.5px solid var(--navy);color:var(--navy);border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.ilist{list-style:none;margin:0;padding:8px 10px;border:1px solid var(--line-2);border-radius:12px;display:flex;flex-direction:column;gap:4px;font-size:12.5px}
+.ilist li{display:flex;justify-content:space-between;gap:8px}.ilist li span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ilist li b{color:var(--navy);flex:none;direction:ltr;unicode-bidi:isolate}
+.ocard .sum.total{font-size:15px}
+.ocard .actions{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line-2);padding-top:10px}
+.cta.sm{min-height:46px;padding:10px 16px;font-size:14px;box-shadow:none}
+.ocard .cancel{align-self:center;color:var(--red);font-size:12.5px;font-weight:700;padding:6px 10px}
+.drv{display:flex;gap:8px;align-items:center;border:1.5px solid var(--hair);border-radius:12px;padding:4px 4px 4px 10px}
+.drv .ic{flex:none}
+.drv input{border:0;background:transparent;font-size:13px;min-width:0;flex:1;min-height:34px;padding:0}
+.drv input:focus{outline:none}
+.drv button{flex:none;background:var(--navy);color:#FFF;border-radius:9px;padding:0 12px;min-height:34px;font-size:12.5px;font-weight:700;text-align:center}
+.ocard-grid .ocard{padding:12px;gap:8px}
+.ocard-grid .ocard .no{font-size:14px}
+.ocard-grid .ocard .who .tm{margin-inline-start:0;width:100%}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kpi{background:#FFFFFF;border:1px solid var(--line);border-radius:16px;padding:10px 12px;border-top:3px solid var(--red)}
+.kpi b{display:block;font-family:var(--display);font-size:22px;line-height:1.1;color:var(--navy)}
+.kpi span{font-size:11px;color:var(--muted)}
+.toast{position:absolute;bottom:110px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--navy);color:#FFF;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;z-index:30;opacity:0;transition:.25s;pointer-events:none;max-width:calc(100% - 32px);text-align:center;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.conn{position:absolute;bottom:calc(96px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:5;font-size:11px;background:#FFFFFF;color:var(--navy);border:1px solid var(--line);border-radius:999px;padding:4px 10px;display:none;white-space:nowrap;box-shadow:var(--shadow-sm)}
+.conn.show{display:block}
+</style>
+</head>
+<body>
+
+<div class="stage"><div class="phone" id="phone">
+  <div class="conn" id="conn"></div>
+  <div class="toast" id="toast"></div>
+</div></div>
+
+<script>
+(function(){
+document.documentElement.setAttribute('dir','rtl');document.documentElement.setAttribute('lang','ar');
+
+/* ---------- config ---------- */
+const PROJECT_ID='oxrqkgbbccstbetxpnsn', SERVER='Supabase';
+const DEFAULTS={delivery_fee:0.5,min_order:2,free_delivery_from:15,eta:'25–35 دقيقة',store_phone:''};
+const STATUS={pending:'بانتظار التأكيد',confirmed:'مؤكد',preparing:'قيد التجهيز',out_for_delivery:'في الطريق',delivered:'تم التوصيل',cancelled:'ملغي'};
+const FLOW={pending:'confirmed',confirmed:'preparing',preparing:'out_for_delivery',out_for_delivery:'delivered'};
+const TINTS={35:['--sand-soft','--sand'],36:['--teal-soft','--teal'],37:['--green-soft','--green'],38:['--violet-soft','--violet'],39:['--soft','--muted'],40:['--blue-soft','--blue']};
+const AREAS=['حي الحصن','شارع الجامعة','دوار الجامعة','جامعة اليرموك','حي البارحة','دوار القبة','شارع بغداد','وسط البلد','مجمع عمان الجديد','شارع شفيق ارشيدات','إيدون','جنوب إربد','الحي الشرقي','الحي الجنوبي','حي الأطباء','المدينة الصناعية'];
+const FALLBACK_RECIPES=[
+ {keys:['مقلوب'],dish:'مقلوبة دجاج بالباذنجان والزهرة',intro:'هذه مكوّنات المقلوبة من رفوف المتجر، الكميات لـ 4 أشخاص:',items:[{name:'أرز بسمتي',qty:'2 كغم',pieces:2,search:['أرز بسمتي','ارز']},{name:'دجاج',qty:'1.2 كغم',search:['دجاج']},{name:'باذنجان',qty:'1 كغم',search:['باذنجان']},{name:'زهرة',qty:'1 كغم',search:['زهرة','قرنبيط']},{name:'بطاطا',qty:'1 كغم',search:['بطاطا']},{name:'بصل',qty:'0.5 كغم',search:['بصل']},{name:'زيت قلي',qty:'1.8 لتر',search:['زيت','قلي']},{name:'بهارات مقلوبة',qty:'كيس',search:['بهار مقلوبة','بهارات']},{name:'لبن رائب',qty:'1 كغم',search:['لبن رائب','لبن']},{name:'لوز مقشّر',qty:'100 غم',search:['لوز'],optional:true}]},
+ {keys:['منسف'],dish:'منسف باللحم والجميد',intro:'المنسف على أصوله، هذا ما تحتاجه من المتجر:',items:[{name:'لحم خروف',qty:'1.5 كغم',search:['لحم']},{name:'جميد',qty:'1 كغم',search:['جميد']},{name:'أرز مصري',qty:'2 كغم',search:['أرز مصري','ارز']},{name:'خبز شراك',qty:'5 أرغفة',search:['شراك','خبز']},{name:'سمن بلدي',qty:'500 غم',search:['سمن']},{name:'لوز',qty:'100 غم',search:['لوز']},{name:'بقدونس',qty:'ربطة',search:['بقدونس']},{name:'بهار منسف',qty:'كيس',search:['بهار','بهارات']}]},
+ {keys:['مجدر'],dish:'مجدرة عدس مع البصل المقلي',intro:'أكلة خفيفة وسريعة، وهذا ما تحتاجه:',items:[{name:'عدس بني',qty:'1 كغم',search:['عدس']},{name:'أرز مصري',qty:'1 كغم',search:['أرز مصري','ارز']},{name:'بصل',qty:'1 كغم',search:['بصل']},{name:'زيت زيتون',qty:'500 مل',search:['زيت زيتون']},{name:'كمون',qty:'50 غم',search:['كمون']},{name:'لبن رائب',qty:'1 كغم',search:['لبن رائب','لبن']},{name:'خيار',qty:'0.5 كغم',search:['خيار']}]},
+ {keys:['كبس'],dish:'كبسة دجاج',intro:'كبسة على الطريقة الخليجية، كل شيء متوفر على الرف:',items:[{name:'أرز بسمتي',qty:'2 كغم',search:['أرز بسمتي','ارز']},{name:'دجاج',qty:'1.2 كغم',search:['دجاج']},{name:'بصل',qty:'0.5 كغم',search:['بصل']},{name:'طماطم',qty:'0.5 كغم',search:['طماطم','بندورة']},{name:'معجون طماطم',qty:'علبة',search:['معجون']},{name:'بهار كبسة',qty:'كيس',search:['بهار كبسة','بهارات']},{name:'لومي',qty:'3 حبات',search:['لومي','ليمون أسود']},{name:'زبيب',qty:'100 غم',search:['زبيب'],optional:true}]},
+ {keys:['ضياف','عزوم','ضيوف'],dish:'ضيافة للضيوف',intro:'هذا ما تحتاجه لاستقبال الضيوف:',items:[{name:'قهوة عربية',qty:'250 غم',search:['قهوة عربية','قهوة']},{name:'هيل',qty:'50 غم',search:['هيل']},{name:'شاي',qty:'علبة',search:['شاي']},{name:'سكر',qty:'1 كغم',search:['سكر']},{name:'عصير',qty:'2 لتر',pieces:2,search:['عصير']},{name:'مياه',qty:'6 عبوات',pieces:6,search:['مياه']},{name:'شوكولاتة',qty:'علبة',search:['شوكلاته','شوكولاتة']},{name:'بسكويت',qty:'علبتان',pieces:2,search:['بسكويت']},{name:'مكسرات',qty:'300 غم',search:['مكسرات']},{name:'مناديل',qty:'علبة',search:['محارم','مناديل']}]},
+ {keys:['تنظيف','نظاف'],dish:'تنظيف البيت',perPerson:false,intro:'قائمة تنظيف شاملة من رفوف المتجر:',items:[{name:'كلور',qty:'1 لتر',search:['كلور','كلوركس']},{name:'منظف أرضيات',qty:'1 لتر',search:['منظف أرضيات','فلاش','ديتول']},{name:'سائل جلي',qty:'1 لتر',search:['سائل جلي','جلي']},{name:'منظف زجاج',qty:'عبوة',search:['منظف زجاج','زجاج']},{name:'منظف حمام',qty:'عبوة',search:['هاربيك','منظف حمام']},{name:'اسفنج جلي',qty:'عبوة',search:['اسفنج']},{name:'أكياس نفايات',qty:'رول',search:['اكياس نفايات','نفايات']},{name:'فوطة مسح',qty:'2',pieces:2,search:['فوطة','ممسحة']},{name:'معطّر جو',qty:'عبوة',search:['معطر'],optional:true}]},
+ {keys:['رضيع','بيبي','حفاض'],dish:'مستلزمات الرضيع',perPerson:false,intro:'كل ما يلزم الصغير من المتجر:',items:[{name:'حفاضات',qty:'كيس',search:['حفاض','فوط اطفال','بامبرز']},{name:'مناديل مبللة',qty:'عبوتان',pieces:2,search:['مناديل مبللة','مبلل']},{name:'شامبو أطفال',qty:'عبوة',search:['شامبو اطفال','جونسون']},{name:'زيت أطفال',qty:'عبوة',search:['زيت اطفال']},{name:'بودرة أطفال',qty:'عبوة',search:['بودرة اطفال']},{name:'كريم طفح',qty:'أنبوب',search:['كريم اطفال','سودو'],optional:true}]},
+ {keys:['فطور'],dish:'فطور عائلي',intro:'فطور عائلي كامل:',items:[{name:'خبز',qty:'2 كيس',pieces:2,search:['خبز']},{name:'بيض',qty:'طبق',search:['بيض']},{name:'لبنة',qty:'500 غم',search:['لبنة']},{name:'جبنة',qty:'400 غم',search:['جبنة']},{name:'زيتون',qty:'عبوة',search:['زيتون']},{name:'حمص',qty:'علبة',search:['حمص']},{name:'فول',qty:'علبة',search:['فول']},{name:'زعتر',qty:'250 غم',search:['زعتر']},{name:'زيت زيتون',qty:'500 مل',search:['زيت زيتون']},{name:'مربى',qty:'عبوة',search:['مربى'],optional:true},{name:'شاي',qty:'علبة',search:['شاي']}]}
+];
+
+/* ---------- state ---------- */
+const S={view:'grid',img:new Map(),imgPending:new Set(),hasThumb:false,mcp:null,sample:null,ready:false,loading:false,cats:[],prods:[],byId:new Map(),settings:{...DEFAULTS},top:[],
+  screen:'home',params:{},stack:[],cart:{},cartMeta:{},customer:null,skipped:false,
+  catParent:null,catSub:null,q:'',shown:60,delivery:'now',schedule:'',pay:'cash',busy:false,
+  chef:{msgs:[],result:null,servings:4,baseServings:4,off:{},pick:{},qty:{},manual:{}},
+  mine:[],myOrders:[],staffOrders:[],stFilter:'active',track:null,trackTimer:null,trackT0:0,
+  otp:'',pendingPhone:''};
+const $=(s,r)=>(r||document).querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sq=s=>"'"+String(s??'').replace(/'/g,"''")+"'";
+const fmt=n=>(Math.round(Number(n||0)*1000)/1000).toFixed(3);
+const jd=n=>`<span class="money">${fmt(n)} د.أ</span>`;
+const norm=s=>String(s||'').toLowerCase().replace(/[ً-ْـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/ؤ/g,'و').replace(/ئ/g,'ي');
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const tint=()=>'';
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200)}
+function fmtTime(iso){try{return new Date(iso).toLocaleTimeString('ar-JO-u-nu-latn',{hour:'numeric',minute:'2-digit',hour12:true})}catch{return ''}}
+function fmtDate(iso){try{return new Date(iso).toLocaleString('ar-JO-u-nu-latn',{dateStyle:'short',timeStyle:'short',hour12:true})}catch{return iso}}
+const ICON={back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+ search:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+ pin:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+ spark:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>',
+ home:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+ list:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+ grid2:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>',
+ grid:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>',
+ cart:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 11.3a1 1 0 0 0 1 .7h9.6a1 1 0 0 0 1-.7L21 7H6"/></svg>',
+ user:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
+ send:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12L4 4l3 8-3 8z"/><path d="M7 12h13"/></svg>',
+ check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>',
+ bike:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 17h6l3-7h-5l-2 4H9z"/><path d="M12 6h3l2 4"/></svg>',
+ copy:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
+ fwd:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+ refresh:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>',
+ info:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>'};
+
+/* ---------- database: public RPC on Supabase (anon key); staff actions carry the PIN ---------- */
+const SB_URL='https://oxrqkgbbccstbetxpnsn.supabase.co', SB_KEY='sb_publishable_ZZTqt5iEvQBsDIomZCIVQw_bvcaJ5_g', IMG_BASE=SB_URL+'/storage/v1/object/public/product-images/';
+async function rpc(action,args){
+  let r;
+  try{r=await fetch(SB_URL+'/rest/v1/rpc/orders_app',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({action,args:args||{}})})}
+  catch(e){throw{code:'server_unavailable',message:String(e&&e.message||e)}}
+  if(!r.ok){let j=null;try{j=await r.json()}catch{}const msg=(j&&(j.message||j.hint))||('HTTP '+r.status);if(/bad_pin/.test(msg))throw{code:'bad_pin',message:msg};if(r.status>=500||r.status===429)throw{code:'server_unavailable',message:msg};throw{code:'tool_error',message:msg}}
+  return r.json();
+}
+function staffPin(){let p=ls.get('smo_staff_pin','');if(!p){p=prompt('رمز الموظفين:')||'';if(p)ls.set('smo_staff_pin',p)}return p}
+async function staffRpc(action,args){try{return await rpc(action,{...(args||{}),pin:staffPin()})}catch(e){if(e&&e.code==='bad_pin')ls.set('smo_staff_pin','');throw e}}
+function errText(e){
+  const c=e&&e.code;
+  if(c==='bad_pin')return 'رمز الموظفين غير صحيح.';
+  if(c==='server_unavailable'||c==='rate_limited')return 'قاعدة البيانات لا تستجيب حالياً. حاول بعد لحظات.';
+  if(c==='tool_error')return 'رفضت قاعدة البيانات العملية: '+(e.message||'').slice(0,220);
+  if(c==='not_granted')return 'لا يوجد اتصال بالمتجر حالياً.';
+  return 'حدث خطأ غير متوقع'+(e&&e.message?': '+String(e.message).slice(0,160):'');
+}
+function setConn(txt){const c=$('#conn');c.textContent=txt||'';c.classList.toggle('show',!!txt)}
+
+function applyCatalog(d){
+  // categories with nothing to show (no visible product in them or their sub-categories) are dropped
+  const n=new Map();for(const p of d.prods){n.set(p.cat,(n.get(p.cat)||0)+1)}
+  const subCnt=c=>n.get(c.id)||0;
+  S.cats=d.cats.filter(c=>c.parent?subCnt(c)>0:(subCnt(c)>0||d.cats.some(s=>s.parent===c.id&&subCnt(s)>0)));
+  S.catById=new Map(S.cats.map(c=>[c.id,c]));
+  if(d.settings)S.settings={...DEFAULTS,...d.settings};
+  S.prods=d.prods.map(p=>({...p,n:norm(p.name)}));
+  S.byId=new Map(S.prods.map(p=>[p.id,p]));
+  for(const p of S.prods){if(!p.emoji||p.emoji==='📦'){const c=S.catById.get(p.cat);if(c&&c.emoji)p.emoji=c.emoji}}
+  for(const id of Object.keys(S.cart)){if(!S.byId.has(id))delete S.cart[id]}
+  S.top=(d.top||[]).map(id=>S.byId.get(id)).filter(Boolean);
+  S.hasThumb=!!d.thumb;S.catImg=d.catimg||{};
+  S.ready=true;
+}
+async function loadCatalog(force){
+  if(S.loading)return;
+  const cached=ls.get('smo_catalog7',null);
+  if(!force&&cached&&Date.now()-cached.ts<60*60*1000&&cached.prods&&cached.prods.length){applyCatalog(cached);render();return}
+  S.loading=true;setConn('جارٍ تحميل المنتجات من المتجر…');render();
+  try{
+    const d=await rpc('catalog_meta');
+    if(!d||!d.cats)throw{code:'tool_error',message:'شكل النتيجة غير متوقع'};
+    const cats=(d.cats||[]).map(a=>({id:a[0],name:a[1],emoji:a[2]||'📦',parent:a[3],sort:a[4],img:a[5]||null}));
+    const rows=[];let last='';
+    for(let i=0;i<12;i++){
+      setConn(`جارٍ تحميل المنتجات… ${rows.length}`);
+      const arr=await rpc('products_page',{after:last});
+      rows.push(...(Array.isArray(arr)?arr:[]));
+      if(arr.length<1000)break;last=arr[arr.length-1][0];
+    }
+    const prods=rows.map(a=>({id:a[0],name:a[1],price:Number(a[2]),stock:Number(a[3]),emoji:a[4]||'📦',cat:a[5],unit:a[6],bulk:!!a[7],sm:a[8]||null}));
+    prods.sort((x,y)=>x.name.localeCompare(y.name,'ar'));
+    const data={ts:Date.now(),cats,prods,settings:(d.settings&&typeof d.settings==='object')?d.settings:null,top:d.top||[],thumb:!!d.thumb,catimg:d.catimg||{}};
+    ls.set('smo_catalog7',data);applyCatalog(data);setConn('');
+  }catch(e){S.loadError=errText(e);setConn('')}
+  finally{S.loading=false;render()}
+}
+
+/* ---------- product images: small copies in storage (direct URLs, browser-cached); base64 via rpc for the rest ---------- */
+function imgSrc(p){if(p.sm)return IMG_BASE+p.sm;return S.img.get(p.id)||null}
+function tileHTML(p,cls,extra){const im=imgSrc(p);return `<div class="tile ${cls||''}" ${p.sm?'':`data-pid="${esc(p.id)}"`}>${im?`<img src="${im}" alt="" loading="lazy" decoding="async">`:esc(p.emoji)}${extra||''}</div>`}
+/* thumbs persist in IndexedDB so the second visit is instant; the first visit fetches only what is near the viewport, small tiles first */
+const IDB={db:null,open(){if(this.db)return Promise.resolve(this.db);return new Promise(res=>{try{const r=indexedDB.open('smo_thumbs',1);r.onupgradeneeded=()=>r.result.createObjectStore('t');r.onsuccess=()=>{this.db=r.result;res(this.db)};r.onerror=()=>res(null)}catch{res(null)}})},
+  async getMany(ids){const db=await this.open();if(!db)return new Map();return new Promise(res=>{const out=new Map();try{const st=db.transaction('t','readonly').objectStore('t');let n=ids.length;if(!n)return res(out);ids.forEach(id=>{const q=st.get(id);q.onsuccess=()=>{if(q.result)out.set(id,q.result);if(--n===0)res(out)};q.onerror=()=>{if(--n===0)res(out)}})}catch{res(out)}})},
+  async putMany(pairs){const db=await this.open();if(!db)return;try{const st=db.transaction('t','readwrite').objectStore('t');pairs.forEach(([k,v])=>st.put(v,k))}catch{}}};
+function paintImages(){
+  document.querySelectorAll('[data-pid]').forEach(el=>{const im=S.img.get(el.dataset.pid);if(im&&!el.querySelector('img')){const ex=el.querySelector('.low');el.innerHTML=`<img src="${im}" alt="" loading="lazy">`+(ex?ex.outerHTML:'')}});
+}
+async function ensureImages(ids){
+  let want=[...new Set(ids)].filter(id=>!S.img.has(id)&&!S.imgPending.has(id));if(!want.length)return;
+  want.forEach(id=>S.imgPending.add(id));
+  const cached=await IDB.getMany(want);cached.forEach((v,k)=>{S.img.set(k,v);S.imgPending.delete(k)});
+  want=want.filter(id=>!cached.has(id));
+  if(cached.size)paintImages();
+  if(!want.length)return;
+  for(let i=0;i<want.length;i+=40){const chunk=want.slice(i,i+40);
+    try{const rows=await rpc('images',{ids:chunk});
+      const got=new Map((Array.isArray(rows)?rows:[]).map(r=>[r.id,r.im]));const keep=[];
+      chunk.forEach(id=>{const v=got.get(id);const ok=v&&String(v).startsWith('data:');S.img.set(id,ok?v:null);if(ok)keep.push([id,v]);S.imgPending.delete(id)});
+      if(keep.length)IDB.putMany(keep);
+      paintImages();
+    }catch(e){chunk.forEach(id=>S.imgPending.delete(id));break}
+  }
+}
+/* viewport-driven: tiles report in as they come within 400px of view; nearby ones are fetched first, in small batches */
+let _io=null,_ioQ=new Set(),_ioT=null;
+function flushImageQueue(){_ioT=null;const ids=[..._ioQ];_ioQ.clear();if(ids.length)ensureImages(ids)}
+function queueImages(){
+  if(_io)_io.disconnect();
+  const els=[...document.querySelectorAll('[data-pid]')];if(!els.length)return;
+  const seen=new Set();const want=els.filter(el=>{const id=el.dataset.pid;if(seen.has(id)||S.img.has(id))return false;seen.add(id);return true});
+  if(!want.length){paintImages();return}
+  if(!('IntersectionObserver' in window)){ensureImages(want.map(e=>e.dataset.pid));return}
+  _io=new IntersectionObserver(entries=>{let hit=false;entries.forEach(en=>{if(en.isIntersecting){_ioQ.add(en.target.dataset.pid);_io.unobserve(en.target);hit=true}});if(hit&&!_ioT)_ioT=setTimeout(flushImageQueue,60)},{root:null,rootMargin:'400px 0px',threshold:0});
+  want.forEach(el=>_io.observe(el));
+  paintImages();
+}
+
+/* ---------- cart ---------- */
+function cartLines(){return Object.entries(S.cart).map(([id,q])=>({p:S.byId.get(id),q,meta:S.cartMeta[id]})).filter(l=>l.p)}
+function totals(){
+  const lines=cartLines();const sub=lines.reduce((a,l)=>a+l.p.price*l.q,0);const s=S.settings;
+  const fee=sub>0&&s.free_delivery_from&&sub>=Number(s.free_delivery_from)?0:Number(s.delivery_fee||0);
+  return{sub,fee,total:sub+fee,count:lines.reduce((a,l)=>a+l.q,0),n:lines.length};
+}
+function setQty(id,q,meta){
+  const p=S.byId.get(id);if(!p)return;
+  q=Math.max(0,Math.min(q,p.stock));
+  if(q){if(!S.cart[id]&&meta)S.cartMeta[id]=meta;S.cart[id]=q}else{delete S.cart[id];delete S.cartMeta[id]}
+  if(q===p.stock&&q>0)toast(`المتاح من هذا المنتج ${p.stock} فقط`);
+  ls.set('smo_cart',S.cart);ls.set('smo_cartmeta',S.cartMeta);
+  render();
+}
+function stepHTML(id,lite){const q=S.cart[id]||0;return `<div class="step${lite?' lite':''}"><button data-dec="${esc(id)}" aria-label="تقليل">−</button><span>${q}</span><button data-inc="${esc(id)}" aria-label="زيادة">+</button></div>`}
+function ctlHTML(p,lg){return S.cart[p.id]?stepHTML(p.id):`<button class="plus${lg?' lg':''}" data-inc="${esc(p.id)}" aria-label="إضافة ${esc(p.name)} للسلة">+</button>`}
+const unitLabel=p=>p.bulk?'يُباع بالوزن':(p.unit&&p.unit!=='pc'?p.unit:'قطعة');
+
+/* ---------- Google Maps (links & coordinates; the embedded map lives in the standalone app) ---------- */
+const STORE_LL=()=>({lat:Number(S.settings.store_lat||32.546806),lng:Number(S.settings.store_lng||35.851194)});
+function parseLatLng(txt){const t=String(txt||'').trim();if(!t)return null;
+  const dms=t.match(/(\d{1,2})°\s*(\d{1,2})['′]\s*([\d.]+)["″]\s*([NS])\s*,?\s*(\d{1,3})°\s*(\d{1,2})['′]\s*([\d.]+)["″]\s*([EW])/i);
+  if(dms){const lat=(+dms[1]+dms[2]/60+dms[3]/3600)*(/s/i.test(dms[4])?-1:1),lng=(+dms[5]+dms[6]/60+dms[7]/3600)*(/w/i.test(dms[8])?-1:1);return{lat:+lat.toFixed(6),lng:+lng.toFixed(6)}}
+  const pats=[/@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/,/[?&]q=(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/,/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/,/[?&](?:ll|center|destination|query)=(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/,/^\s*(-?\d{1,2}\.\d+)\s*[, ]\s*(-?\d{1,3}\.\d+)\s*$/];
+  for(const re of pats){const m=t.match(re);if(m){const lat=+m[1],lng=+m[2];if(Math.abs(lat)<=90&&Math.abs(lng)<=180)return{lat,lng}}}
+  return null}
+function kmBetween(a,b){const R=6371,d=Math.PI/180;const dLat=(b.lat-a.lat)*d,dLng=(b.lng-a.lng)*d;const h=Math.sin(dLat/2)**2+Math.cos(a.lat*d)*Math.cos(b.lat*d)*Math.sin(dLng/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+const gmapsPick=()=>'https://www.google.com/maps/@'+STORE_LL().lat+','+STORE_LL().lng+',16z';
+const gmapsView=(ll)=>'https://www.google.com/maps/search/?api=1&query='+ll.lat+','+ll.lng;
+const gmapsDir=(ll)=>'https://www.google.com/maps/dir/?api=1&destination='+ll.lat+','+ll.lng+'&travelmode=driving';
+const gmapsAddr=(txt)=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(txt+'، إربد، الأردن');
+const addrLL=a=>a&&a.lat&&a.lng?{lat:+a.lat,lng:+a.lng}:null;
+
+/* ---------- navigation ---------- */
+function go(screen,params,replace){
+  if(S.trackTimer){clearInterval(S.trackTimer);S.trackTimer=null}
+  if(!replace&&S.screen!==screen)S.stack.push({screen:S.screen,params:S.params});
+  if(S.stack.length>12)S.stack.shift();
+  S.screen=screen;S.params=params||{};
+  render();
+  const b=$('.body');if(b)b.scrollTop=0;
+  if(screen==='account')loadMine();if(screen==='staff')loadStaff();if(screen==='track')startTracking();
+}
+function back(){const s=S.stack.pop();if(s)go(s.screen,s.params,true);else go('home',{},true)}
+function cartBar(){const t=totals();if(!t.count)return'';return `<div class="ft"><button class="cta" data-go="cart"><span style="display:flex;align-items:center;gap:10px"><span style="background:#FFF;color:#002068;border:1px solid #FFF;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700">${t.count}</span>عرض السلة</span>${jd(t.sub)}</button></div>`}
+function navHTML(cur){
+  const t=totals();
+  const it=(k,l,ic)=>`<button data-go="${k}" ${cur===k?'aria-current="page"':''}>${ic}<span>${l}</span>${k==='cart'&&t.count?`<span class="badge">${t.count}</span>`:''}</button>`;
+  return `<nav class="nav" aria-label="التنقل الرئيسي">${it('home','الرئيسية',ICON.home)}${it('cats','الأقسام',ICON.grid)}<button class="chef" data-go="chef" aria-label="المساعد الذكي" ${cur==='chef'?'aria-current="page"':''}><span class="orb">${ICON.spark}</span><span>المساعد الذكي</span></button>${it('cart','السلة',ICON.cart)}${it('account','حسابي',ICON.user)}</nav>`;
+}
+function head(title,sub,extra){return `<div class="hd"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button><div style="flex:1;min-width:0"><h1>${esc(title)}</h1>${sub?`<div class="sub">${sub}</div>`:''}</div>${extra||''}</div>`}
+function pcardHTML(p){return `<div class="pcard">${tileHTML(p,'',p.stock<=3?`<span class="low">متبقٍ ${p.stock}</span>`:'')}<div class="nm">${esc(p.name)}</div><div class="u">${unitLabel(p)}</div><div class="row">${jd(p.price)}${ctlHTML(p)}</div></div>`}
+function prowHTML(p){return `<div class="prow">${tileHTML(p,'',p.stock<=3?`<span class="low">متبقٍ ${p.stock}</span>`:'')}<div class="mid"><div class="nm">${esc(p.name)}</div><div class="u">${unitLabel(p)}${p.stock<=10?` · متوفر ${p.stock}`:''}</div>${jd(p.price)}</div>${ctlHTML(p,true)}</div>`}
+function catTile(c,cls,style){const pid=S.catImg&&S.catImg[c.id];const pp=pid&&S.byId&&S.byId.get(pid);const src=pp?imgSrc(pp):null;if(src)return `<span class="${cls}" style="${style||''}"><img src="${src}" alt="" loading="lazy" decoding="async"></span>`;if(c.img&&!pid)return `<span class="${cls}" style="${style||''}"><img src="${c.img}" alt=""></span>`;return `<span class="${cls}" style="${style||''}" ${pid?`data-pid="${esc(pid)}"`:''}>${esc(c.emoji)}</span>`}
+function viewToggle(){return `<div class="vt" role="group" aria-label="طريقة العرض"><button data-view="grid" aria-pressed="${S.view==='grid'}" aria-label="شبكة">${ICON.grid2}</button><button data-view="list" aria-pressed="${S.view==='list'}" aria-label="قائمة">${ICON.list}</button></div>`}
+function productsHTML(list){return S.view==='list'?`<div class="list">${list.map(prowHTML).join('')}</div>`:`<div class="grid2">${list.map(pcardHTML).join('')}</div>`}
+function dbNotice(){
+  if(S.ready)return'';
+  if(S.loadError)return `<div class="alert red">${ICON.info}<span>${esc(S.loadError)} <button class="link" data-retry>إعادة المحاولة</button></span></div>`;
+  return '';
+}
+function skelGrid(n){return `<div class="grid2">${Array.from({length:n||4},()=>`<div class="pcard"><div class="tile skel"></div><div class="nm skel" style="min-height:2.4em"></div><div class="skel" style="height:20px;width:60%"></div></div>`).join('')}</div>`}
+
+/* ---------- screens ---------- */
+const LOGO='data:image/webp;base64,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';
+function logoSVG(cls){return `<img class="${cls||''}" src="${LOGO}" alt="3045 Supermarket" width="720" height="343">`}
+const V={};
+V.welcome=()=>`<div class="auth"><div class="logo">${logoSVG('')}</div>
+  <div class="morse" aria-hidden="true"><span><i class="d"></i><i class="d"></i><i class="d"></i><i class="h"></i><i class="h"></i></span><span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i></span><span><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="h"></i></span><span><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i></span></div>
+  <h1>أهلاً بك في سمو 3045</h1><p>سوبرماركت حيّك في إربد، مفتوح 24 ساعة. أدخل رقم هاتفك لنوصل طلبك إلى باب بيتك.</p></div>
+  <form class="authft" id="welcomeForm"><div class="phonein"><b>+962</b><input id="phoneIn" inputmode="numeric" placeholder="7X XXX XXXX" value="${esc(S.pendingPhone.replace(/^0/,''))}" autocomplete="tel-national"></div>
+  <div id="authErr"></div><button class="cta" type="submit" style="justify-content:center">متابعة</button><button type="button" class="link" data-skip style="align-self:center;padding:6px">تصفّح المتجر أولاً</button></form>`;
+V.otp=()=>`<div class="hd"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button></div>
+  <form class="body" id="otpForm" style="gap:24px;padding:28px 24px"><div><h1 style="font-size:24px">أدخل رمز التحقق</h1><p class="hint" style="margin:8px 0 0;font-size:13.5px">أرسلنا رمزاً من 4 أرقام إلى <b style="direction:ltr;unicode-bidi:isolate">+962 ${esc(S.pendingPhone.replace(/^0/,''))}</b></p></div>
+  <div class="otp">${[0,1,2,3].map(i=>`<input id="otp${i}" inputmode="numeric" maxlength="1" aria-label="الرقم ${i+1}">`).join('')}</div>
+  <div class="alert amber">${ICON.info}<span>نسخة تجريبية: لا تُرسل رسائل SMS بعد. الرمز هو <b>3045</b>.</span></div><div id="authErr"></div>
+  <button class="cta" type="submit" style="justify-content:center">تأكيد</button><button type="button" class="link" data-go="welcome" style="align-self:center">تغيير الرقم</button></form>`;
+V.signup=()=>{const c=S.customer||{};return head('إكمال الحساب')+`<form class="body" id="signupForm" style="gap:16px"><div class="field"><label for="nameIn">الاسم</label><input id="nameIn" value="${esc(c.name||'')}" autocomplete="name" placeholder="اسمك كما يناديك المندوب"></div><div class="field"><label>رقم الهاتف</label><input value="${esc(S.pendingPhone||c.phone||'')}" disabled style="direction:ltr;text-align:right"></div><div id="authErr"></div></form><div class="ft"><button class="cta" id="signupBtn" style="justify-content:center">متابعة إلى العنوان</button></div>`};
+V.address=()=>{const a=(S.customer&&S.customer.address)||{};return head('تحديد العنوان','داخل نطاق التوصيل · إربد')+`<div class="body flush"><div class="mapbox">${mapSVG(0,false)}<a class="tag" href="${gmapsView(STORE_LL())}" target="_blank" rel="noopener" style="text-decoration:none">${ICON.pin} المتجر على خرائط Google</a></div>
+  <form id="addrForm" style="padding:16px;display:flex;flex-direction:column;gap:14px"><div class="field"><label for="areaIn">الحي / المنطقة</label><input id="areaIn" list="areas" value="${esc(a.area||'')}" placeholder="مثال: حي الحصن"><datalist id="areas">${AREAS.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></div>
+  <div class="field"><label for="streetIn">الشارع والبناية</label><input id="streetIn" value="${esc(a.street||'')}" placeholder="شارع الجامعة، بناية 12، طابق 3"></div>
+  <div class="field"><label for="landIn">أقرب معلم (اختياري)</label><input id="landIn" value="${esc(a.landmark||'')}" placeholder="مقابل صيدلية…"></div>
+  <div class="card" style="gap:10px"><div class="t">📍 موقعك على خرائط Google</div><p class="hint" style="margin:0">افتح خرائط Google، اضغط مطوّلاً على باب بيتك، ثم «مشاركة» وانسخ الرابط والصقه هنا. يصل المندوب إلى النقطة نفسها.</p>
+  <a class="ghost" href="${gmapsPick()}" target="_blank" rel="noopener" style="text-decoration:none">${ICON.pin} فتح خرائط Google</a>
+  <div class="field"><label for="gmapIn">رابط الموقع أو الإحداثيات</label><input id="gmapIn" value="${a.lat?esc(a.lat+', '+a.lng):''}" placeholder="https://maps.app.goo.gl/… أو 32.55, 35.85" style="direction:ltr;text-align:left"></div>
+  <div id="gmapStatus">${addrLL(a)?`<div class="alert green">${ICON.info}<span>الموقع محدّد · يبعد ${kmBetween(addrLL(a),STORE_LL()).toFixed(1)} كم عن المتجر · <a href="${gmapsView(addrLL(a))}" target="_blank" rel="noopener"><b>عرض على الخريطة</b></a></span></div>`:''}</div></div>
+  <div id="authErr"></div></form></div>
+  <div class="ft"><button class="cta" id="addrBtn" style="justify-content:center">حفظ العنوان</button></div>`};
+V.home=()=>{const c=S.customer;const addr=c&&c.address?`${c.address.area}${c.address.street?'، '+c.address.street:''}`:'حدّد عنوان التوصيل';
+  const parents=S.cats.filter(x=>!x.parent).slice(0,8);
+  return `<div class="hd green"><div class="brandline"><span class="logo-sm-wrap">${logoSVG('logo-sm')}</span><div class="open"><i></i>مفتوح 24 ساعة</div></div>
+  <button class="addr" data-go="address"><span style="color:var(--red)">${ICON.pin}</span><div><small>التوصيل إلى</small><b>${esc(addr)} ▾</b></div></button>
+  <label class="search">${ICON.search}<input id="homeQ" placeholder="ابحث عن منتج… حليب، أرز، شامبو" aria-label="ابحث عن منتج"></label></div>
+  <div class="body">${dbNotice()}
+  <button class="chefcard" data-go="chef"><span class="orb">${ICON.spark}</span><div><h2>ما احتياجك اليوم؟</h2><p>طبخة، ضيافة، تنظيف البيت، مستلزمات الأطفال، فطور… اكتب احتياجك والمساعد الذكي يجهّز لك قائمة المشتريات من رفوف المتجر</p></div></button>
+  <div class="sec"><div class="sec-h"><h2>الأقسام</h2><button class="link" data-go="cats">عرض الكل</button></div>
+  ${S.ready?`<div class="cat4">${parents.map(c=>`<button data-cat="${c.id}">${catTile(c,'ic')}<span>${esc(c.name)}</span></button>`).join('')}</div>`:`<div class="cat4">${Array.from({length:4},()=>`<div class="skel" style="height:64px;border-radius:18px"></div>`).join('')}</div>`}</div>
+  <div class="sec"><div class="sec-h"><h2>الأكثر طلباً في حيّك</h2><div style="display:flex;align-items:center;gap:10px">${viewToggle()}<button class="link" data-cat="">المزيد</button></div></div>${S.ready?(S.top.length?productsHTML(S.top):`<div class="empty">تظهر هنا الأصناف الأكثر مبيعاً خلال 30 يوماً من بيانات نقطة البيع.</div>`):skelGrid(4)}</div>
+  </div>`+(totals().count?cartBar():'')+navHTML('home')};
+V.cats=()=>{const parents=S.cats.filter(x=>!x.parent);const grid=S.view==='grid';
+  const cnt=c=>{const subs=S.cats.filter(x=>x.parent===c.id);return S.prods.filter(p=>p.cat===c.id||subs.some(s=>s.id===p.cat)).length};
+  const cntSub=sid=>S.prods.filter(p=>p.cat===sid).length;
+  return `<div class="hd"><h1>الأقسام</h1><span class="sub">${S.ready?S.prods.length+' منتج متوفر':''}</span>${viewToggle()}</div><div class="body">${dbNotice()}${S.ready?parents.map(c=>{const subs=S.cats.filter(x=>x.parent===c.id);
+    return grid?`<div class="sec"><div class="sec-h"><h2 style="display:flex;align-items:center;gap:8px">${catTile(c,'ic','width:30px;height:30px;border-radius:9px;font-size:16px')}${esc(c.name)}</h2><button class="link" data-cat="${c.id}">عرض الكل (${cnt(c)})</button></div>
+      <div class="cat4">${subs.map(sc=>`<button data-sub="${sc.id}" data-parent="${c.id}">${catTile(sc,'ic')}<span>${esc(sc.name)}</span><small class="hint">${cntSub(sc.id)}</small></button>`).join('')}</div></div>`
+    :`<div class="card" style="gap:10px"><button data-cat="${c.id}" style="display:flex;align-items:center;gap:12px">${catTile(c,'ic','width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;border:1px solid var(--line);overflow:hidden')}<span style="flex:1"><b style="font-family:var(--display);font-size:16px;font-weight:800">${esc(c.name)}</b><br><small class="hint">${cnt(c)} منتج · ${subs.length} قسم فرعي</small></span><span style="color:var(--muted)">${ICON.fwd}</span></button><div class="chips">${subs.map(sc=>`<button class="chip" data-sub="${sc.id}" data-parent="${c.id}">${esc(sc.emoji)} ${esc(sc.name)}</button>`).join('')}</div></div>`}).join(''):skelGrid(2)}</div>`+cartBar()+navHTML('cats')};
+function filtered(){const q=norm(S.q.trim());let ids=null;if(S.catSub)ids=new Set([S.catSub]);else if(S.catParent)ids=new Set(S.cats.filter(c=>c.parent===S.catParent).map(c=>c.id).concat([S.catParent]));return S.prods.filter(p=>(!ids||ids.has(p.cat))&&(!q||p.n.includes(q)))}
+V.category=()=>{const par=S.catById&&S.catById.get(S.catParent);const sub=S.catById&&S.catById.get(S.catSub);const subs=S.catParent?S.cats.filter(c=>c.parent===S.catParent):[];const list=filtered();
+  const title=S.q.trim()?`نتائج «${S.q.trim()}»`:sub?sub.name:par?par.name:'كل المنتجات';
+  return `<div class="hd" style="flex-direction:column;align-items:stretch;gap:12px;padding-bottom:0"><div style="display:flex;align-items:center;gap:12px"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button><div style="flex:1;min-width:0"><h1>${esc(title)}</h1><div class="sub">${list.length} منتج${S.q.trim()?'':' · أسعار المتجر الحالية'}</div></div>${viewToggle()}</div>
+  <label class="search" style="min-height:40px">${ICON.search}<input id="catQ" value="${esc(S.q)}" placeholder="ابحث داخل القائمة" style="height:40px"></label>
+  ${subs.length?`<div class="chips" style="padding-bottom:12px"><button class="chip" data-sub="" data-parent="${S.catParent}" aria-pressed="${!S.catSub}">الكل</button>${subs.map(s=>`<button class="chip" data-sub="${s.id}" data-parent="${S.catParent}" aria-pressed="${S.catSub===s.id}" style="display:inline-flex;align-items:center;gap:6px">${s.img?`<img src="${s.img}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover">`:esc(s.emoji)} ${esc(s.name)}</button>`).join('')}</div>`:'<div style="height:12px"></div>'}</div>
+  <div class="body">${list.length?productsHTML(list.slice(0,S.shown)):`<div class="empty"><h3>لا توجد منتجات</h3>جرّب كلمة أخرى أو قسماً مختلفاً.</div>`}${list.length>S.shown?`<button class="more" data-more>عرض المزيد (${list.length-S.shown})</button>`:''}</div>`+cartBar()+navHTML('cats')};
+
+/* chef */
+V.chef=()=>{const ch=S.chef;const msgs=ch.msgs.map(m=>m.role==='me'?`<div class="bub me">${esc(m.text)}</div>`:m.typing?`<div class="bub"><span class="typing"><i></i><i></i><i></i></span></div>`:`<div class="bub">${esc(m.text)}</div>`).join('');
+  let result='';
+  if(ch.result){const r=ch.result;let total=0,count=0;
+    const rows=r.items.map((it,i)=>{const cands=it.cands||[];const pk=ch.pick[i]||0;const p=cands[pk];const off=!!ch.off[i]||!p;const q=Math.max(1,Math.min(ch.qty[i]||1,p?p.stock:1));if(p&&!off){total+=p.price*q;count++}
+      return `<div class="ing${off?' off':''}"><input type="checkbox" data-ing="${i}" ${!off?'checked':''} ${!p?'disabled':''}>${p?tileHTML(p):`<span class="tile" style="color:var(--muted)">∅</span>`}<div class="mid"><div class="nm">${esc(it.name)}${it.optional?' <small class="hint">(اختياري)</small>':''}</div><div class="u">${esc(scaleQtyText(it.qty,ch.servings/(ch.baseServings||ch.servings)))}${p?` · ${esc(p.name)}`:' · غير متوفر في المتجر حالياً'}</div>${cands.length>1?`<button class="alt" data-alt="${i}">بديل آخر (${pk+1}/${cands.length})</button>`:''}</div>${p?`<div class="qcol"><div class="step lite"><button data-cq="${i}" data-d="-1" aria-label="تقليل">−</button><span>${q}</span><button data-cq="${i}" data-d="1" aria-label="زيادة">+</button></div>${jd(p.price*q)}</div>`:''}</div>`}).join('');
+    result=`<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div><h2 style="font-size:16px">${esc(r.dish)}</h2><div class="hint">${count} من ${r.items.length} أصناف مختارة${r.perPerson===false?'':` · الكميات لـ ${ch.servings} أشخاص`}</div></div>${r.perPerson===false?'':`<div class="servings"><button data-serv="-1" aria-label="تقليل">−</button><span>${ch.servings} أشخاص</span><button data-serv="1" aria-label="زيادة">+</button></div>`}</div><div class="hr"></div><div class="${S.view==='grid'?'ing-grid':''}" style="display:flex;flex-direction:column;gap:6px">${rows}</div><div class="alert amber">${ICON.info}<span>أزل علامة أي صنف موجود عندك في البيت، اختر بديلاً إذا لم يناسبك المنتج المقترح، وعدّل عدد القطع من كل صنف بالعدّاد.</span></div></div>
+    <button class="cta" data-chef-add ${count?'':'disabled'}><span>أضف ${count} أصناف للسلة</span>${jd(total)}</button><button class="link" data-chef-reset style="align-self:center;padding:8px">احتياج آخر؟</button>`;}
+  return `<div class="hd"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button><span style="width:40px;height:40px;border-radius:50%;background:var(--amber);color:#FFF;display:grid;place-items:center;flex:none">${ICON.spark}</span><div style="flex:1;min-width:0"><h1 style="font-size:17px">المساعد الذكي</h1><div class="sub" style="color:var(--green);font-weight:500">يعرف كل ما في رفوف سمو 3045</div></div>${viewToggle()}</div>
+  <div class="body"><div class="bub">أهلاً! قل لي ما تحتاجه اليوم — طبخة، ضيافة، تنظيف، أطفال، فطور، رحلة… — ولكم شخصاً، وأنا أرتّب لك قائمة المشتريات من رفوف المتجر مباشرة.</div>
+  ${ch.msgs.length?'':`<div class="sugg">${['أريد أن أطبخ مقلوبة','ضيافة لـ 6 أشخاص','تنظيف البيت','فطور عائلي','مستلزمات رضيع','سهرة مباراة'].map(s=>`<button data-chef-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>`}
+  ${msgs}${result}${!S.ready?`<div class="alert amber">${ICON.info}<span>يحتاج المساعد إلى تحميل منتجات المتجر أولاً.</span></div>`:''}</div>
+  <form class="ft chatform" id="chefForm" style="flex-direction:row"><label><input id="chefIn" placeholder="اكتب احتياجك: طبخة، ضيافة، تنظيف…" aria-label="اكتب احتياجك"></label><button type="submit" aria-label="إرسال">${ICON.send}</button></form>`+navHTML('chef')};
+function matchCatalog(terms,exclude){
+  const out=[];const ex=new Set(exclude||[]);
+  for(const t of (terms||[])){const nt=norm(t);if(!nt)continue;
+    for(const p of S.prods){if(ex.has(p.id)||p.bulk)continue;if(p.n.includes(nt)){const starts=p.n.startsWith(nt)?2:0;out.push({p,score:starts+1+Math.min(p.stock,50)/100-p.price/100});ex.add(p.id)}}
+  }
+  out.sort((a,b)=>b.score-a.score);return out.slice(0,5).map(o=>o.p);
+}
+async function chefAsk(text){
+  const ch=S.chef;ch.msgs.push({role:'me',text});ch.msgs.push({role:'ai',typing:true});ch.result=null;ch.off={};ch.pick={};ch.qty={};ch.manual={};
+  const m=text.match(/(\d+)/);if(m){const n=parseInt(m[1],10);if(n>=1&&n<=30)ch.servings=n}
+  render();scrollBody();
+  let r=null;
+  if(S.sample){try{
+    r=await askAssistant(`أنت مساعد تسوّق في سوبرماركت أردني (سمو 3045 في إربد). المستخدم كتب احتياجه: «${text}». قد يكون طبخة، أو ضيافة/عزومة، أو تنظيف البيت، أو مستلزمات رضيع/أطفال، أو فطور، أو رحلة، أو مرض/زكام، أو سهرة، أو عودة للمدارس، أو أي احتياج يومي آخر. أعد JSON فقط بالشكل:
+{"dish":"عنوان القائمة بالعربية","intro":"جملة ترحيب قصيرة","perPerson":true,"items":[{"name":"اسم الصنف","qty":"الكمية لـ ${ch.servings} أشخاص مثل: 2 كغم أو عبوة واحدة","pieces":1,"search":["كلمة","كلمة بديلة"],"optional":false}]}
+قواعد: perPerson = true فقط إذا كانت الكميات تتغير بعدد الأشخاص (طعام، ضيافة)، و false للاحتياجات الثابتة (تنظيف، أدوات). pieces = عدد العبوات/القطع التي تُشترى من المتجر (عدد صحيح ≥1)؛ 6 إلى 12 صنفاً؛ أسماء بضائع تُباع في سوبرماركت؛ search كلمات عربية قصيرة بلا تشكيل تطابق أسماء المنتجات الشائعة في الأردن (مثل: "أرز بسمتي"، "جميد"، "كلوركس"، "حفاضات"). إن لم يكن النص احتياجاً يمكن تلبيته من سوبرماركت أعد {"dish":"","intro":"سبب","items":[]}.`);
+  }catch(e){r=null;if(e&&e.code==='no_key')S.sample=null}}
+  if(!r||!Array.isArray(r.items)){const fb=FALLBACK_RECIPES.find(x=>x.keys.some(k=>text.includes(k)));if(fb)r={dish:fb.dish,intro:fb.intro,perPerson:fb.perPerson!==false,items:fb.items}}
+  ch.msgs.pop();
+  if(!r||!r.dish||!r.items.length){ch.msgs.push({role:'ai',text:(r&&r.intro)||'لم أفهم الاحتياج. جرّب: مقلوبة، ضيافة لـ 6، تنظيف البيت، فطور عائلي، أو مستلزمات رضيع.'});render();scrollBody();return}
+  const used=[];
+  r.items=r.items.slice(0,14).map(it=>{const cands=matchCatalog([].concat(it.search||[],[it.name]),used);if(cands[0])used.push(cands[0].id);return{name:it.name,qty:it.qty,pieces:Math.max(1,Math.round(Number(it.pieces)||1)),optional:!!it.optional,cands}});
+  ch.baseServings=ch.servings;r.items.forEach((it,i)=>{ch.qty[i]=it.pieces});
+  ch.msgs.push({role:'ai',text:r.intro||'هذه المكوّنات من رفوف المتجر:'});ch.result=r;render();scrollBody();
+}
+async function askAssistant(prompt){
+  const r=await fetch(SB_URL+'/functions/v1/assistant',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({prompt})});
+  const j=await r.json().catch(()=>null);
+  if(!r.ok||!j){throw{code:(j&&j.error)||'server_unavailable',message:(j&&j.message)||('HTTP '+r.status)}}
+  return j.result;
+}
+function scaleQtyText(txt,f){return String(txt||'').replace(/(\d+(?:[.,]\d+)?)/,m=>{const v=parseFloat(m.replace(',','.'))*f;return (Math.round(v*10)/10).toString()})}
+function applyServings(){const ch=S.chef;if(!ch.result)return;const f=ch.servings/(ch.baseServings||ch.servings);ch.result.items.forEach((it,i)=>{if(ch.manual[i])return;const p=(it.cands||[])[ch.pick[i]||0];const max=p?p.stock:99;ch.qty[i]=Math.max(1,Math.min(max,Math.round((it.pieces||1)*f)))})}
+function scrollBody(){const b=$('.body');if(b)b.scrollTop=b.scrollHeight}
+
+/* cart & checkout */
+V.cart=()=>{const lines=cartLines();const t=totals();const c=S.customer;const min=Number(S.settings.min_order||0);const under=t.sub>0&&t.sub<min;
+  const groups={};for(const l of lines){const k=l.meta&&l.meta.dish?l.meta.dish:'';(groups[k]=groups[k]||[]).push(l)}
+  const lineHTML=l=>`<div class="cline">${tileHTML(l.p)}<div class="mid"><span class="nm">${esc(l.p.name)}</span><span class="u">${fmt(l.p.price)} د.أ × ${l.q}</span></div>${stepHTML(l.p.id,true)}<span class="money">${fmt(l.p.price*l.q)}</span></div>`;
+  const body=lines.length?Object.entries(groups).map(([dish,ls])=>`<div class="card" style="padding:0;overflow:hidden;gap:0">${dish?`<div class="grouph"><span class="orb">${ICON.spark}</span><div><b>${esc(dish)}</b><small>قائمة المساعد الذكي · ${ls.length} أصناف</small></div><button class="link" data-go="chef" style="color:var(--amber-text)">تعديل</button></div>`:''}<div class="${S.view==='grid'?'cline-grid':''}" style="padding:4px 14px">${ls.map(lineHTML).join('')}</div></div>`).join('')+`
+    <div class="card"><div class="t">وقت التوصيل</div><div class="opt2"><button class="opt" data-del="now" aria-pressed="${S.delivery==='now'}"><b>الآن</b><small>خلال ${esc(S.settings.eta)}</small></button><button class="opt" data-del="later" aria-pressed="${S.delivery==='later'}"><b>جدولة</b><small>اختر ساعة تناسبك</small></button></div>${S.delivery==='later'?`<div class="field"><label for="schedIn">وقت التوصيل</label><input id="schedIn" type="time" value="${esc(S.schedule)}"></div>`:''}
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)">${ICON.pin}<span>${c&&c.address?esc(c.address.area+(c.address.street?'، '+c.address.street:'')):'لم يُحدَّد عنوان بعد'} · <button class="link" data-go="address">${c&&c.address?'تغيير':'تحديد'}</button></span></div></div>
+    <div class="card"><div class="t">طريقة الدفع</div>${[['cash','كاش عند الاستلام','الأكثر استخداماً'],['cliq','CliQ — تحويل فوري',''],['card','بطاقة عند الاستلام','']].map(([v,l,s])=>`<label class="radio"><input type="radio" name="pay" value="${v}" ${S.pay===v?'checked':''}><span>${l}</span>${s?`<small>${s}</small>`:''}</label>`).join('')}</div>
+    <div class="card"><div class="t">ملاحظات للمتجر (اختياري)</div><textarea id="notesIn" class="hint" style="border:1px solid var(--line);border-radius:12px;padding:10px;min-height:60px;font-size:13px;color:var(--fg);background:var(--surface)" placeholder="مثال: بدون جرس، أو استبدل الصنف لو غير متوفر">${esc(S.notes||'')}</textarea></div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding:4px 4px 0"><div class="sum"><span>المنتجات (${t.count})</span><span>${fmt(t.sub)} د.أ</span></div><div class="sum"><span>رسوم التوصيل</span><span>${t.fee?fmt(t.fee)+' د.أ':'<span style="color:var(--green);font-weight:600">مجاناً</span>'}</span></div>${S.settings.free_delivery_from&&t.fee?`<div class="hint">التوصيل مجاني للطلبات فوق ${fmt(S.settings.free_delivery_from)} د.أ</div>`:''}<div class="hr"></div><div class="sum total"><span>الإجمالي</span><span>${fmt(t.total)} د.أ</span></div></div>
+    ${under?`<div class="alert amber">${ICON.info}<span>الحد الأدنى للطلب ${fmt(min)} د.أ — أضف ${fmt(min-t.sub)} د.أ لإتمام الطلب.</span></div>`:''}<div id="orderErr"></div>`
+    :`<div class="empty"><h3>السلة فارغة</h3>أضف منتجات من الأقسام أو اطلب من المساعد الذكي قائمة لاحتياجك.</div>`;
+  return `<div class="hd"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button><h1>السلة</h1><span class="sub">${t.count?t.count+' أصناف':''}</span>${viewToggle()}${lines.length?`<button class="link" data-clear style="color:var(--red)">إفراغ</button>`:''}</div><div class="body">${body}</div>
+  ${lines.length?`<div class="ft"><button class="cta" id="placeOrder" ${under||S.busy?'disabled':''}><span>${S.busy?'جارٍ إرسال الطلب…':'تأكيد الطلب'}</span>${jd(t.total)}</button></div>`:''}`+navHTML('cart')};
+function genOrderNo(){const d=new Date();const yy=String(d.getFullYear()).slice(2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=A[Math.floor(Math.random()*A.length)];return `ON-${yy}${mm}${dd}-${s}`}
+async function placeOrder(){
+  if(S.busy)return;const c=S.customer;
+  if(!c||!c.name||!c.phone){S.afterAuth='cart';go('welcome');return}
+  if(!c.address||!c.address.area){S.afterAuth='cart';go('address');return}
+  const t=totals();const lines=cartLines();if(!lines.length)return;
+  const notesEl=$('#notesIn');S.notes=notesEl?notesEl.value.trim():'';
+  const payL={cash:'كاش عند الاستلام',cliq:'CliQ',card:'بطاقة عند الاستلام'}[S.pay];
+  const when=S.delivery==='later'&&S.schedule?`جدولة: ${S.schedule}`:'التوصيل الآن';
+  const dishes=[...new Set(lines.map(l=>l.meta&&l.meta.dish).filter(Boolean))];
+  const notes=[`الدفع: ${payL}`,when,dishes.length?`قائمة الشيف: ${dishes.join('، ')}`:'',S.notes].filter(Boolean).join(' · ');
+  const items=lines.map(l=>({id:l.p.id,name:l.p.name,price:Number(fmt(l.p.price)),qty:l.q,line:Number(fmt(l.p.price*l.q)),dish:(l.meta&&l.meta.dish)||undefined}));
+  const addr=[c.address.area,c.address.street,c.address.landmark?'قرب '+c.address.landmark:''].filter(Boolean).join('، ');
+  const order_no=genOrderNo();S.busy=true;render();
+  try{
+    const r=await rpc('place_order',{order_no,customer_name:c.name,customer_phone:c.phone,customer_address:addr,lat:c.address.lat?Number(c.address.lat):null,lng:c.address.lng?Number(c.address.lng):null,notes,items,subtotal:Number(fmt(t.sub)),delivery_fee:Number(fmt(t.fee)),total:Number(fmt(t.total))});
+    const row=(r&&r.order_no)?r:{order_no};
+    S.mine=[row.order_no,...S.mine.filter(x=>x!==row.order_no)].slice(0,30);ls.set('smo_orders',S.mine);
+    S.cart={};S.cartMeta={};S.notes='';ls.set('smo_cart',{});ls.set('smo_cartmeta',{});
+    S.track={id:row.id,order_no:row.order_no,status:'pending',total:t.total,items,created_at:row.created_at||new Date().toISOString(),customer_address:addr,customer_notes:notes};
+    S.busy=false;S.stack=[];go('track',{order_no:row.order_no},true);toast('تم استلام طلبك');
+  }catch(e){
+    S.busy=false;render();const code=e&&e.code;const amb=code==='server_unavailable'||code==='upstream_error'||code==='cancelled';
+    const el=$('#orderErr');if(el)el.innerHTML=`<div class="alert red">${ICON.info}<span>${esc(errText(e))}${amb?' قد يكون الطلب وصل رغم الخطأ؛ تحقق من «حسابي» برقم '+esc(order_no)+' قبل إعادة الإرسال.':''}</span></div>`;
+    if(amb){S.mine=[order_no,...S.mine].slice(0,30);ls.set('smo_orders',S.mine)}
+  }
+}
+
+/* tracking */
+function mapSVG(progress,withRider){
+  const route=[[320,70],[320,180],[200,180],[200,300],[80,300]];
+  let len=0;const segs=[];for(let i=1;i<route.length;i++){const l=Math.hypot(route[i][0]-route[i-1][0],route[i][1]-route[i-1][1]);segs.push(l);len+=l}
+  let d=progress*len,rx=320,ry=70;for(let i=0;i<segs.length;i++){if(d<=segs[i]){const t=d/segs[i];rx=route[i][0]+(route[i+1][0]-route[i][0])*t;ry=route[i][1]+(route[i+1][1]-route[i][1])*t;break}d-=segs[i];rx=route[i+1][0];ry=route[i+1][1]}
+  return `<svg viewBox="0 0 390 380" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="390" height="380" fill="var(--map)"/><rect x="20" y="40" width="110" height="80" rx="10" fill="var(--map-park)"/><rect x="230" y="250" width="150" height="110" rx="10" fill="var(--map-park)"/><path d="M-20 330 Q60 310 140 335 T330 330 T420 340" fill="none" stroke="var(--map-water)" stroke-width="12"/>
+  <g stroke="var(--map-road)" stroke-width="14" stroke-linecap="round" fill="none"><path d="M-20 180 H410"/><path d="M-20 300 H410"/><path d="M200 -20 V400"/><path d="M320 -20 V400"/></g><g stroke="var(--surface)" stroke-width="10" stroke-linecap="round" fill="none"><path d="M-20 180 H410"/><path d="M-20 300 H410"/><path d="M200 -20 V400"/><path d="M320 -20 V400"/></g><g stroke="var(--surface)" stroke-width="5" fill="none"><path d="M-20 70 H410"/><path d="M-20 240 H410"/><path d="M80 -20 V400"/><path d="M140 -20 V400"/><path d="M260 -20 V400"/></g>
+  <g fill="var(--map-bldg)"><rect x="215" y="195" width="34" height="30" rx="3"/><rect x="330" y="90" width="44" height="34" rx="3"/><rect x="90" y="200" width="40" height="30" rx="3"/><rect x="150" y="90" width="40" height="30" rx="3"/><rect x="230" y="90" width="34" height="34" rx="3"/><rect x="30" y="140" width="40" height="28" rx="3"/></g>
+  <g font-family="IBM Plex Sans Arabic, sans-serif" font-size="10" fill="var(--muted)"><text x="120" y="170" text-anchor="middle">شارع الجامعة</text><text x="75" y="85" text-anchor="middle">حديقة الحصن</text><text x="305" y="310" text-anchor="middle">جامعة اليرموك</text><text x="345" y="292" text-anchor="middle">شارع بغداد</text></g>
+  <path d="M320 70 V180 H200 V300 H80" fill="none" stroke="var(--map-dash)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 7"/>${withRider?`<path d="M320 70 V180 H200 V300 H80" pathLength="1" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${progress.toFixed(3)} 1"/>`:''}
+  <g transform="translate(320 70)"><circle r="15" fill="var(--green)" stroke="var(--surface)" stroke-width="3"/><text x="0" y="4" text-anchor="middle" font-family="Cairo, sans-serif" font-weight="800" font-size="9" fill="#FFF">3045</text></g>
+  <g transform="translate(80 300)"><path d="M0 -30 c-8 0 -14 6 -14 13 c0 9 14 22 14 22 s14 -13 14 -22 c0 -7 -6 -13 -14 -13z" fill="var(--red)" stroke="var(--surface)" stroke-width="2"/><circle r="4" cy="-18" fill="#FFF"/></g>
+  ${withRider?`<g transform="translate(${rx.toFixed(1)} ${ry.toFixed(1)})"><circle r="26" fill="var(--amber)" opacity="0.18"/><circle r="15" fill="var(--amber)" stroke="var(--surface)" stroke-width="3"/><g transform="translate(-8 -8)" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="12" r="2.2"/><circle cx="12.5" cy="12" r="2.2"/><path d="M6 12h4.5l2-4.5h-3.5L7.5 10H6z"/><path d="M8.5 4.5h2.5l1.5 3"/></g></g>`:''}</svg>`;
+}
+function trackProgress(o){const st=o.status;if(st==='delivered')return 1;if(st==='out_for_delivery'){const t0=new Date(o.updated_at||o.created_at).getTime();const mins=(Date.now()-t0)/60000;return Math.min(.92,.08+mins/25*.84)}return 0}
+V.track=()=>{const o=S.track;if(!o)return head('تتبع الطلب')+`<div class="body"><div class="empty">جارٍ تحميل الطلب…</div></div>`;
+  const st=o.status||'pending';const idx={pending:0,confirmed:0,preparing:1,out_for_delivery:2,delivered:3,cancelled:-1}[st];
+  const stages=[['تم الاستلام',fmtTime(o.created_at)],['جاري التجهيز',idx>=1?fmtTime(o.updated_at):''],['في الطريق',idx>=2?fmtTime(o.updated_at):''],['تم التوصيل',idx>=3?fmtTime(o.updated_at):'']];
+  const eta={pending:['ننتظر تأكيد المتجر','خلال دقائق'],confirmed:['تم تأكيد طلبك','جاري البدء بالتجهيز'],preparing:['الوقت المتوقع للوصول',S.settings.eta],out_for_delivery:['المندوب في الطريق إليك','دقائق قليلة'],delivered:['تم التوصيل','بالهناء والشفاء'],cancelled:['أُلغي الطلب','تواصل مع المتجر']}[st];
+  let items=[];try{items=Array.isArray(o.items)?o.items:JSON.parse(o.items||'[]')}catch{}
+  const dishes=[...new Set(items.map(i=>i.dish).filter(Boolean))];
+  return `<div class="body flush"><div class="mapbox">${mapSVG(trackProgress(o),st!=='cancelled')}<button class="fab" data-back aria-label="رجوع">${ICON.back}</button><div class="tag">طلب <span style="direction:ltr;unicode-bidi:isolate">${esc(o.order_no)}</span></div></div>
+  <div style="padding:0 16px 20px;margin-top:-24px;display:flex;flex-direction:column;gap:12px">
+  <div class="card" style="border-radius:20px;padding:16px;gap:14px;box-shadow:var(--shadow)"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div><div class="hint">${eta[0]}</div><div style="font-family:var(--display);font-weight:800;font-size:22px">${eta[1]}</div></div><span class="pill ${esc(st)}">${esc(STATUS[st]||st)}</span></div>
+  ${st==='cancelled'?'':`<div class="stages">${stages.map(([l,tm],i)=>`${i?`<div class="stgline${i<=idx?' done':''}"></div>`:''}<div class="stg${i<idx?' done':i===idx?' now':''}"><div class="dot">${i<idx||st==='delivered'?ICON.check:i===idx?ICON.bike:''}</div><b>${l}</b><small>${tm||'—'}</small></div>`).join('')}</div>`}</div>
+  <div class="card"><div class="driver"><span class="av">${ICON.user}</span><div><b>${o.assigned_driver?esc(o.assigned_driver):'مندوب سمو 3045'}</b><small>${o.assigned_driver?'دراجة نارية · يحمل طلبك':'يُعيَّن المندوب عند بدء التجهيز'}</small></div>${S.settings.store_phone?`<button class="copybtn" data-copy="${esc(S.settings.store_phone)}" aria-label="نسخ رقم المتجر">${ICON.copy}</button>`:''}</div>${S.settings.store_phone?`<div class="hint">هاتف المتجر: <span style="direction:ltr;unicode-bidi:isolate">${esc(S.settings.store_phone)}</span></div>`:''}</div>
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div class="t">ملخص الطلب</div><span class="hint">${esc(fmtDate(o.created_at))}</span></div>${dishes.length?`<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)"><span style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:#FFF;display:grid;place-items:center;flex:none">${ICON.spark}</span><span>${esc(dishes.join('، '))}</span></div>`:''}<div class="ocard items" style="padding:0;border:0">${items.map(i=>`<span>${esc(i.name)} ×${i.qty}</span>`).join('، ')}</div><div class="hint">${ICON.pin} ${esc(o.customer_address||'')}${o.customer_location_lat?` · <a href="${gmapsView({lat:o.customer_location_lat,lng:o.customer_location_lng})}" target="_blank" rel="noopener"><b>موقعك على خرائط Google</b></a>`:''}</div>${o.customer_notes?`<div class="hint">${esc(o.customer_notes)}</div>`:''}<div class="sum total"><span>الإجمالي</span><span>${fmt(o.total)} د.أ</span></div></div>
+  <button class="ghost" data-refresh-track>تحديث الحالة</button><button class="link" data-go="home" style="align-self:center;padding:8px">العودة إلى المتجر</button></div></div>`;
+}
+async function refreshTrack(quiet){const no=S.params.order_no;if(!no)return;
+  try{const row=await rpc('order_by_no',{order_no:no});
+    if(row&&row.order_no){S.track=row;if(S.screen==='track')render();if(!quiet)toast('تم تحديث الحالة')}else if(!quiet)toast('لم يُعثر على الطلب')}
+  catch(e){if(!quiet)toast(errText(e))}}
+function startTracking(){const no=S.params.order_no;if(!S.track||S.track.order_no!==no){S.track=null;render()}refreshTrack(true);
+  S.trackTimer=setInterval(()=>{if(S.screen!=='track'){clearInterval(S.trackTimer);S.trackTimer=null;return}if(document.hidden)return;if(S.track&&['delivered','cancelled'].includes(S.track.status)){render();return}refreshTrack(true)},45000);
+  S.animTimer=S.animTimer||setInterval(()=>{if(S.screen==='track'&&S.track&&S.track.status==='out_for_delivery'){const box=$('.mapbox');if(box)box.firstElementChild.outerHTML=mapSVG(trackProgress(S.track),true)}},5000)}
+
+/* account / orders */
+function orderCard(o,staff){let items=[];try{items=Array.isArray(o.items)?o.items:JSON.parse(o.items||'[]')}catch{}const st=o.status||'pending';const next=FLOW[st];
+  const ll=o.customer_location_lat?{lat:o.customer_location_lat,lng:o.customer_location_lng}:null;
+  const itemsHtml=`<ul class="ilist">${items.map(i=>`<li><span>${esc(i.name)}</span><b>×${i.qty}</b></li>`).join('')}</ul>`;
+  if(!staff)return `<button class="ocard" data-track="${esc(o.order_no)}"><div class="top"><span class="no">${esc(o.order_no)}</span><span class="pill ${esc(st)}">${esc(STATUS[st]||st)}</span></div><div class="meta"><span>${esc(fmtDate(o.created_at))}</span>${o.assigned_driver?`<span>🛵 ${esc(o.assigned_driver)}</span>`:''}</div>${itemsHtml}<div class="sum total" style="font-size:15px"><span>الإجمالي</span><span>${fmt(o.total)} د.أ</span></div></button>`;
+  return `<div class="ocard staff">
+    <div class="top"><span class="no">${esc(o.order_no)}</span><span class="pill ${esc(st)}">${esc(STATUS[st]||st)}</span></div>
+    <div class="who"><b>${esc(o.customer_name)}</b><span class="ph">${esc(o.customer_phone)}</span><span class="tm">${esc(fmtDate(o.created_at))}</span></div>
+    <div class="line-ic"><span class="ic">${ICON.pin}</span><span class="tx">${esc(o.customer_address)}</span><a class="mapbtn" href="${ll?gmapsDir(ll):gmapsAddr(o.customer_address||'')}" target="_blank" rel="noopener" title="${ll?'التوجيه إلى الموقع في خرائط Google':'بحث العنوان في خرائط Google'}">${ll?'توجيه':'خرائط'}</a></div>
+    ${o.customer_notes?`<div class="line-ic note"><span class="ic">📝</span><span class="tx">${esc(o.customer_notes)}</span></div>`:''}
+    ${itemsHtml}
+    <div class="sum total"><span>الإجمالي</span><span>${fmt(o.total)} د.أ</span></div>
+    <div class="actions">
+      ${next?`<button class="cta sm" data-st="${next}" data-oid="${esc(o.id)}"><span>${esc(STATUS[next])}</span><span>←</span></button>`:''}
+      <div class="drv"><span class="ic">🛵</span><input id="drv-${esc(o.id)}" placeholder="اسم المندوب" value="${esc(o.assigned_driver||'')}"><button data-drv="${esc(o.id)}">حفظ</button></div>
+      ${st!=='cancelled'&&st!=='delivered'?`<button class="cancel" data-st="cancelled" data-oid="${esc(o.id)}">إلغاء الطلب</button>`:st==='cancelled'?`<button class="cancel" data-st="pending" data-oid="${esc(o.id)}">إعادة فتح الطلب</button>`:''}
+    </div></div>`;
+}
+V.account=()=>{const c=S.customer;return `<div class="hd"><h1>حسابي</h1>${viewToggle()}</div><div class="body">
+  ${c&&c.phone?`<div class="card"><div class="driver"><span class="av">${ICON.user}</span><div><b>${esc(c.name||'')}</b><small style="direction:ltr;unicode-bidi:isolate">${esc(c.phone)}</small></div><button class="link" data-logout style="color:var(--red)">خروج</button></div><div class="pin" style="border:0;padding:4px 0 0"><span class="ic">${ICON.pin}</span><div><b>${c.address?esc(c.address.area+(c.address.street?'، '+c.address.street:'')):'لم يُحدَّد عنوان'}</b><small>${c.address&&c.address.lat?'📍 موقع محدّد على خرائط Google':(c.address&&c.address.landmark?esc('قرب '+c.address.landmark):'إربد')}</small></div><button class="link" data-go="address">تعديل</button></div></div>`
+  :`<div class="card"><div class="t">سجّل دخولك لحفظ عنوانك ومتابعة طلباتك</div><button class="cta" data-go="welcome" style="justify-content:center">تسجيل الدخول</button></div>`}
+  <div class="sec"><div class="sec-h"><h2>طلباتي</h2><button class="link" data-refresh-mine>تحديث</button></div><div class="${S.view==='grid'?'grid2 ocard-grid':'list'}" id="myOrders">${S.myLoading?`<div class="empty">جارٍ التحميل…</div>`:S.myOrders.length?S.myOrders.map(o=>orderCard(o,false)).join(''):`<div class="empty"><h3>لا توجد طلبات بعد</h3>${S.myErr?esc(S.myErr):'طلباتك من هذا الجهاز تظهر هنا.'}</div>`}</div>
+  <form id="lookupForm" style="display:flex;gap:8px"><input id="lookupIn" placeholder="متابعة طلب آخر برقمه (ON-…)" style="flex:1;border:1.5px solid var(--hair);border-radius:12px;padding:10px 12px;background:#FFF;min-width:0"><button class="chip" type="submit">متابعة</button></form></div>
+  <div class="card"><div class="t">للمتجر</div><button class="pin" data-go="staff" style="border:0;padding:4px 0"><span class="ic">${ICON.grid}</span><div><b>لوحة الطلبات</b><small>استقبال الطلبات وتغيير حالتها وتعيين المندوب</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button><button class="pin" data-reload style="border:0;padding:4px 0"><span class="ic">${ICON.refresh}</span><div><b>تحديث المنتجات والأسعار</b><small>${S.ready?'آخر تحميل: '+fmtDate((ls.get('smo_catalog7',{})||{}).ts||Date.now()):'غير محمّلة'}</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button></div>
+  <p class="hint" style="text-align:center">سمو 3045 · إربد · مفتوح 24 ساعة</p></div>`+navHTML('account')};
+async function loadMine(extra){const nos=[...new Set([...(extra?[extra]:[]),...S.mine])];if(!nos.length){S.myOrders=[];render();return}
+  S.myLoading=true;S.myErr='';render();
+  try{const rows=await rpc('my_orders',{nos});S.myOrders=Array.isArray(rows)?rows:[];
+    if(extra){if(S.myOrders.some(o=>o.order_no===extra)){if(!S.mine.includes(extra)){S.mine.unshift(extra);ls.set('smo_orders',S.mine)}}else toast('لم يُعثر على الطلب')}}
+  catch(e){S.myErr=errText(e)}finally{S.myLoading=false;if(S.screen==='account')render()}}
+
+/* staff */
+V.staff=()=>{const all=S.staffOrders;const today=new Date().toDateString();const tr=all.filter(o=>new Date(o.created_at).toDateString()===today&&o.status!=='cancelled');
+  const list=all.filter(o=>S.stFilter==='all'||(S.stFilter==='active'?!['delivered','cancelled'].includes(o.status):o.status===S.stFilter));
+  return head('لوحة الطلبات','الطلبات الواردة عبر التطبيق',viewToggle()+`<button class="icon-btn" data-refresh-staff aria-label="تحديث">${ICON.refresh}</button>`)+`<div class="body">
+  <div class="kpis"><div class="kpi"><b>${all.filter(o=>o.status==='pending').length}</b><span>بانتظار التأكيد</span></div><div class="kpi"><b>${all.filter(o=>['confirmed','preparing','out_for_delivery'].includes(o.status)).length}</b><span>قيد التنفيذ</span></div><div class="kpi"><b>${fmt(tr.reduce((a,o)=>a+Number(o.total||0),0))}</b><span>مبيعات اليوم بالدينار · ${tr.length} طلب</span></div></div>
+  <div class="chips">${[['active','النشطة'],['all','الكل'],['delivered','المسلّمة'],['cancelled','الملغاة']].map(([v,l])=>`<button class="chip" data-stf="${v}" aria-pressed="${S.stFilter===v}">${l}</button>`).join('')}</div>
+  <div class="${S.view==='grid'?'list ocard-grid':'list'}">${S.stLoading?`<div class="empty">جارٍ التحميل…</div>`:S.stErr?`<div class="alert red">${ICON.info}<span>${esc(S.stErr)}</span></div>`:list.length?list.map(o=>orderCard(o,true)).join(''):`<div class="empty"><h3>لا توجد طلبات هنا</h3>الطلبات الجديدة من التطبيق تظهر في هذه اللوحة.</div>`}</div></div>`+navHTML('account')};
+async function loadStaff(){S.stLoading=true;S.stErr='';render();
+  try{const rows=await staffRpc('staff_orders');S.staffOrders=Array.isArray(rows)?rows:[]}
+  catch(e){S.stErr=errText(e)}finally{S.stLoading=false;if(S.screen==='staff')render()}}
+async function setStatus(id,st){if(S.busy)return;S.busy=true;try{await staffRpc('set_status',{id,status:st});const o=S.staffOrders.find(x=>x.id===id);if(o){o.status=st;o.updated_at=new Date().toISOString()}render();toast('تم التحديث: '+(STATUS[st]||st))}catch(e){toast(errText(e))}finally{S.busy=false}}
+async function setDriver(id){const el=$('#drv-'+CSS.escape(id));const val=el?el.value.trim():'';if(S.busy)return;S.busy=true;try{await staffRpc('set_driver',{id,driver:val});const o=S.staffOrders.find(x=>x.id===id);if(o)o.assigned_driver=val||null;render();toast('تم حفظ المندوب')}catch(e){toast(errText(e))}finally{S.busy=false}}
+
+/* ---------- render ---------- */
+function render(){
+  const ph=$('#phone');let el=$('#screen');
+  if(!el){el=document.createElement('div');el.className='screen';el.id='screen';ph.insertBefore(el,$('#toast'))}
+  const active=document.activeElement;const keep=active&&ph.contains(active)&&active.id?{id:active.id,s:active.selectionStart,e:active.selectionEnd}:null;
+  const scroll=$('.body',el)?$('.body',el).scrollTop:0;
+  el.innerHTML=(V[S.screen]||V.home)();
+  const b=$('.body',el);if(b&&S._keepScroll)b.scrollTop=scroll;S._keepScroll=false;
+  queueImages();
+  if(keep){const n=$('#'+CSS.escape(keep.id));if(n){n.focus({preventScroll:true});try{if(keep.s!=null)n.setSelectionRange(keep.s,keep.e)}catch{}}}
+}
+const rerender=()=>{S._keepScroll=true;render()};
+window.__dbg={S,render,go};
+
+/* ---------- events ---------- */
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const d=b.dataset;
+  if(d.go!==undefined){if(d.go==='cart'||d.go==='home'||d.go==='cats'||d.go==='chef'||d.go==='account'){S.stack=[];go(d.go,{},true)}else go(d.go);return}
+  if(d.back!==undefined)return back();
+  if(d.view){S.view=d.view;ls.set('smo_view',S.view);rerender();return}
+  if(d.skip!==undefined){S.skipped=true;ls.set('smo_skipped',true);S.stack=[];go('home',{},true);return}
+  if(d.inc!==undefined){S._keepScroll=true;return setQty(d.inc,(S.cart[d.inc]||0)+1)}
+  if(d.dec!==undefined){S._keepScroll=true;return setQty(d.dec,(S.cart[d.dec]||0)-1)}
+  if(d.cat!==undefined){S.catParent=d.cat?Number(d.cat):null;S.catSub=null;S.q='';S.shown=60;go('category');return}
+  if(d.sub!==undefined){S.catParent=d.parent?Number(d.parent):null;S.catSub=d.sub?Number(d.sub):null;S.shown=60;if(S.screen!=='category'){S.q='';go('category')}else rerender();return}
+  if(d.more!==undefined){S.shown+=60;rerender();return}
+  if(d.retry!==undefined)return loadCatalog(true);
+  if(d.reload!==undefined){toast('جارٍ تحديث المنتجات…');return loadCatalog(true)}
+  if(d.del){S.delivery=d.del;rerender();return}
+  if(d.clear!==undefined){S.cart={};S.cartMeta={};ls.set('smo_cart',{});ls.set('smo_cartmeta',{});render();return}
+  if(b.id==='placeOrder')return placeOrder();
+  if(d.chefQ){return chefAsk(d.chefQ)}
+  if(d.alt!==undefined){const i=Number(d.alt);const n=(S.chef.result.items[i].cands||[]).length;S.chef.pick[i]=((S.chef.pick[i]||0)+1)%n;rerender();return}
+  if(d.cq!==undefined){const i=Number(d.cq);const it=S.chef.result.items[i];const p=(it.cands||[])[S.chef.pick[i]||0];const max=p?p.stock:1;S.chef.qty[i]=Math.max(1,Math.min(max,(S.chef.qty[i]||1)+Number(d.d)));S.chef.manual[i]=true;rerender();return}
+  if(d.serv){S.chef.servings=Math.max(1,Math.min(30,S.chef.servings+Number(d.serv)));applyServings();rerender();return}
+  if(d.chefAdd!==undefined){const r=S.chef.result;let n=0;r.items.forEach((it,i)=>{const p=(it.cands||[])[S.chef.pick[i]||0];if(p&&!S.chef.off[i]){const q=Math.max(1,Math.min(S.chef.qty[i]||1,p.stock));S.cart[p.id]=Math.min(p.stock,(S.cart[p.id]||0)+q);if(!S.cartMeta[p.id])S.cartMeta[p.id]={dish:r.dish};n++}});ls.set('smo_cart',S.cart);ls.set('smo_cartmeta',S.cartMeta);toast(`أُضيف ${n} أصناف للسلة`);S.stack=[];go('cart',{},true);return}
+  if(d.chefReset!==undefined){S.chef={msgs:[],result:null,servings:4,baseServings:4,off:{},pick:{},qty:{},manual:{}};render();return}
+  if(d.track){go('track',{order_no:d.track});return}
+  if(d.refreshTrack!==undefined)return refreshTrack(false);
+  if(d.refreshMine!==undefined)return loadMine();
+  if(d.refreshStaff!==undefined)return loadStaff();
+  if(d.stf){S.stFilter=d.stf;rerender();return}
+  if(d.st&&d.oid)return setStatus(d.oid,d.st);
+  if(d.drv)return setDriver(d.drv);
+  if(d.logout!==undefined){S.customer=null;ls.set('smo_customer',null);render();return}
+  if(d.copy){try{await navigator.clipboard.writeText(d.copy);toast('نُسخ الرقم')}catch{toast(d.copy)}return}
+  if(b.id==='signupBtn'){const n=$('#nameIn').value.trim();if(n.length<2){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>اكتب اسمك.</span></div>`;return}S.customer={...(S.customer||{}),name:n,phone:S.pendingPhone||(S.customer||{}).phone};ls.set('smo_customer',S.customer);go('address',{},true);return}
+  if(b.id==='addrBtn'){const area=$('#areaIn').value.trim(),street=$('#streetIn').value.trim(),landmark=$('#landIn').value.trim(),gm=$('#gmapIn').value.trim();if(!area||street.length<4){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>اكتب الحي والشارع/البناية حتى يصل المندوب.</span></div>`;return}
+    let ll=null;if(gm){ll=parseLatLng(gm);if(!ll){if(/goo\.gl|maps\.app/.test(gm)){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>الرابط المختصر لا يحمل الإحداثيات. افتحه في المتصفح ثم انسخ الرابط الكامل من شريط العنوان (يحتوي على @32.5…,35.8…)، أو الصق الإحداثيات مباشرة.</span></div>`}else{$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>لم أتعرّف على الموقع. الصق رابط خرائط Google الكامل أو إحداثيات مثل 32.55, 35.85.</span></div>`}return}
+      const km=kmBetween(ll,STORE_LL());if(km>12){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>هذا الموقع يبعد ${km.toFixed(0)} كم عن المتجر، خارج نطاق التوصيل. تأكد من الرابط.</span></div>`;return}}
+    S.customer={...(S.customer||{}),address:{area,street,landmark,lat:ll?ll.lat:undefined,lng:ll?ll.lng:undefined}};ls.set('smo_customer',S.customer);toast('تم حفظ العنوان');const next=S.afterAuth||'home';S.afterAuth=null;S.stack=[];go(next,{},true);return}
+});
+document.addEventListener('submit',e=>{e.preventDefault();const f=e.target;
+  if(f.id==='welcomeForm'){let v=$('#phoneIn').value.replace(/\D/g,'');if(v.startsWith('962'))v=v.slice(3);if(v.startsWith('0'))v=v.slice(1);if(!/^7\d{8}$/.test(v)){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>أدخل رقماً أردنياً صحيحاً مثل 79 123 4567</span></div>`;return}S.pendingPhone='0'+v;S.otp='';go('otp');setTimeout(()=>{const o=$('#otp0');if(o)o.focus()},50)}
+  else if(f.id==='otpForm'){const code=[0,1,2,3].map(i=>$('#otp'+i).value).join('');if(code!=='3045'){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>الرمز غير صحيح. في النسخة التجريبية الرمز 3045.</span></div>`;return}
+    const c=S.customer||{};S.customer={...c,phone:S.pendingPhone};ls.set('smo_customer',S.customer);if(S.customer.name&&S.customer.address){S.stack=[];go(S.afterAuth||'home',{},true);S.afterAuth=null}else go('signup',{},true)}
+  else if(f.id==='chefForm'){const v=$('#chefIn').value.trim();if(v){$('#chefIn').value='';chefAsk(v)}}
+  else if(f.id==='lookupForm'){const v=$('#lookupIn').value.trim().toUpperCase();if(v)loadMine(v)}
+  else if(f.id==='addrForm'){$('#addrBtn').click()}else if(f.id==='signupForm'){$('#signupBtn').click()}
+});
+document.addEventListener('input',e=>{const t=e.target;
+  if(t.id==='homeQ'){const v=t.value;if(v.trim().length>=2){S.q=v;S.catParent=null;S.catSub=null;S.shown=60;go('category');setTimeout(()=>{const i=$('#catQ');if(i){i.focus();i.setSelectionRange(v.length,v.length)}},0)}}
+  else if(t.id==='catQ'){S.q=t.value;S.shown=60;rerender()}
+  else if(t.id==='schedIn'){S.schedule=t.value}
+  else if(t.id==='gmapIn'){const ll=parseLatLng(t.value);const st=$('#gmapStatus');if(st)st.innerHTML=ll?`<div class="alert green">${ICON.info}<span>تم التعرّف على الموقع · يبعد ${kmBetween(ll,STORE_LL()).toFixed(1)} كم عن المتجر · <a href="${gmapsView(ll)}" target="_blank" rel="noopener"><b>عرض على الخريطة</b></a></span></div>`:''}
+  else if(t.id==='notesIn'){S.notes=t.value}
+  else if(/^otp\d$/.test(t.id)){t.value=t.value.replace(/\D/g,'').slice(-1);const i=Number(t.id.slice(3));if(t.value&&i<3)$('#otp'+(i+1)).focus();if(i===3&&t.value){const all=[0,1,2,3].every(k=>$('#otp'+k).value);if(all)$('#otpForm').requestSubmit()}}
+});
+document.addEventListener('change',e=>{const t=e.target;if(t.name==='pay'){S.pay=t.value}else if(t.dataset.ing!==undefined){S.chef.off[t.dataset.ing]=!t.checked;rerender()}});
+document.addEventListener('keydown',e=>{if(e.key==='Backspace'&&/^otp\d$/.test(e.target.id)&&!e.target.value){const i=Number(e.target.id.slice(3));if(i>0)$('#otp'+(i-1)).focus()}});
+
+/* ---------- boot ---------- */
+S.view=ls.get('smo_view','grid');S.cart=ls.get('smo_cart',{});S.cartMeta=ls.get('smo_cartmeta',{});S.mine=ls.get('smo_orders',[]);S.customer=ls.get('smo_customer',null);S.skipped=ls.get('smo_skipped',false);
+const h=(location.hash||'').replace('#','');
+if(['home','cats','chef','cart','account','staff'].includes(h))S.screen=h;else S.screen=(S.customer&&S.customer.phone)||S.skipped?'home':'welcome';
+render();
+(async()=>{
+  S.mcp=true;S.sample=true;S.booted=true;
+  if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js')}catch{}}
+  await loadCatalog(false);
+  if(S.screen==='account')loadMine();if(S.screen==='staff')loadStaff();
+})();
+})();
+</script>
+</body>
+</html>
