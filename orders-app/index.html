@@ -277,7 +277,7 @@ a{color:var(--navy);text-decoration:none}
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;background:#FFFFFF;border:1px solid var(--hair);color:var(--muted)}
 .pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
 .pill.pending{border-color:var(--red);color:var(--red)}
-.pill.confirmed,.pill.preparing,.pill.out_for_delivery{border-color:var(--navy);color:var(--navy)}
+.pill.confirmed,.pill.preparing,.pill.ready,.pill.out_for_delivery{border-color:var(--navy);color:var(--navy)}
 .pill.delivered{border-color:var(--ok);color:var(--ok)}
 .pill.cancelled{border-color:var(--hair);color:var(--muted)}
 .driver{display:flex;align-items:center;gap:12px}
@@ -336,8 +336,8 @@ document.documentElement.setAttribute('dir','rtl');document.documentElement.setA
 /* ---------- config ---------- */
 const PROJECT_ID='oxrqkgbbccstbetxpnsn', SERVER='Supabase';
 const DEFAULTS={delivery_fee:0.5,min_order:2,free_delivery_from:15,eta:'25–35 دقيقة',store_phone:''};
-const STATUS={pending:'بانتظار التأكيد',confirmed:'مؤكد',preparing:'قيد التجهيز',out_for_delivery:'في الطريق',delivered:'تم التوصيل',cancelled:'ملغي'};
-const FLOW={pending:'confirmed',confirmed:'preparing',preparing:'out_for_delivery',out_for_delivery:'delivered'};
+const STATUS={pending:'بانتظار التأكيد',confirmed:'مؤكد',preparing:'قيد التجهيز',ready:'جاهز · بانتظار المندوب',out_for_delivery:'في الطريق',delivered:'تم التوصيل',cancelled:'ملغي'};
+const FLOW={pending:'confirmed',confirmed:'preparing',preparing:'ready',ready:'out_for_delivery',out_for_delivery:'delivered'};
 const TINTS={35:['--sand-soft','--sand'],36:['--teal-soft','--teal'],37:['--green-soft','--green'],38:['--violet-soft','--violet'],39:['--soft','--muted'],40:['--blue-soft','--blue']};
 const AREAS=['حي الحصن','شارع الجامعة','دوار الجامعة','جامعة اليرموك','حي البارحة','دوار القبة','شارع بغداد','وسط البلد','مجمع عمان الجديد','شارع شفيق ارشيدات','إيدون','جنوب إربد','الحي الشرقي','الحي الجنوبي','حي الأطباء','المدينة الصناعية'];
 const FALLBACK_RECIPES=[
@@ -403,6 +403,7 @@ async function staffRpc(action,args){try{return await rpc(action,{...(args||{}),
 function errText(e){
   const c=e&&e.code;
   if(c==='bad_pin')return 'رمز الموظفين غير صحيح.';
+  if(e&&/blocked/.test(String(e.message||'')))return 'لا يمكن إتمام الطلب من هذا الرقم. تواصل مع المتجر.';
   if(c==='server_unavailable'||c==='rate_limited')return 'قاعدة البيانات لا تستجيب حالياً. حاول بعد لحظات.';
   if(c==='tool_error')return 'رفضت قاعدة البيانات العملية: '+(e.message||'').slice(0,220);
   if(c==='not_granted')return 'لا يوجد اتصال بالمتجر حالياً.';
@@ -616,7 +617,7 @@ V.home=()=>{const c=S.customer;const addr=c&&c.address?`${c.address.area}${c.add
   return `<div class="hd green"><div class="brandline"><span class="logo-sm-wrap">${logoSVG('logo-sm')}</span><div class="open"><i></i>مفتوح 24 ساعة</div></div>
   <button class="addr" data-go="address"><span style="color:var(--red)">${ICON.pin}</span><div><small>التوصيل إلى</small><b>${esc(addr)} ▾</b></div></button>
   <label class="search">${ICON.search}<input id="homeQ" placeholder="ابحث عن منتج… حليب، أرز، شامبو" aria-label="ابحث عن منتج"></label></div>
-  <div class="body">${dbNotice()}${installCard()}
+  <div class="body">${dbNotice()}${S.settings.store_open===false?`<div class="alert red">${ICON.info}<span>${esc(S.settings.closed_message||'نعتذر، التوصيل متوقف مؤقتًا. سنعود قريبًا.')}</span></div>`:''}${installCard()}
   <button class="chefcard" data-go="chef"><span class="orb">${ICON.spark}</span><div><h2>ما احتياجك اليوم؟</h2><p>طبخة، ضيافة، تنظيف البيت، مستلزمات الأطفال، فطور… اكتب احتياجك والمساعد الذكي يجهّز لك قائمة المشتريات من رفوف المتجر</p></div></button>
   <div class="sec"><div class="sec-h"><h2>الأقسام</h2><button class="link" data-go="cats">عرض الكل</button></div>
   ${S.ready?`<div class="cat4">${parents.map(c=>`<button data-cat="${c.id}">${catTile(c,'ic')}<span>${esc(c.name)}</span></button>`).join('')}</div>`:`<div class="cat4">${Array.from({length:4},()=>`<div class="skel" style="height:64px;border-radius:18px"></div>`).join('')}</div>`}</div>
@@ -702,6 +703,7 @@ V.cart=()=>{const lines=cartLines();const t=totals();const c=S.customer;const mi
 function genOrderNo(){const d=new Date();const yy=String(d.getFullYear()).slice(2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=A[Math.floor(Math.random()*A.length)];return `ON-${yy}${mm}${dd}-${s}`}
 async function placeOrder(){
   if(S.busy)return;const c=S.customer;
+  if(S.settings.store_open===false){toast(S.settings.closed_message||'التوصيل متوقف مؤقتًا');return}
   if(!c||!c.name||!c.phone){S.afterAuth='cart';go('welcome');return}
   if(!c.address||!c.address.area){S.afterAuth='cart';go('address');return}
   const t=totals();const lines=cartLines();if(!lines.length)return;
@@ -743,9 +745,9 @@ function mapSVG(progress,withRider){
 }
 function trackProgress(o){const st=o.status;if(st==='delivered')return 1;if(st==='out_for_delivery'){const t0=new Date(o.updated_at||o.created_at).getTime();const mins=(Date.now()-t0)/60000;return Math.min(.92,.08+mins/25*.84)}return 0}
 V.track=()=>{const o=S.track;if(!o)return head('تتبع الطلب')+`<div class="body"><div class="empty">جارٍ تحميل الطلب…</div></div>`;
-  const st=o.status||'pending';const idx={pending:0,confirmed:0,preparing:1,out_for_delivery:2,delivered:3,cancelled:-1}[st];
+  const st=o.status||'pending';const idx={pending:0,confirmed:0,preparing:1,ready:1,out_for_delivery:2,delivered:3,cancelled:-1}[st];
   const stages=[['تم الاستلام',fmtTime(o.created_at)],['جاري التجهيز',idx>=1?fmtTime(o.updated_at):''],['في الطريق',idx>=2?fmtTime(o.updated_at):''],['تم التوصيل',idx>=3?fmtTime(o.updated_at):'']];
-  const eta={pending:['ننتظر تأكيد المتجر','خلال دقائق'],confirmed:['تم تأكيد طلبك','جاري البدء بالتجهيز'],preparing:['الوقت المتوقع للوصول',S.settings.eta],out_for_delivery:['المندوب في الطريق إليك','دقائق قليلة'],delivered:['تم التوصيل','بالهناء والشفاء'],cancelled:['أُلغي الطلب','تواصل مع المتجر']}[st];
+  const eta={pending:['ننتظر تأكيد المتجر','خلال دقائق'],confirmed:['تم تأكيد طلبك','جاري البدء بالتجهيز'],preparing:['الوقت المتوقع للوصول',S.settings.eta],ready:['طلبك جاهز','بانتظار انطلاق المندوب'],out_for_delivery:['المندوب في الطريق إليك','دقائق قليلة'],delivered:['تم التوصيل','بالهناء والشفاء'],cancelled:['أُلغي الطلب','تواصل مع المتجر']}[st];
   let items=[];try{items=Array.isArray(o.items)?o.items:JSON.parse(o.items||'[]')}catch{}
   const dishes=[...new Set(items.map(i=>i.dish).filter(Boolean))];
   return `<div class="body flush"><div class="mapbox">${mapSVG(trackProgress(o),st!=='cancelled')}<button class="fab" data-back aria-label="رجوع">${ICON.back}</button><div class="tag">طلب <span style="direction:ltr;unicode-bidi:isolate">${esc(o.order_no)}</span></div></div>
