@@ -42,7 +42,8 @@ jobs:
           cp -r "$ANDROID_HOME/cmdline-tools/latest/." "$SDK_BW/"
           mkdir -p "$SDK_BW/licenses" && cp -r "$ANDROID_HOME/licenses/." "$SDK_BW/licenses/" || true
           yes | "$SDK_BW/bin/sdkmanager" --sdk_root="$SDK_BW" --licenses >/dev/null 2>&1 || true
-          "$SDK_BW/bin/sdkmanager" --sdk_root="$SDK_BW" "platforms;android-36" "platform-tools" "build-tools;36.0.0" >/dev/null
+          yes | "$SDK_BW/bin/sdkmanager" --sdk_root="$SDK_BW" "platforms;android-36" "platform-tools" "build-tools;36.0.0" | tail -n 5
+          echo "--- SDK_BW contents"; ls -la "$SDK_BW" "$SDK_BW/platforms" "$SDK_BW/build-tools" 2>&1 | head -40
           echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$SDK_BW\"}" > ~/.bubblewrap/config.json
           cat ~/.bubblewrap/config.json; ls "$SDK_BW"
           bubblewrap doctor || true
@@ -89,7 +90,7 @@ jobs:
       - name: Save build log to the repo on failure (the session that drives this cannot read Actions logs)
         if: failure()
         run: |
-          mkdir -p twa && (tail -n 250 twa/build.log 2>/dev/null || echo "no build.log") > twa/last-build.log
+          mkdir -p twa && { echo "== SDK_BW"; ls -la "$HOME/android-sdk-bw" "$HOME/android-sdk-bw/platforms" 2>&1 | head -30; echo "== build.log"; tail -n 250 twa/build.log 2>/dev/null || echo "no build.log"; } > twa/last-build.log
           git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add twa/last-build.log && git commit -m "Android build failed: log tail" && git push || true
       - name: Publish assetlinks.json to the site
