@@ -252,7 +252,7 @@ function V_settings(){const s=S.settings;if(!s)return `<div class="hdr"><h2>ال
   </div><div class="card"><h3>المندوبون والرموز</h3>
     ${f('s_drivers','أسماء المندوبين (افصل بفاصلة)',(s.drivers||[]).join('، '),'text','تظهر كخيارات عند تسليم الطلب')}
     ${f('s_admin_pin','رمز المدير',s.admin_pin||'','text','كامل الصلاحيات: المالية والإعدادات والعملاء')}
-    ${f('s_cashier_pin','رمز الكاشير',s.cashier_pin||'','text','الطلبات والتجهيز والعملاء (عرض فقط). هو نفسه رمز «لوحة الطلبات» داخل تطبيق الزبائن')}
+    ${f('s_cashier_pin','رمز الكاشير',s.cashier_pin||'','text','الطلبات والتجهيز والعملاء (عرض فقط). «لوحة الطلبات» داخل تطبيق الزبائن تقبل رمز المدير أو رمز الكاشير')}
   </div></div>`}
 
 function V_login(){return `<div class="login"><div class="box"><img src="../icon-512.png" alt="3045"><h1>إدارة 3045</h1><p>لوحة الطلبات والتجهيز والحسابات — للمدير والكاشير</p><input id="pinIn" inputmode="numeric" autocomplete="one-time-code" placeholder="الرمز" autofocus><div class="err" id="pinErr"></div><button class="btn primary" id="pinBtn" style="width:100%">دخول</button></div></div>`}

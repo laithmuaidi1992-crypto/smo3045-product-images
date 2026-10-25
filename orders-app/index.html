@@ -398,7 +398,7 @@ async function rpc(action,args){
 }
 function registerCustomer(){const c=S.customer;if(!c||!c.phone)return;const a=c.address||{};rpc('register',{phone:c.phone,name:c.name||null,area:a.area||null,street:a.street||null,landmark:a.landmark||null,lat:a.lat||null,lng:a.lng||null,source:'web'}).catch(()=>{})}
 function heartbeat(){const c=S.customer;if(!c||!c.phone)return;const last=ls.get('smo_seen',0);if(Date.now()-last<6*3600*1000)return;ls.set('smo_seen',Date.now());rpc('seen',{phone:c.phone,source:'web'}).catch(()=>{})}
-function staffPin(){let p=ls.get('smo_staff_pin','');if(!p){p=prompt('رمز الموظفين:')||'';if(p)ls.set('smo_staff_pin',p)}return p}
+function staffPin(){let p=ls.get('smo_staff_pin','');if(!p){p=(prompt('رمز الموظفين:')||'').replace(/\D/g,'');if(p)ls.set('smo_staff_pin',p)}return p}
 async function staffRpc(action,args){try{return await rpc(action,{...(args||{}),pin:staffPin()})}catch(e){if(e&&e.code==='bad_pin')ls.set('smo_staff_pin','');throw e}}
 function errText(e){
   const c=e&&e.code;
