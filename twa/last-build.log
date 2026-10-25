@@ -29,13 +29,7 @@ FAILURE: Build failed with an exception.
 
 * What went wrong:
 Could not determine the dependencies of task ':app:minifyReleaseWithR8'.
-> Several environment variables and/or system properties contain different paths to the SDK.
-  Please correct and use only one way to inject the SDK location.
-  
-  ANDROID_HOME: /home/runner/android-sdk-bw
-  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-  
-  It is recommended to use ANDROID_HOME as other methods are deprecated
+> Failed to find target with hash string 'android-36' in: /home/runner/android-sdk-bw
 
 * Try:
 > Run with --info or --debug option to get more log output.
@@ -184,24 +178,13 @@ org.gradle.api.internal.tasks.TaskDependencyResolveException: Could not determin
 	at org.gradle.launcher.daemon.server.DaemonStateCoordinator.lambda$runCommand$0(DaemonStateCoordinator.java:321)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
-Caused by: java.lang.RuntimeException: Several environment variables and/or system properties contain different paths to the SDK.
-Please correct and use only one way to inject the SDK location.
-
-ANDROID_HOME: /home/runner/android-sdk-bw
-ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-
-It is recommended to use ANDROID_HOME as other methods are deprecated
-	at com.android.build.gradle.internal.SdkLocator$SdkLocationSource$INJECTED_SDK_HOME.getSdkPathProperty(SdkLocator.kt:212)
-	at com.android.build.gradle.internal.SdkLocator$SdkLocationSource.getSdkLocation(SdkLocator.kt:217)
-	at com.android.build.gradle.internal.SdkLocator.getSdkLocation(SdkLocator.kt:295)
-	at com.android.build.gradle.internal.SdkDirectLoadingStrategy.loadSdkComponents(SdkDirectLoadingStrategy.kt:106)
-	at com.android.build.gradle.internal.SdkDirectLoadingStrategy.init(SdkDirectLoadingStrategy.kt:98)
-	at com.android.build.gradle.internal.SdkDirectLoadingStrategy.access$init(SdkDirectLoadingStrategy.kt:51)
-	at com.android.build.gradle.internal.SdkDirectLoadingStrategy$components$2.invoke(SdkDirectLoadingStrategy.kt:77)
-	at com.android.build.gradle.internal.SdkDirectLoadingStrategy$components$2.invoke(SdkDirectLoadingStrategy.kt:76)
-	at kotlin.SynchronizedLazyImpl.getValue(LazyJVM.kt:74)
-	at com.android.build.gradle.internal.SdkDirectLoadingStrategy.getComponents(SdkDirectLoadingStrategy.kt:76)
-	at com.android.build.gradle.internal.SdkDirectLoadingStrategy.loadedSuccessfully(SdkDirectLoadingStrategy.kt:190)
+Caused by: com.android.builder.errors.EvalIssueException: Failed to find target with hash string 'android-36' in: /home/runner/android-sdk-bw
+	at com.android.builder.errors.IssueReporter.reportError(IssueReporter.kt:133)
+	at com.android.build.gradle.internal.SdkHandler.initTarget(SdkHandler.java:156)
+	at com.android.build.gradle.internal.SdkFullLoadingStrategy.init(SdkFullLoadingStrategy.kt:49)
+	at com.android.build.gradle.internal.SdkFullLoadingStrategy.getBuildToolsInfo(SdkFullLoadingStrategy.kt:74)
+	at com.android.build.gradle.internal.SdkFullLoadingStrategy.getFileFromBuildTool(SdkFullLoadingStrategy.kt:78)
+	at com.android.build.gradle.internal.SdkFullLoadingStrategy.getCoreLambaStubs(SdkFullLoadingStrategy.kt:81)
 	at com.android.build.gradle.internal.SdkLoadingStrategy.getCoreLambaStubs(SdkLoadingStrategy.kt:41)
 	at com.android.build.gradle.internal.SdkComponentsBuildService$VersionedSdkLoader$coreLambdaStubsProvider$1.call(SdkComponents.kt:244)
 	at com.android.build.gradle.internal.SdkComponentsBuildService$VersionedSdkLoader$coreLambdaStubsProvider$1.call(SdkComponents.kt:244)
@@ -227,9 +210,13 @@ It is recommended to use ANDROID_HOME as other methods are deprecated
 	at org.gradle.internal.graph.CachingDirectedGraphWalker.findValues(CachingDirectedGraphWalker.java:73)
 	at org.gradle.api.internal.tasks.CachingTaskDependencyResolveContext.getDependencies(CachingTaskDependencyResolveContext.java:67)
 	... 139 more
+Caused by: java.lang.IllegalStateException: Failed to find target with hash string 'android-36' in: /home/runner/android-sdk-bw
+	at com.android.builder.sdk.DefaultSdkLoader.getTargetInfo(DefaultSdkLoader.java:174)
+	at com.android.build.gradle.internal.SdkHandler.initTarget(SdkHandler.java:136)
+	... 167 more
 
 
-BUILD FAILED in 33s
+BUILD FAILED in 37s
 [0m
 
 
