@@ -42,6 +42,7 @@ jobs:
           cp -r "$ANDROID_HOME/cmdline-tools/latest/." "$SDK_BW/"
           mkdir -p "$SDK_BW/licenses" && cp -r "$ANDROID_HOME/licenses/." "$SDK_BW/licenses/" || true
           yes | "$SDK_BW/bin/sdkmanager" --sdk_root="$SDK_BW" --licenses >/dev/null 2>&1 || true
+          "$SDK_BW/bin/sdkmanager" --sdk_root="$SDK_BW" "platforms;android-36" "platform-tools" "build-tools;36.0.0" >/dev/null
           echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$SDK_BW\"}" > ~/.bubblewrap/config.json
           cat ~/.bubblewrap/config.json; ls "$SDK_BW"
           bubblewrap doctor || true
