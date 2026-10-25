@@ -1,3 +1,25 @@
+== SDK_BW
+/home/runner/android-sdk-bw:
+total 160
+drwxr-xr-x  9 runner runner   4096 Oct 25 10:40 .
+drwxr-x--- 17 runner runner   4096 Oct 25 10:41 ..
+drwxr-xr-x  2 runner runner   4096 Oct 25 10:41 .temp
+-rwxr-xr-x  1 runner runner 120464 Oct 25 10:40 NOTICE.txt
+drwxr-xr-x  2 runner runner   4096 Oct 25 10:40 bin
+drwxr-xr-x  5 runner runner   4096 Oct 25 10:41 build-tools
+drwxr-xr-x 17 runner runner   4096 Oct 25 10:40 lib
+drwxr-xr-x  2 runner runner   4096 Oct 25 10:40 licenses
+drwxr-xr-x  3 runner runner   4096 Oct 25 10:40 platform-tools
+drwxr-xr-x  4 runner runner   4096 Oct 25 10:41 platforms
+-rwxr-xr-x  1 runner runner     86 Oct 25 10:40 source.properties
+
+/home/runner/android-sdk-bw/platforms:
+total 16
+drwxr-xr-x 4 runner runner 4096 Oct 25 10:41 .
+drwxr-xr-x 9 runner runner 4096 Oct 25 10:40 ..
+drwxr-xr-x 6 runner runner 4096 Oct 25 10:40 android-36
+drwxr-xr-x 6 runner runner 4096 Oct 25 10:41 android-36-2
+== build.log
 ,-----.        ,--.  ,--.  ,--.
 |  |) /_,--.,--|  |-.|  |-.|  |,---.,--.   ,--,--.--.,--,--.,---.
 |  .-.  |  ||  | .-. | .-. |  | .-. |  |.'.|  |  .--' ,-.  | .-. |
@@ -216,7 +238,7 @@ Caused by: java.lang.IllegalStateException: Failed to find target with hash stri
 	... 167 more
 
 
-BUILD FAILED in 45s
+BUILD FAILED in 33s
 [0m
 
 
