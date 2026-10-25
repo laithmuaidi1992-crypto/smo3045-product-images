@@ -158,7 +158,9 @@ function logout(){S.role=null;S.pin='';ls.set('adm_role',null);ls.set('adm_pin',
 let actx=null;
 function beep(times=2){if(!S.sound)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const t0=actx.currentTime;for(let i=0;i<times;i++){const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=i%2?1174:880;g.gain.setValueAtTime(0.0001,t0+i*.35);g.gain.exponentialRampToValueAtTime(.4,t0+i*.35+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+i*.35+.3);o.connect(g).connect(actx.destination);o.start(t0+i*.35);o.stop(t0+i*.35+.32)}}catch{}}
 function notify(title,body){try{if('Notification' in window&&Notification.permission==='granted')new Notification(title,{body,icon:'../icon-192.png',tag:'new-order'})}catch{}}
-function updateTitle(){const n=S.orders.filter(o=>o.status==='pending').length;document.title=(n?`(${n}) طلب جديد — `:'')+'إدارة 3045'}
+function updateTitle(){const n=S.orders.filter(o=>o.status==='pending').length;document.title=(n?`(${n}) طلب جديد — `:'')+'إدارة 3045';alarm(n)}
+// the alert keeps ringing every 6s while any order is still waiting to be accepted or rejected
+let alarmT=null;function alarm(n){if(n>0&&S.sound){if(!alarmT){alarmT=setInterval(()=>{if(S.sound&&S.orders.some(o=>o.status==='pending'))beep(2);else{clearInterval(alarmT);alarmT=null}},6000)}}else if(alarmT){clearInterval(alarmT);alarmT=null}}
 
 /* ---------- polling ---------- */
 async function loadOrders(){
@@ -209,7 +211,7 @@ function V_orders(){const g=k=>S.orders.filter(o=>k.includes(o.status));const to
   const done=S.orders.filter(o=>['delivered','cancelled'].includes(o.status)&&new Date(o.created_at).toDateString()===today);
   const col=(title,arr,cls)=>`<section class="col ${cls||''}"><h3>${title}<span class="n">${arr.length}</span></h3>${arr.length?arr.map(o=>orderCard(o)).join(''):'<div class="empty">لا شيء</div>'}</section>`;
   const tOrders=S.orders.filter(o=>new Date(o.created_at).toDateString()===today);
-  return `<div class="hdr"><div><h2>لوحة الطلبات</h2><div class="sub">تتحدّث كل 10 ثوانٍ · الطلبات الجديدة تُنبّه بالصوت${Notification&&Notification.permission!=='granted'?' · <button class="link" data-notif>فعّل إشعارات المتصفح</button>':''}</div></div><button class="btn sm" data-refresh>تحديث الآن</button></div>
+  return `<div class="hdr"><div><h2>لوحة الطلبات</h2><div class="sub">تتحدّث كل 10 ثوانٍ · الطلب الجديد يرنّ حتى يُقبل أو يُرفض${Notification&&Notification.permission!=='granted'?' · <button class="link" data-notif>فعّل إشعارات المتصفح</button>':''}</div></div><button class="btn sm" data-refresh>تحديث الآن</button></div>
   <div class="kpis"><div class="kpi ${g(['pending']).length?'hot':''}"><b>${g(['pending']).length}</b><span>جديد بانتظار القبول</span></div><div class="kpi"><b>${g(['confirmed','preparing']).length}</b><span>قيد التجهيز</span></div><div class="kpi"><b>${g(['ready','out_for_delivery']).length}</b><span>جاهز / في الطريق</span></div><div class="kpi"><b>${tOrders.filter(o=>o.status==='delivered').length}</b><span>سُلّم اليوم</span></div><div class="kpi"><b>${fmt(tOrders.filter(o=>o.status==='delivered').reduce((a,o)=>a+Number(o.total),0))}</b><span>تحصيل اليوم (د.أ)</span></div></div>
   <div class="board">${col('🆕 جديد',g(['pending']),'hot')}${col('🧺 قيد التجهيز',g(['confirmed','preparing']))}${col('✅ جاهز للتوصيل',g(['ready']))}${col('🛵 في الطريق',g(['out_for_delivery']))}${col('📦 منتهية اليوم',done)}</div>`}
 
@@ -280,7 +282,7 @@ document.addEventListener('click',async e=>{if(e.target.classList&&e.target.clas
   if(b.id==='pinBtn'){const pin=$('#pinIn').value.trim();try{const r=await fetch(SB_URL+'/rest/v1/rpc/admin_app',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY},body:JSON.stringify({action:'auth',args:{pin}})}).then(r=>r.json());if(r&&r.role){S.role=r.role;S.pin=pin;ls.set('adm_role',r.role);ls.set('adm_pin',pin);render();startPolling();if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}else $('#pinErr').textContent='الرمز غير صحيح'}catch{$('#pinErr').textContent='تعذّر الاتصال'}return}
   if(d.tab){openTab(d.tab);return}
   if(d.logout!==undefined){logout();return}
-  if(d.sound!==undefined){S.sound=!S.sound;ls.set('adm_sound',S.sound);if(S.sound){beep(1);toast('التنبيه الصوتي مفعّل')}render();return}
+  if(d.sound!==undefined){S.sound=!S.sound;ls.set('adm_sound',S.sound);if(S.sound){beep(1);toast('التنبيه الصوتي مفعّل — يستمر حتى قبول الطلب أو رفضه')}updateTitle();render();return}
   if(d.notif!==undefined){try{const p=await Notification.requestPermission();toast(p==='granted'?'إشعارات المتصفح مفعّلة':'لم يُسمح بالإشعارات')}catch{}render();return}
   if(d.refresh!==undefined){loadOrders();return}
   if(d.st&&d.id){setStatus(d.id,d.st);return}
