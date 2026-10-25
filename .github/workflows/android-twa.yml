@@ -36,8 +36,12 @@ jobs:
         run: |
           npm i -g @bubblewrap/cli
           mkdir -p ~/.bubblewrap
+          # Bubblewrap looks for the old tools/bin layout as well as cmdline-tools: give it both
+          sudo mkdir -p "$ANDROID_HOME/tools/bin" && sudo ln -sf "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$ANDROID_HOME/tools/bin/sdkmanager" || true
           echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
+          ls "$ANDROID_HOME" "$ANDROID_HOME/tools/bin" "$ANDROID_HOME/cmdline-tools" || true
+          bubblewrap doctor || true
       - name: Prepare keystore
         id: ks
         working-directory: twa
