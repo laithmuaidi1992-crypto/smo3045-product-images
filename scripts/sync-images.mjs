@@ -9,8 +9,23 @@ const SB_KEY = "sb_publishable_ZZTqt5iEvQBsDIomZCIVQw_bvcaJ5_g";
 const OUT = "orders-app/img";
 await mkdir(OUT, { recursive: true });
 
-const r = await fetch(`${SB_URL}/rest/v1/rpc/orders_app_sm_list`, { method: "POST", headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, "Content-Type": "application/json" }, body: "{}" });
-if (!r.ok) throw new Error(`list ${r.status}: ${await r.text()}`);
+// Supabase sits behind Cloudflare; an occasional 5xx HTML page (gateway hiccup) must not fail the whole run — retry with backoff.
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+async function fetchRetry(url, init, tries = 5) {
+  let last;
+  for (let i = 0; i < tries; i++) {
+    try {
+      const res = await fetch(url, init);
+      if (res.ok) return res;
+      const body = await res.text();
+      last = new Error(`HTTP ${res.status}: ${body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 160)}`);
+      if (res.status < 500 && res.status !== 429) throw last; // a real client error — don't retry
+    } catch (e) { last = e; if (!/HTTP (5\d\d|429)/.test(String(e)) && !(e instanceof TypeError)) throw e; }
+    await sleep(Math.min(30000, 1500 * 2 ** i));
+  }
+  throw last;
+}
+const r = await fetchRetry(`${SB_URL}/rest/v1/rpc/orders_app_sm_list`, { method: "POST", headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, "Content-Type": "application/json" }, body: "{}" });
 const list = await r.json(); // [[id, path], ...]
 console.log(`${list.length} pictures in storage`);
 
@@ -33,8 +48,7 @@ const worker = async () => {
   while (todo.length) {
     const [id, path, f] = todo.shift();
     try {
-      const res = await fetch(`${SB_URL}/storage/v1/object/public/product-images/${encodeURIComponent(path)}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await fetchRetry(`${SB_URL}/storage/v1/object/public/product-images/${encodeURIComponent(path)}`, undefined, 3);
       const buf = Buffer.from(await res.arrayBuffer());
       if (buf.length < 500) throw new Error("too small");
       await writeFile(f, buf); sources[id] = path; done++;
