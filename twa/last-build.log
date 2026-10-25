@@ -216,7 +216,7 @@ Caused by: java.lang.IllegalStateException: Failed to find target with hash stri
 	... 167 more
 
 
-BUILD FAILED in 37s
+BUILD FAILED in 45s
 [0m
 
 
