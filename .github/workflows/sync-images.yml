@@ -1,9 +1,8 @@
 # Mirrors product thumbnails from Supabase storage into orders-app/img/ (served by Netlify's CDN).
 # Runs daily and on demand; commits only when something changed.
 name: Sync product thumbnails
+# Disabled permanently on request (2026-10-25): no schedule; the workflow is also switched off in the repo's Actions settings.
 on:
-  schedule:
-    - cron: '17 2 * * *'
   workflow_dispatch:
 permissions:
   contents: write
