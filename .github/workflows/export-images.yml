@@ -1,0 +1,19 @@
+# One-off: export every product picture (full size, named by barcode) + Excel index, published as a GitHub release.
+name: Export product images
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install openpyxl
+      - run: python3 scripts/export-images.py
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="images-$(date -u +%Y%m%d-%H%M)"
+          gh release create "$tag" export/smo3045-product-images.zip export/products.xlsx --title "صور منتجات سمو 3045 ($(date -u +%Y-%m-%d))" --notes "كل صور المنتجات بالحجم الكامل مسمّاة بالباركود + ملف Excel يربط كل صورة بالمنتج (الباركود، الاسم، الفئة، السعر)."
