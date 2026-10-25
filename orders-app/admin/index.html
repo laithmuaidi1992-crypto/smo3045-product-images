@@ -77,6 +77,13 @@ main{flex:1;padding:16px max(16px,env(safe-area-inset-right)) 32px max(16px,env(
 /* picking */
 .pick{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:16px;align-items:start}
 @media (max-width:860px){.pick{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .top{flex-wrap:wrap;gap:8px 10px;padding-top:max(8px,env(safe-area-inset-top))}
+  .top .ttl{flex:1;min-width:0}
+  .top .ttl small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  .tabs{order:10;flex-basis:100%;margin-inline-start:0;justify-content:space-between;gap:2px;-webkit-overflow-scrolling:touch}
+  .tabs button{padding:8px 10px;font-size:14px;flex:1 0 auto}
+}
 .list{display:flex;flex-direction:column;gap:8px}
 .list .it{border:1px solid var(--line);border-radius:14px;padding:12px;background:#FFF;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:right;width:100%}
 .list .it[aria-current="true"]{border-color:var(--navy);background:var(--tint)}
@@ -211,7 +218,7 @@ function V_orders(){const g=k=>S.orders.filter(o=>k.includes(o.status));const to
   const done=S.orders.filter(o=>['delivered','cancelled'].includes(o.status)&&new Date(o.created_at).toDateString()===today);
   const col=(title,arr,cls)=>`<section class="col ${cls||''}"><h3>${title}<span class="n">${arr.length}</span></h3>${arr.length?arr.map(o=>orderCard(o)).join(''):'<div class="empty">لا شيء</div>'}</section>`;
   const tOrders=S.orders.filter(o=>new Date(o.created_at).toDateString()===today);
-  return `<div class="hdr"><div><h2>لوحة الطلبات</h2><div class="sub">تتحدّث كل 10 ثوانٍ · الطلب الجديد يرنّ حتى يُقبل أو يُرفض${Notification&&Notification.permission!=='granted'?' · <button class="link" data-notif>فعّل إشعارات المتصفح</button>':''}</div></div><button class="btn sm" data-refresh>تحديث الآن</button></div>
+  return `<div class="hdr"><div><h2>لوحة الطلبات</h2><div class="sub">تتحدّث كل 10 ثوانٍ · الطلب الجديد يرنّ حتى يُقبل أو يُرفض${('Notification' in window)&&Notification.permission!=='granted'?' · <button class="link" data-notif>فعّل إشعارات المتصفح</button>':''}</div></div><button class="btn sm" data-refresh>تحديث الآن</button></div>
   <div class="kpis"><div class="kpi ${g(['pending']).length?'hot':''}"><b>${g(['pending']).length}</b><span>جديد بانتظار القبول</span></div><div class="kpi"><b>${g(['confirmed','preparing']).length}</b><span>قيد التجهيز</span></div><div class="kpi"><b>${g(['ready','out_for_delivery']).length}</b><span>جاهز / في الطريق</span></div><div class="kpi"><b>${tOrders.filter(o=>o.status==='delivered').length}</b><span>سُلّم اليوم</span></div><div class="kpi"><b>${fmt(tOrders.filter(o=>o.status==='delivered').reduce((a,o)=>a+Number(o.total),0))}</b><span>تحصيل اليوم (د.أ)</span></div></div>
   <div class="board">${col('🆕 جديد',g(['pending']),'hot')}${col('🧺 قيد التجهيز',g(['confirmed','preparing']))}${col('✅ جاهز للتوصيل',g(['ready']))}${col('🛵 في الطريق',g(['out_for_delivery']))}${col('📦 منتهية اليوم',done)}</div>`}
 
@@ -287,7 +294,7 @@ async function openTab(t){S.tab=t;location.hash=t;render();
 
 /* ---------- events ---------- */
 document.addEventListener('click',async e=>{if(e.target.classList&&e.target.classList.contains('modal')){S.modal=null;render();return}const b=e.target.closest('button,[data-undo]');if(!b)return;const d=b.dataset;
-  if(b.id==='pinBtn'){const pin=$('#pinIn').value.trim();try{const r=await fetch(SB_URL+'/rest/v1/rpc/admin_app',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY},body:JSON.stringify({action:'auth',args:{pin}})}).then(r=>r.json());if(r&&r.role){S.role=r.role;S.pin=pin;ls.set('adm_role',r.role);ls.set('adm_pin',pin);render();startPolling();if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}else $('#pinErr').textContent='الرمز غير صحيح'}catch{$('#pinErr').textContent='تعذّر الاتصال'}return}
+  if(b.id==='pinBtn'){const pin=$('#pinIn').value.trim();try{const r=await fetch(SB_URL+'/rest/v1/rpc/admin_app',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY},body:JSON.stringify({action:'auth',args:{pin}})}).then(r=>r.json());if(r&&r.role){S.role=r.role;S.pin=pin;ls.set('adm_role',r.role);ls.set('adm_pin',pin);try{render();startPolling();if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}catch(err){console.error(err);toast('خطأ في العرض: '+err.message,true)}}else $('#pinErr').textContent='الرمز غير صحيح'}catch{const e=$('#pinErr');if(e)e.textContent='تعذّر الاتصال — تحقّق من الإنترنت'}return}
   if(d.tab){openTab(d.tab);return}
   if(d.logout!==undefined){logout();return}
   if(d.sound!==undefined){S.sound=!S.sound;ls.set('adm_sound',S.sound);if(S.sound){beep(1);toast('التنبيه الصوتي مفعّل — يستمر حتى قبول الطلب أو رفضه')}updateTitle();render();return}
