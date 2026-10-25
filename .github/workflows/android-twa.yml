@@ -80,6 +80,7 @@ jobs:
           BUBBLEWRAP_KEY_PASSWORD: ${{ steps.ks.outputs.pass }}
         run: |
           set -o pipefail
+          unset ANDROID_SDK_ROOT ANDROID_HOME   # Bubblewrap sets ANDROID_HOME for gradle itself; a second, different path makes gradle refuse
           # generate the Android project from twa-manifest.json (writes the checksum build asks about), then build
           bubblewrap update --skipVersionUpgrade 2>&1 | tee build.log
           yes "" | bubblewrap build --skipPwaValidation 2>&1 | tee -a build.log
