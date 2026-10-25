@@ -89,6 +89,15 @@ a{color:var(--navy);text-decoration:none}
 .search:focus-within{border-color:var(--navy)}
 .hd.green .search{background:#FFFFFF}
 .search input{flex:1;border:0;outline:0;background:transparent;font-size:14px;color:var(--fg);padding:0;min-width:0;height:46px}
+.installcard{display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:var(--navy-tint);border:1px solid var(--hair);border-radius:18px;padding:12px 14px;color:var(--fg)}
+.installcard img{width:44px;height:44px;border-radius:12px;background:#FFF;border:1px solid var(--line);flex:none;object-fit:contain}
+.installcard .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.installcard b{font-size:13.5px;color:var(--navy)}
+.installcard small{font-size:11.5px;color:var(--muted);line-height:1.45}
+.installcard .acts{display:flex;flex-direction:row;gap:6px;flex:none}
+.installcard .go{background:var(--navy);color:#FFF;border-radius:10px;padding:8px 12px;font-size:12.5px;font-weight:700}
+.installcard .x{color:var(--muted);padding:8px;font-size:12px}
+.iossteps{flex:1 1 100%;background:#FFF;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:12.5px;line-height:1.7;color:var(--fg)}
 .chefcard{display:flex;align-items:center;gap:14px;background:#FFFFFF;border:1.5px solid var(--red);border-radius:22px;padding:16px;color:var(--fg);width:100%;position:relative;overflow:hidden}
 .chefcard::before{content:"";position:absolute;inset-inline-start:-34px;top:-34px;width:130px;height:130px;border-radius:50%;background:var(--red-tint)}
 .chefcard .orb{width:52px;height:52px;border-radius:16px;background:var(--red);display:grid;place-items:center;color:#FFF;flex:none;position:relative}
@@ -606,7 +615,7 @@ V.home=()=>{const c=S.customer;const addr=c&&c.address?`${c.address.area}${c.add
   return `<div class="hd green"><div class="brandline"><span class="logo-sm-wrap">${logoSVG('logo-sm')}</span><div class="open"><i></i>مفتوح 24 ساعة</div></div>
   <button class="addr" data-go="address"><span style="color:var(--red)">${ICON.pin}</span><div><small>التوصيل إلى</small><b>${esc(addr)} ▾</b></div></button>
   <label class="search">${ICON.search}<input id="homeQ" placeholder="ابحث عن منتج… حليب، أرز، شامبو" aria-label="ابحث عن منتج"></label></div>
-  <div class="body">${dbNotice()}
+  <div class="body">${dbNotice()}${installCard()}
   <button class="chefcard" data-go="chef"><span class="orb">${ICON.spark}</span><div><h2>ما احتياجك اليوم؟</h2><p>طبخة، ضيافة، تنظيف البيت، مستلزمات الأطفال، فطور… اكتب احتياجك والمساعد الذكي يجهّز لك قائمة المشتريات من رفوف المتجر</p></div></button>
   <div class="sec"><div class="sec-h"><h2>الأقسام</h2><button class="link" data-go="cats">عرض الكل</button></div>
   ${S.ready?`<div class="cat4">${parents.map(c=>`<button data-cat="${c.id}">${catTile(c,'ic')}<span>${esc(c.name)}</span></button>`).join('')}</div>`:`<div class="cat4">${Array.from({length:4},()=>`<div class="skel" style="height:64px;border-radius:18px"></div>`).join('')}</div>`}</div>
@@ -837,6 +846,8 @@ document.addEventListener('click',async e=>{
   if(d.serv){S.chef.servings=Math.max(1,Math.min(30,S.chef.servings+Number(d.serv)));applyServings();rerender();return}
   if(d.chefAdd!==undefined){const r=S.chef.result;let n=0;r.items.forEach((it,i)=>{const p=(it.cands||[])[S.chef.pick[i]||0];if(p&&!S.chef.off[i]){const q=Math.max(1,Math.min(S.chef.qty[i]||1,p.stock));S.cart[p.id]=Math.min(p.stock,(S.cart[p.id]||0)+q);if(!S.cartMeta[p.id])S.cartMeta[p.id]={dish:r.dish};n++}});ls.set('smo_cart',S.cart);ls.set('smo_cartmeta',S.cartMeta);toast(`أُضيف ${n} أصناف للسلة`);S.stack=[];go('cart',{},true);return}
   if(d.chefReset!==undefined){S.chef={msgs:[],result:null,servings:4,baseServings:4,off:{},pick:{},qty:{},manual:{}};render();return}
+  if(d.install!==undefined){doInstall();return}
+  if(d.installHide!==undefined){ls.set('smo_install_hide',Date.now()+3*864e5);rerender();return}
   if(d.geo!==undefined){useMyLocation();return}
   if(d.track){go('track',{order_no:d.track});return}
   if(d.refreshTrack!==undefined)return refreshTrack(false);
@@ -871,6 +882,17 @@ document.addEventListener('input',e=>{const t=e.target;
 });
 document.addEventListener('change',e=>{const t=e.target;if(t.name==='pay'){S.pay=t.value}else if(t.dataset.ing!==undefined){S.chef.off[t.dataset.ing]=!t.checked;rerender()}});
 document.addEventListener('keydown',e=>{if(e.key==='Backspace'&&/^otp\d$/.test(e.target.id)&&!e.target.value){const i=Number(e.target.id.slice(3));if(i>0)$('#otp'+(i-1)).focus()}});
+
+/* ---------- install (PWA): Android gets the browser's install prompt, iPhone gets the share-sheet steps ---------- */
+let _installEvt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_installEvt=e;if(S.screen==='home')rerender()});
+window.addEventListener('appinstalled',()=>{_installEvt=null;ls.set('smo_installed',true);toast('تم تثبيت التطبيق');rerender()});
+const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;
+function installCard(){if(isStandalone()||ls.get('smo_installed',false)||ls.get('smo_install_hide',0)>Date.now())return'';
+  if(!_installEvt&&!isIOS())return'';
+  return `<div class="installcard"><img src="icon-192.png" alt=""><div class="txt"><b>ثبّت تطبيق 3045 على هاتفك</b><small>${isIOS()?'يفتح كتطبيق من الشاشة الرئيسية بلا متصفح':'أيقونة على الشاشة الرئيسية، يفتح أسرع ويعمل كتطبيق'}</small></div><div class="acts"><button class="go" data-install>${isIOS()?(S.iosSteps?'فهمت':'كيف؟'):'تثبيت'}</button><button class="x" data-install-hide aria-label="لاحقاً">لاحقاً</button></div>${S.iosSteps?`<div class="iossteps">١. اضغط زر <b>المشاركة</b> أسفل Safari (المربع والسهم ↑)<br>٢. اختر <b>«إضافة إلى الشاشة الرئيسية»</b><br>٣. اضغط <b>إضافة</b> في الأعلى</div>`:''}</div>`}
+async function doInstall(){if(_installEvt){const e=_installEvt;_installEvt=null;e.prompt();try{const r=await e.userChoice;if(r&&r.outcome!=='accepted')_installEvt=e}catch{}rerender();return}
+  if(isIOS()){if(S.iosSteps){ls.set('smo_install_hide',Date.now()+7*864e5);S.iosSteps=false}else S.iosSteps=true;rerender()}}
 
 /* ---------- boot ---------- */
 S.view=ls.get('smo_view','grid');S.cart=ls.get('smo_cart',{});S.cartMeta=ls.get('smo_cartmeta',{});S.mine=ls.get('smo_orders',[]);S.customer=ls.get('smo_customer',null);S.skipped=ls.get('smo_skipped',false);
