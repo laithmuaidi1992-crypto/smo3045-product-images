@@ -72,8 +72,15 @@ jobs:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ steps.ks.outputs.pass }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ steps.ks.outputs.pass }}
         run: |
-          bubblewrap build --skipPwaValidation
+          set -o pipefail
+          bubblewrap build --skipPwaValidation 2>&1 | tee build.log
           ls -la *.aab *.apk || true
+      - name: Save build log to the repo on failure (the session that drives this cannot read Actions logs)
+        if: failure()
+        run: |
+          mkdir -p twa && (tail -n 250 twa/build.log 2>/dev/null || echo "no build.log") > twa/last-build.log
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add twa/last-build.log && git commit -m "Android build failed: log tail" && git push || true
       - name: Publish assetlinks.json to the site
         run: |
           FP="${{ steps.ks.outputs.fingerprint }}"
