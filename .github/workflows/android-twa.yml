@@ -82,11 +82,19 @@ jobs:
           BUBBLEWRAP_KEY_PASSWORD: ${{ steps.ks.outputs.pass }}
         run: |
           set -o pipefail
-          unset ANDROID_SDK_ROOT ANDROID_HOME   # Bubblewrap sets ANDROID_HOME for gradle itself; a second, different path makes gradle refuse
-          # generate the Android project from twa-manifest.json (writes the checksum build asks about), then build
+          # 1) generate the Android project from twa-manifest.json
           bubblewrap update --skipVersionUpgrade 2>&1 | tee build.log
-          yes "" | bubblewrap build --skipPwaValidation 2>&1 | tee -a build.log
-          ls -la *.aab *.apk || true
+          # 2) build it with the runner's full Android SDK (Bubblewrap's own SDK handling trips over gradle here)
+          export ANDROID_HOME=/usr/local/lib/android/sdk; unset ANDROID_SDK_ROOT
+          chmod +x ./gradlew
+          ./gradlew --no-daemon -q bundleRelease assembleRelease 2>&1 | tee -a build.log
+          # 3) sign the bundle (jarsigner) and the APK (apksigner) with the upload key, as Bubblewrap would
+          AAB=$(ls app/build/outputs/bundle/release/*.aab | head -1); APK=$(ls app/build/outputs/apk/release/*.apk | head -1)
+          jarsigner -sigalg SHA256withRSA -digestalg SHA-256 -keystore android.keystore -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" -keypass "$BUBBLEWRAP_KEY_PASSWORD" -signedjar app-release-bundle.aab "$AAB" 3045
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$BT/zipalign" -f -p 4 "$APK" aligned.apk
+          "$BT/apksigner" sign --ks android.keystore --ks-key-alias 3045 --ks-pass "pass:$BUBBLEWRAP_KEYSTORE_PASSWORD" --key-pass "pass:$BUBBLEWRAP_KEY_PASSWORD" --out app-release-signed.apk aligned.apk
+          ls -la *.aab *.apk
       - name: Save build log to the repo on failure (the session that drives this cannot read Actions logs)
         if: failure()
         run: |
