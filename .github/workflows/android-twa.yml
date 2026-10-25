@@ -80,7 +80,9 @@ jobs:
           BUBBLEWRAP_KEY_PASSWORD: ${{ steps.ks.outputs.pass }}
         run: |
           set -o pipefail
-          bubblewrap build --skipPwaValidation 2>&1 | tee build.log
+          # generate the Android project from twa-manifest.json (writes the checksum build asks about), then build
+          bubblewrap update --skipVersionUpgrade 2>&1 | tee build.log
+          yes "" | bubblewrap build --skipPwaValidation 2>&1 | tee -a build.log
           ls -la *.aab *.apk || true
       - name: Save build log to the repo on failure (the session that drives this cannot read Actions logs)
         if: failure()
