@@ -1,0 +1,111 @@
+# Builds the Google Play package (Android App Bundle) for the 3045 ordering app as a Trusted Web Activity
+# around https://3045orderapp.netlify.app, with Bubblewrap. Manual run only.
+#
+# First run (no TWA_KEYSTORE_B64 secret yet): creates the upload keystore, prints its SHA-256, publishes
+# .well-known/assetlinks.json to the site, and uploads the keystore as a run artifact. Download it and save it
+# as repository secrets TWA_KEYSTORE_B64 (base64 of the file) and TWA_KEYSTORE_PASS (its password) so later
+# builds are signed with the same key. Without that, every run makes a new key and Play rejects the update.
+name: Build Android app (Play)
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version shown to users (e.g. 1.0.0)'
+        default: '1.0.0'
+      version_code:
+        description: 'Integer that must increase every upload (empty = run number)'
+        default: ''
+permissions:
+  contents: write
+concurrency:
+  group: android-twa
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Bubblewrap
+        run: |
+          npm i -g @bubblewrap/cli
+          mkdir -p ~/.bubblewrap
+          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
+      - name: Prepare keystore
+        id: ks
+        working-directory: twa
+        env:
+          KS_B64: ${{ secrets.TWA_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.TWA_KEYSTORE_PASS }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > android.keystore
+            echo "pass=$KS_PASS" >> "$GITHUB_OUTPUT"; echo "fresh=false" >> "$GITHUB_OUTPUT"
+            echo "Using the saved upload key."
+          else
+            PASS=$(openssl rand -base64 18 | tr -d '/+=' | cut -c1-20)
+            keytool -genkeypair -v -keystore android.keystore -alias 3045 -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$PASS" -keypass "$PASS" -dname "CN=3045 Supermarket, O=3045 Supermarket, L=Irbid, C=JO"
+            echo "pass=$PASS" >> "$GITHUB_OUTPUT"; echo "fresh=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::A NEW upload key was created. Download the 'android-upload-keystore' artifact and save it as the TWA_KEYSTORE_B64 / TWA_KEYSTORE_PASS secrets."
+          fi
+          FP=$(keytool -list -v -keystore android.keystore -alias 3045 -storepass "${PASS:-$KS_PASS}" | grep -m1 'SHA256:' | sed 's/.*SHA256: //')
+          echo "fingerprint=$FP" >> "$GITHUB_OUTPUT"
+          echo "SHA-256: $FP"
+      - name: Set version
+        working-directory: twa
+        run: |
+          CODE="${{ github.event.inputs.version_code }}"; [ -z "$CODE" ] && CODE="${{ github.run_number }}"
+          jq --arg n "${{ github.event.inputs.version_name }}" --argjson c "$CODE" --arg fp "${{ steps.ks.outputs.fingerprint }}" \
+             '.appVersionName=$n | .appVersion=$n | .appVersionCode=$c | .fingerprints=[{"name":"upload key","value":$fp}]' twa-manifest.json > t.json && mv t.json twa-manifest.json
+          cat twa-manifest.json
+      - name: Build bundle
+        working-directory: twa
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ steps.ks.outputs.pass }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ steps.ks.outputs.pass }}
+        run: |
+          bubblewrap build --skipPwaValidation
+          ls -la *.aab *.apk || true
+      - name: Publish assetlinks.json to the site
+        run: |
+          FP="${{ steps.ks.outputs.fingerprint }}"
+          mkdir -p orders-app/.well-known
+          printf '[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"app.netlify.orderapp3045.twa","sha256_cert_fingerprints":["%s"]}}]\n' "$FP" > orders-app/.well-known/assetlinks.json
+          cp orders-app/.well-known/assetlinks.json twa/assetlinks.json
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add orders-app/.well-known/assetlinks.json
+          git diff --cached --quiet || (git commit -m "assetlinks.json for the Play app (upload key $FP)" && git push)
+      - name: Keystore (first run only — download and save as secrets)
+        if: steps.ks.outputs.fresh == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-upload-keystore
+          path: twa/android.keystore
+          retention-days: 30
+      - name: Keystore password (first run only)
+        if: steps.ks.outputs.fresh == 'true'
+        run: |
+          echo "${{ steps.ks.outputs.pass }}" > twa/keystore-password.txt
+      - uses: actions/upload-artifact@v4
+        if: steps.ks.outputs.fresh == 'true'
+        with:
+          name: android-upload-keystore-password
+          path: twa/keystore-password.txt
+          retention-days: 30
+      - name: Play package
+        uses: actions/upload-artifact@v4
+        with:
+          name: 3045-play-package
+          path: |
+            twa/app-release-bundle.aab
+            twa/app-release-signed.apk
+            twa/assetlinks.json
+          retention-days: 90
