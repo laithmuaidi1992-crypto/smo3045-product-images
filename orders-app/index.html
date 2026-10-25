@@ -428,7 +428,7 @@ function applyCatalog(d){
 }
 async function loadCatalog(force){
   if(S.loading)return;
-  const cached=ls.get('smo_catalog7',null);
+  const cached=ls.get('smo_catalog8',null);
   if(!force&&cached&&Date.now()-cached.ts<60*60*1000&&cached.prods&&cached.prods.length){applyCatalog(cached);render();return}
   S.loading=true;setConn('جارٍ تحميل المنتجات من المتجر…');render();
   try{
@@ -445,7 +445,7 @@ async function loadCatalog(force){
     const prods=rows.map(a=>({id:a[0],name:a[1],price:Number(a[2]),stock:Number(a[3]),emoji:a[4]||'📦',cat:a[5],unit:a[6],bulk:!!a[7],sm:a[8]||null}));
     prods.sort((x,y)=>x.name.localeCompare(y.name,'ar'));
     const data={ts:Date.now(),cats,prods,settings:(d.settings&&typeof d.settings==='object')?d.settings:null,top:d.top||[],thumb:!!d.thumb,catimg:d.catimg||{}};
-    ls.set('smo_catalog7',data);applyCatalog(data);setConn('');
+    ls.set('smo_catalog8',data);applyCatalog(data);setConn('');
   }catch(e){S.loadError=errText(e);setConn('')}
   finally{S.loading=false;render()}
 }
@@ -789,7 +789,7 @@ V.account=()=>{const c=S.customer;return `<div class="hd"><h1>حسابي</h1>${v
   :`<div class="card"><div class="t">سجّل دخولك لحفظ عنوانك ومتابعة طلباتك</div><button class="cta" data-go="welcome" style="justify-content:center">تسجيل الدخول</button></div>`}
   <div class="sec"><div class="sec-h"><h2>طلباتي</h2><button class="link" data-refresh-mine>تحديث</button></div><div class="${S.view==='grid'?'grid2 ocard-grid':'list'}" id="myOrders">${S.myLoading?`<div class="empty">جارٍ التحميل…</div>`:S.myOrders.length?S.myOrders.map(o=>orderCard(o,false)).join(''):`<div class="empty"><h3>لا توجد طلبات بعد</h3>${S.myErr?esc(S.myErr):'طلباتك من هذا الجهاز تظهر هنا.'}</div>`}</div>
   <form id="lookupForm" style="display:flex;gap:8px"><input id="lookupIn" placeholder="متابعة طلب آخر برقمه (ON-…)" style="flex:1;border:1.5px solid var(--hair);border-radius:12px;padding:10px 12px;background:#FFF;min-width:0"><button class="chip" type="submit">متابعة</button></form></div>
-  <div class="card"><div class="t">للمتجر</div><button class="pin" data-go="staff" style="border:0;padding:4px 0"><span class="ic">${ICON.grid}</span><div><b>لوحة الطلبات</b><small>استقبال الطلبات وتغيير حالتها وتعيين المندوب</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button><button class="pin" data-reload style="border:0;padding:4px 0"><span class="ic">${ICON.refresh}</span><div><b>تحديث المنتجات والأسعار</b><small>${S.ready?'آخر تحميل: '+fmtDate((ls.get('smo_catalog7',{})||{}).ts||Date.now()):'غير محمّلة'}</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button></div>
+  <div class="card"><div class="t">للمتجر</div><button class="pin" data-go="staff" style="border:0;padding:4px 0"><span class="ic">${ICON.grid}</span><div><b>لوحة الطلبات</b><small>استقبال الطلبات وتغيير حالتها وتعيين المندوب</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button><button class="pin" data-reload style="border:0;padding:4px 0"><span class="ic">${ICON.refresh}</span><div><b>تحديث المنتجات والأسعار</b><small>${S.ready?'آخر تحميل: '+fmtDate((ls.get('smo_catalog8',{})||{}).ts||Date.now()):'غير محمّلة'}</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button></div>
   <p class="hint" style="text-align:center">3045 · إربد · مفتوح 24 ساعة</p></div>`+navHTML('account')};
 async function loadMine(extra){const nos=[...new Set([...(extra?[extra]:[]),...S.mine])];if(!nos.length){S.myOrders=[];render();return}
   S.myLoading=true;S.myErr='';render();
