@@ -1,8 +1,1 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "app.netlify.orderapp3045.twa",
-    "sha256_cert_fingerprints": ["REPLACE_WITH_SHA256_FROM_PWABUILDER_OR_PLAY_CONSOLE"]
-  }
-}]
+[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"app.netlify.orderapp3045.twa","sha256_cert_fingerprints":["E9:F7:63:F4:EB:B4:AB:EF:92:14:23:9E:8E:82:E5:8F:E9:63:9F:4F:AE:78:D5:B9:74:B4:A1:10:4C:B5:9A:C9"]}}]
