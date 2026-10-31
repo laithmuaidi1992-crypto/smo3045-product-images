@@ -389,6 +389,16 @@ const ICON={back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" st
 
 /* ---------- database: public RPC on Supabase (anon key); staff actions carry the PIN ---------- */
 const SB_URL='https://oxrqkgbbccstbetxpnsn.supabase.co', SB_KEY='sb_publishable_ZZTqt5iEvQBsDIomZCIVQw_bvcaJ5_g', IMG_BASE=SB_URL+'/storage/v1/object/public/product-images/';
+/* ---- native (iOS app via Capacitor). Everything below is a no-op on the website. ---- */
+const NATIVE=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+const SITE=NATIVE?'https://3045orderapp.netlify.app/':'';
+const _plugs={};function plug(n){if(!NATIVE)return null;if(_plugs[n])return _plugs[n];const C=window.Capacitor;try{_plugs[n]=(C.Plugins&&C.Plugins[n])||(C.registerPlugin&&C.registerPlugin(n))||null}catch{_plugs[n]=null}return _plugs[n]}
+function haptic(kind){try{const h=plug('Haptics');if(!h)return;kind==='ok'?h.notification({type:'SUCCESS'}):h.impact({style:'LIGHT'})}catch{}}
+let _notifAsked=false;async function nativeAlert(title,body){const L=plug('LocalNotifications');if(!L)return;try{if(!_notifAsked){_notifAsked=true;const p=await L.checkPermissions();if(p.display!=='granted')await L.requestPermissions()}await L.schedule({notifications:[{id:Math.floor(Math.random()*2e9),title,body}]})}catch{}}
+function initNative(){if(!NATIVE)return;document.documentElement.classList.add('native');try{const sb=plug('StatusBar');sb&&sb.setStyle({style:'LIGHT'})}catch{}try{const sp=plug('SplashScreen');sp&&setTimeout(()=>sp.hide(),300)}catch{}}
+const _lastStatus=(()=>{try{return JSON.parse(localStorage.getItem('smo_last_status')||'{}')}catch{return{}}})();
+function noteStatus(o){if(!o||!o.order_no||!o.status)return;const prev=_lastStatus[o.order_no];_lastStatus[o.order_no]=o.status;try{localStorage.setItem('smo_last_status',JSON.stringify(_lastStatus))}catch{}
+  if(prev&&prev!==o.status){haptic('ok');nativeAlert('طلبك '+o.order_no,(typeof STATUS!=='undefined'&&STATUS[o.status]&&(STATUS[o.status].label||STATUS[o.status]))||o.status)}}
 async function rpc(action,args){
   let r;
   try{r=await fetch(SB_URL+'/rest/v1/rpc/orders_app',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({action,args:args||{}})})}
@@ -452,8 +462,8 @@ async function loadCatalog(force){
 
 /* ---------- product images: small copies in storage (direct URLs, browser-cached); base64 via rpc for the rest ---------- */
 const LOCAL_IMG=new Map(); // product id → version, for pictures mirrored into img/ on this site (img/manifest.json): served from the site's own CDN
-function imgSrc(p){const v=LOCAL_IMG.get(p.id);if(v)return 'img/'+encodeURIComponent(p.id)+'.jpg?v='+encodeURIComponent(v);if(p.sm)return IMG_BASE+p.sm;return S.img.get(p.id)||null}
-async function loadLocalImages(){try{const r=await fetch('img/manifest.json',{cache:'no-cache'});if(!r.ok)return;const m=await r.json();if(m&&typeof m==='object'&&!Array.isArray(m)){Object.entries(m).forEach(([id,v])=>LOCAL_IMG.set(id,String(v).replace(/[^\w.-]/g,'').slice(-24)));if(LOCAL_IMG.size)render()}}catch{}}
+function imgSrc(p){const v=LOCAL_IMG.get(p.id);if(v)return SITE+'img/'+encodeURIComponent(p.id)+'.jpg?v='+encodeURIComponent(v);if(p.sm)return IMG_BASE+p.sm;return S.img.get(p.id)||null}
+async function loadLocalImages(){try{const r=await fetch(SITE+'img/manifest.json',{cache:'no-cache'});if(!r.ok)return;const m=await r.json();if(m&&typeof m==='object'&&!Array.isArray(m)){Object.entries(m).forEach(([id,v])=>LOCAL_IMG.set(id,String(v).replace(/[^\w.-]/g,'').slice(-24)));if(LOCAL_IMG.size)render()}}catch{}}
 function tileHTML(p,cls,extra){const im=imgSrc(p);return `<div class="tile ${cls||''}" ${im?'':`data-pid="${esc(p.id)}"`}>${im?`<img src="${im}" alt="" loading="lazy" decoding="async">`:esc(p.emoji)}${extra||''}</div>`}
 /* thumbs persist in IndexedDB so the second visit is instant; the first visit fetches only what is near the viewport, small tiles first */
 const IDB={db:null,open(){if(this.db)return Promise.resolve(this.db);return new Promise(res=>{try{const r=indexedDB.open('smo_thumbs',1);r.onupgradeneeded=()=>r.result.createObjectStore('t');r.onsuccess=()=>{this.db=r.result;res(this.db)};r.onerror=()=>res(null)}catch{res(null)}})},
@@ -500,7 +510,7 @@ function totals(){
   return{sub,fee,total:sub+fee,count:lines.reduce((a,l)=>a+l.q,0),n:lines.length};
 }
 function setQty(id,q,meta){
-  const p=S.byId.get(id);if(!p)return;
+  const p=S.byId.get(id);if(!p)return;haptic();
   q=Math.max(0,Math.min(q,p.stock));
   if(q){if(!S.cart[id]&&meta)S.cartMeta[id]=meta;S.cart[id]=q}else{delete S.cart[id];delete S.cartMeta[id]}
   if(q===p.stock&&q>0)toast(`المتاح من هذا المنتج ${p.stock} فقط`);
@@ -760,7 +770,7 @@ V.track=()=>{const o=S.track;if(!o)return head('تتبع الطلب')+`<div clas
 }
 async function refreshTrack(quiet){const no=S.params.order_no;if(!no)return;
   try{const row=await rpc('order_by_no',{order_no:no});
-    if(row&&row.order_no){S.track=row;if(S.screen==='track')render();if(!quiet)toast('تم تحديث الحالة')}else if(!quiet)toast('لم يُعثر على الطلب')}
+    if(row&&row.order_no){noteStatus(row);S.track=row;if(S.screen==='track')render();if(!quiet)toast('تم تحديث الحالة')}else if(!quiet)toast('لم يُعثر على الطلب')}
   catch(e){if(!quiet)toast(errText(e))}}
 function startTracking(){const no=S.params.order_no;if(!S.track||S.track.order_no!==no){S.track=null;render()}refreshTrack(true);
   S.trackTimer=setInterval(()=>{if(S.screen!=='track'){clearInterval(S.trackTimer);S.trackTimer=null;return}if(document.hidden)return;if(S.track&&['delivered','cancelled'].includes(S.track.status)){render();return}refreshTrack(true)},45000);
@@ -789,11 +799,12 @@ V.account=()=>{const c=S.customer;return `<div class="hd"><h1>حسابي</h1>${v
   :`<div class="card"><div class="t">سجّل دخولك لحفظ عنوانك ومتابعة طلباتك</div><button class="cta" data-go="welcome" style="justify-content:center">تسجيل الدخول</button></div>`}
   <div class="sec"><div class="sec-h"><h2>طلباتي</h2><button class="link" data-refresh-mine>تحديث</button></div><div class="${S.view==='grid'?'grid2 ocard-grid':'list'}" id="myOrders">${S.myLoading?`<div class="empty">جارٍ التحميل…</div>`:S.myOrders.length?S.myOrders.map(o=>orderCard(o,false)).join(''):`<div class="empty"><h3>لا توجد طلبات بعد</h3>${S.myErr?esc(S.myErr):'طلباتك من هذا الجهاز تظهر هنا.'}</div>`}</div>
   <form id="lookupForm" style="display:flex;gap:8px"><input id="lookupIn" placeholder="متابعة طلب آخر برقمه (ON-…)" style="flex:1;border:1.5px solid var(--hair);border-radius:12px;padding:10px 12px;background:#FFF;min-width:0"><button class="chip" type="submit">متابعة</button></form></div>
-  <div class="card"><div class="t">للمتجر</div><button class="pin" data-go="staff" style="border:0;padding:4px 0"><span class="ic">${ICON.grid}</span><div><b>لوحة الطلبات</b><small>استقبال الطلبات وتغيير حالتها وتعيين المندوب</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button><button class="pin" data-reload style="border:0;padding:4px 0"><span class="ic">${ICON.refresh}</span><div><b>تحديث المنتجات والأسعار</b><small>${S.ready?'آخر تحميل: '+fmtDate((ls.get('smo_catalog8',{})||{}).ts||Date.now()):'غير محمّلة'}</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button></div>
+  <div class="card"><div class="t">${NATIVE?'التطبيق':'للمتجر'}</div>${NATIVE?'':`<button class="pin" data-go="staff" style="border:0;padding:4px 0"><span class="ic">${ICON.grid}</span><div><b>لوحة الطلبات</b><small>استقبال الطلبات وتغيير حالتها وتعيين المندوب</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button>`}<button class="pin" data-reload style="border:0;padding:4px 0"><span class="ic">${ICON.refresh}</span><div><b>تحديث المنتجات والأسعار</b><small>${S.ready?'آخر تحميل: '+fmtDate((ls.get('smo_catalog8',{})||{}).ts||Date.now()):'غير محمّلة'}</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button></div>
+  <div class="card"><a class="pin" href="https://3045orderapp.netlify.app/privacy.html" target="_blank" rel="noopener" style="border:0;padding:4px 0;color:inherit;text-decoration:none"><span class="ic">${ICON.info}</span><div><b>سياسة الخصوصية</b><small>كيف نستخدم بياناتك</small></div><span style="color:var(--muted)">${ICON.fwd}</span></a>${c&&c.phone?`<button class="pin" data-delete-account style="border:0;padding:4px 0"><span class="ic" style="color:var(--red)">${ICON.user}</span><div><b style="color:var(--red)">حذف حسابي</b><small>يحذف اسمك ورقمك وعنوانك نهائيًا من المتجر</small></div><span style="color:var(--muted)">${ICON.fwd}</span></button>`:''}</div>
   <p class="hint" style="text-align:center">3045 · إربد · مفتوح 24 ساعة</p></div>`+navHTML('account')};
 async function loadMine(extra){const nos=[...new Set([...(extra?[extra]:[]),...S.mine])];if(!nos.length){S.myOrders=[];render();return}
   S.myLoading=true;S.myErr='';render();
-  try{const rows=await rpc('my_orders',{nos});S.myOrders=Array.isArray(rows)?rows:[];
+  try{const rows=await rpc('my_orders',{nos});S.myOrders=Array.isArray(rows)?rows:[];S.myOrders.forEach(noteStatus);
     if(extra){if(S.myOrders.some(o=>o.order_no===extra)){if(!S.mine.includes(extra)){S.mine.unshift(extra);ls.set('smo_orders',S.mine)}}else toast('لم يُعثر على الطلب')}}
   catch(e){S.myErr=errText(e)}finally{S.myLoading=false;if(S.screen==='account')render()}}
 
@@ -860,6 +871,11 @@ document.addEventListener('click',async e=>{
   if(d.st&&d.oid)return setStatus(d.oid,d.st);
   if(d.drv)return setDriver(d.drv);
   if(d.logout!==undefined){S.customer=null;ls.set('smo_customer',null);render();return}
+  if(d.deleteAccount!==undefined){const c=S.customer;if(!c||!c.phone)return;
+    if(!confirm('حذف حسابك نهائيًا؟\nسيُحذف اسمك ورقم هاتفك وعنوانك من المتجر، ولا يمكن التراجع.'))return;
+    try{await rpc('delete_account',{phone:c.phone,name:c.name||''})}catch(e){if(!/account_not_found/.test((e&&e.message)||'')){toast(errText(e));return}}
+    S.customer=null;S.mine=[];S.myOrders=[];ls.set('smo_customer',null);ls.set('smo_orders',[]);try{localStorage.removeItem('smo_last_status')}catch{}
+    S.screen='welcome';render();toast('حُذف حسابك وبياناتك');return}
   if(d.copy){try{await navigator.clipboard.writeText(d.copy);toast('نُسخ الرقم')}catch{toast(d.copy)}return}
   if(b.id==='signupBtn'){const n=$('#nameIn').value.trim();if(n.length<2){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>اكتب اسمك.</span></div>`;return}S.customer={...(S.customer||{}),name:n,phone:S.pendingPhone||(S.customer||{}).phone};ls.set('smo_customer',S.customer);registerCustomer();go('address',{},true);return}
   if(b.id==='addrBtn'){const area=$('#areaIn').value.trim(),street=$('#streetIn').value.trim(),landmark=$('#landIn').value.trim(),gm=$('#gmapIn').value.trim();if(!area||street.length<4){$('#authErr').innerHTML=`<div class="alert red">${ICON.info}<span>اكتب الحي والشارع/البناية حتى يصل المندوب.</span></div>`;return}
@@ -906,8 +922,8 @@ if(['home','cats','chef','cart','account','staff'].includes(h))S.screen=h;else S
 render();
 (async()=>{
   S.mcp=true;S.sample=true;S.booted=true;
-  loadLocalImages();heartbeat();
-  if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js')}catch{}}
+  initNative();loadLocalImages();heartbeat();
+  if(!NATIVE&&'serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js')}catch{}}
   await loadCatalog(false);
   if(S.screen==='account')loadMine();if(S.screen==='staff')loadStaff();
 })();

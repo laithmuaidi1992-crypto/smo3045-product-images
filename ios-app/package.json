@@ -1,0 +1,23 @@
+{
+  "name": "market3045-ios",
+  "private": true,
+  "version": "1.0.0",
+  "description": "3045 — iOS app (Capacitor). The web code lives in ../orders-app; scripts/prepare-www.sh copies it into www/.",
+  "scripts": {
+    "prepare-www": "bash scripts/prepare-www.sh",
+    "sync": "npm run prepare-www && npx cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/ios": "8.6.0",
+    "@capacitor/local-notifications": "8.3.1",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "4.0.0",
+    "@capacitor/cli": "8.6.0"
+  }
+}

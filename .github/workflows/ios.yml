@@ -1,0 +1,130 @@
+name: iOS app
+
+# Builds the 3045 iOS app on a GitHub Mac (no local Mac needed).
+#  - Always: compiles for the iPhone simulator, launches it and saves screenshots (proves the app runs).
+#  - When the App Store Connect secrets exist: archives, signs automatically and uploads to TestFlight.
+# Secrets for upload (Settings → Secrets → Actions):
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (contents of the .p8 file), APPLE_TEAM_ID
+on:
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: "Upload to TestFlight (needs the App Store Connect secrets)"
+        type: boolean
+        default: true
+  push:
+    branches: [main]
+    paths: ["ios-app/**", ".github/workflows/ios.yml"]
+
+permissions:
+  contents: write
+
+concurrency: { group: ios, cancel-in-progress: true }
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      VERSION: "1.0.0"
+      BUILD: ${{ github.run_number }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+    defaults: { run: { working-directory: ios-app } }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pick the newest Xcode
+        run: |
+          X=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -1)
+          sudo xcode-select -s "$X/Contents/Developer"
+          xcodebuild -version | tee ../xcode-version.txt
+          xcrun simctl list runtimes | tail -5
+
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+
+      - name: Install Capacitor
+        run: npm install --no-audit --no-fund
+
+      - name: Prepare web app + native project
+        run: |
+          npm run prepare-www
+          npx cap add ios
+          bash scripts/configure-ios.sh "$VERSION" "$BUILD"
+          npx @capacitor/assets generate --ios --iconBackgroundColor '#FFFFFF' --splashBackgroundColor '#FFFFFF' --splashBackgroundColorDark '#FFFFFF'
+          npx cap sync ios
+          /usr/libexec/PlistBuddy -c Print ios/App/App/Info.plist | head -60
+
+      - name: Build for simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -derivedDataPath build/sim CODE_SIGNING_ALLOWED=NO build 2>&1 | tee ../sim-build.log | grep -E "error:|warning: .*deprecated|BUILD" | tail -40
+
+      - name: Run in simulator + screenshots
+        run: |
+          set -x
+          DEV=$(xcrun simctl list devices available -j | python3 -c "import json,sys;d=json.load(sys.stdin)['devices'];c=[x for r,l in d.items() if 'iOS' in r for x in l if x['name'].startswith('iPhone') and 'Pro Max' in x['name']] or [x for r,l in d.items() if 'iOS' in r for x in l if x['name'].startswith('iPhone')];print(c[-1]['udid'])")
+          xcrun simctl boot "$DEV"; xcrun simctl bootstatus "$DEV" -b
+          APP=$(find build/sim -name "App.app" -path "*iphonesimulator*" | head -1)
+          xcrun simctl install "$DEV" "$APP"
+          xcrun simctl privacy "$DEV" grant location com.market3045.app || true
+          xcrun simctl location "$DEV" set 32.5556,35.8500 || true
+          xcrun simctl launch "$DEV" com.market3045.app
+          mkdir -p ../ci-out
+          sleep 25; xcrun simctl io "$DEV" screenshot ../ci-out/sim-1.png
+          sleep 20; xcrun simctl io "$DEV" screenshot ../ci-out/sim-2.png
+          xcrun simctl spawn "$DEV" log show --last 2m --predicate 'process == "App"' --style compact 2>/dev/null | grep -iE "error|⚡️|capacitor|js" | tail -80 > ../ci-out/sim-log.txt || true
+
+      - name: Archive + upload to TestFlight
+        if: ${{ env.ASC_KEY_ID != '' && (github.event_name == 'push' || inputs.upload) }}
+        env:
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -o pipefail
+          KEY=$RUNNER_TEMP/AuthKey.p8; printf '%s' "$ASC_KEY_P8" > "$KEY"
+          AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath build/App.xcarchive "${AUTH[@]}" DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic archive 2>&1 | tee ../archive.log | grep -E "error:|BUILD|ARCHIVE" | tail -40
+          cat > build/ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$TEAM</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          EOF
+          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportOptionsPlist build/ExportOptions.plist \
+            -exportPath build/export "${AUTH[@]}" 2>&1 | tee ../upload.log | tail -40
+          echo "Uploaded build $BUILD to App Store Connect → TestFlight" | tee ../ci-out/uploaded.txt
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-ci-${{ github.run_number }}
+          path: |
+            ci-out
+            sim-build.log
+            archive.log
+            upload.log
+
+      - name: Save results to the ci-ios branch
+        if: always()
+        working-directory: .
+        run: |
+          mkdir -p ci-out
+          { echo "run ${{ github.run_number }} · ${{ job.status }}"; cat xcode-version.txt 2>/dev/null; echo "== sim build"; grep -E "error:|BUILD" sim-build.log 2>/dev/null | tail -60;
+            echo "== archive"; grep -E "error:|BUILD|ARCHIVE" archive.log 2>/dev/null | tail -60; echo "== upload"; tail -60 upload.log 2>/dev/null; } > ci-out/summary.txt
+          tail -300 sim-build.log > ci-out/sim-build-tail.log 2>/dev/null || true
+          tail -300 archive.log > ci-out/archive-tail.log 2>/dev/null || true
+          git config user.name "ios-ci"; git config user.email "ios-ci@users.noreply.github.com"
+          git fetch origin ci-ios 2>/dev/null || true
+          cp -R ci-out /tmp/ci-out
+          git checkout --orphan ci-ios-tmp && git rm -rfq . && cp -R /tmp/ci-out/. . && git add -A && git commit -qm "iOS CI run ${{ github.run_number }}: ${{ job.status }}" && git push -f origin HEAD:ci-ios
+

@@ -1,0 +1,21 @@
+{
+  "appId": "com.market3045.app",
+  "appName": "3045",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#FFFFFF",
+    "scrollEnabled": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "launchShowDuration": 3000,
+      "backgroundColor": "#FFFFFF",
+      "showSpinner": false
+    },
+    "LocalNotifications": {
+      "iconColor": "#0B1F5C"
+    }
+  }
+}
