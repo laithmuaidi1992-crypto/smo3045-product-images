@@ -117,14 +117,14 @@ jobs:
       - name: Save results to the ci-ios branch
         if: always()
         working-directory: .
+        env: { GH_TOKEN: "${{ github.token }}" }
         run: |
+          set +e
           mkdir -p ci-out
-          { echo "run ${{ github.run_number }} · ${{ job.status }}"; cat xcode-version.txt 2>/dev/null; echo "== sim build"; grep -E "error:|BUILD" sim-build.log 2>/dev/null | tail -60;
-            echo "== archive"; grep -E "error:|BUILD|ARCHIVE" archive.log 2>/dev/null | tail -60; echo "== upload"; tail -60 upload.log 2>/dev/null; } > ci-out/summary.txt
-          tail -300 sim-build.log > ci-out/sim-build-tail.log 2>/dev/null || true
-          tail -300 archive.log > ci-out/archive-tail.log 2>/dev/null || true
-          git config user.name "ios-ci"; git config user.email "ios-ci@users.noreply.github.com"
-          git fetch origin ci-ios 2>/dev/null || true
-          cp -R ci-out /tmp/ci-out
-          git checkout --orphan ci-ios-tmp && git rm -rfq . && cp -R /tmp/ci-out/. . && git add -A && git commit -qm "iOS CI run ${{ github.run_number }}: ${{ job.status }}" && git push -f origin HEAD:ci-ios
-
+          { echo "run ${{ github.run_number }} · ${{ job.status }}"; cat xcode-version.txt; echo "== sim build"; grep -E "error:|BUILD" sim-build.log | tail -60
+            echo "== archive"; grep -E "error:|BUILD|ARCHIVE" archive.log | tail -60; echo "== upload"; tail -60 upload.log; } > ci-out/summary.txt 2>/dev/null
+          for f in sim-build archive upload; do [ -f $f.log ] && tail -300 $f.log > ci-out/$f-tail.log; done
+          OUT=$RUNNER_TEMP/pub; rm -rf "$OUT"; mkdir -p "$OUT"; cp -R ci-out/. "$OUT"/; cd "$OUT"
+          git init -q && git add -A && git -c user.name=ios-ci -c user.email=ios-ci@users.noreply.github.com commit -qm "iOS CI run ${{ github.run_number }}: ${{ job.status }}"
+          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:refs/heads/ci-ios
+          exit 0
