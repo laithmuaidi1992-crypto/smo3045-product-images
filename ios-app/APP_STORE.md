@@ -30,7 +30,7 @@
 
 ## نصوص صفحة المتجر
 
-**الاسم (≤30):** `3045 ماركت — طلبات وتوصيل`
+**الاسم (≤30):** `3045 Market` (مُدخل في App Store Connect)
 > إن كان الاسم محجوزًا جرّب: `3045 Market إربد`
 
 **العنوان الفرعي (≤30):** `سوبرماركت حيّك، مفتوح 24 ساعة`
@@ -62,7 +62,7 @@
 
 **روابط:**
 - Privacy Policy URL: https://3045orderapp.netlify.app/privacy.html
-- Support URL: https://3045orderapp.netlify.app
+- Support URL: https://3045orderapp.netlify.app/support.html
 - Marketing URL (اختياري): https://3045orderapp.netlify.app
 
 **حقوق النشر (Copyright):** `2026 3045 Market`

@@ -421,7 +421,10 @@ function errText(e){
 }
 function setConn(txt){const c=$('#conn');c.textContent=txt||'';c.classList.toggle('show',!!txt)}
 
+// iOS app: tobacco and hookah are not sold in the App Store build (guideline 1.4.3)
+const NATIVE_HIDE_CATS=new Set([39,13,24]),NATIVE_HIDE_RE=/(أرجيل|ارجيل|اراجيل|أراجيل|معسل|شيشة|سجائر|سيجار|تبغ)/;
 function applyCatalog(d){
+  if(NATIVE){d=Object.assign({},d,{cats:d.cats.filter(c=>!NATIVE_HIDE_CATS.has(c.id)&&!NATIVE_HIDE_CATS.has(c.parent)),prods:d.prods.filter(p=>!NATIVE_HIDE_CATS.has(p.cat)&&!NATIVE_HIDE_RE.test(p.name||''))})}
   // categories with nothing to show (no visible product in them or their sub-categories) are dropped
   const n=new Map();for(const p of d.prods){n.set(p.cat,(n.get(p.cat)||0)+1)}
   const subCnt=c=>n.get(c.id)||0;
