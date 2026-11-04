@@ -53,6 +53,8 @@ jobs:
           bash scripts/configure-ios.sh "$VERSION" "$BUILD"
           npx @capacitor/assets generate --ios --iconBackgroundColor '#FFFFFF' --splashBackgroundColor '#FFFFFF' --splashBackgroundColorDark '#FFFFFF'
           npx cap sync ios
+          gem list -i xcodeproj >/dev/null || sudo gem install xcodeproj --no-document
+          ruby scripts/add-privacy-manifest.rb
           /usr/libexec/PlistBuddy -c Print ios/App/App/Info.plist | head -60
 
       - name: Build for simulator

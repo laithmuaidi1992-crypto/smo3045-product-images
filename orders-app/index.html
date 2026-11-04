@@ -686,7 +686,12 @@ async function chefAsk(text){
   ch.baseServings=ch.servings;r.items.forEach((it,i)=>{ch.qty[i]=it.pieces});
   ch.msgs.push({role:'ai',text:r.intro||'هذه المكوّنات من رفوف المتجر:'});ch.result=r;render();scrollBody();
 }
+// App Store 5.1.2(i): tell the user and get consent before sending their text to a third-party AI.
+function aiConsent(){try{const v=localStorage.getItem('smo_ai_consent');if(v==='yes')return true;if(v==='no')return false}catch{}
+  const ok=confirm('المساعد الذكي يرسل ما تكتبه هنا فقط (بدون اسمك أو رقمك أو عنوانك) إلى خدمة ذكاء اصطناعي خارجية (Claude من شركة Anthropic) ليقترح لك قائمة مشتريات من المتجر.\n\nهل توافق؟ إن رفضت ستظهر لك قوائم جاهزة بدلًا منه.');
+  try{localStorage.setItem('smo_ai_consent',ok?'yes':'no')}catch{}return ok}
 async function askAssistant(prompt){
+  if(!aiConsent())throw{code:'no_consent',message:'لم تتم الموافقة على المساعد الذكي'};
   const r=await fetch(SB_URL+'/functions/v1/assistant',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({prompt})});
   const j=await r.json().catch(()=>null);
   if(!r.ok||!j){throw{code:(j&&j.error)||'server_unavailable',message:(j&&j.message)||('HTTP '+r.status)}}
@@ -907,7 +912,7 @@ let _installEvt=null;window.addEventListener('beforeinstallprompt',e=>{e.prevent
 window.addEventListener('appinstalled',()=>{_installEvt=null;ls.set('smo_installed',true);toast('تم تثبيت التطبيق');rerender()});
 const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;
-function installCard(){if(isStandalone()||ls.get('smo_installed',false)||ls.get('smo_install_hide',0)>Date.now())return'';
+function installCard(){if(NATIVE||isStandalone()||ls.get('smo_installed',false)||ls.get('smo_install_hide',0)>Date.now())return'';
   if(!_installEvt&&!isIOS())return'';
   return `<div class="installcard"><img src="icon-192.png" alt=""><div class="txt"><b>ثبّت تطبيق 3045 على هاتفك</b><small>${isIOS()?'يفتح كتطبيق من الشاشة الرئيسية بلا متصفح':'أيقونة على الشاشة الرئيسية، يفتح أسرع ويعمل كتطبيق'}</small></div><div class="acts"><button class="go" data-install>${isIOS()?(S.iosSteps?'فهمت':'كيف؟'):'تثبيت'}</button><button class="x" data-install-hide aria-label="لاحقاً">لاحقاً</button></div>${S.iosSteps?`<div class="iossteps">١. اضغط زر <b>المشاركة</b> أسفل Safari (المربع والسهم ↑)<br>٢. اختر <b>«إضافة إلى الشاشة الرئيسية»</b><br>٣. اضغط <b>إضافة</b> في الأعلى</div>`:''}</div>`}
 async function doInstall(){if(_installEvt){const e=_installEvt;_installEvt=null;e.prompt();try{const r=await e.userChoice;if(r&&r.outcome!=='accepted')_installEvt=e}catch{}rerender();return}

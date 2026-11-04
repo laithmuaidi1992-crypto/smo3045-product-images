@@ -9,7 +9,7 @@ pb() { /usr/libexec/PlistBuddy -c "$1" "$PLIST" 2>/dev/null || true; }
 set_str() { pb "Delete :$1"; /usr/libexec/PlistBuddy -c "Add :$1 string $2" "$PLIST"; }
 set_bool() { pb "Delete :$1"; /usr/libexec/PlistBuddy -c "Add :$1 bool $2" "$PLIST"; }
 
-set_str CFBundleDisplayName "3045"
+set_str CFBundleDisplayName "3045 Market"
 set_str CFBundleDevelopmentRegion "ar"
 pb "Delete :CFBundleLocalizations"
 /usr/libexec/PlistBuddy -c "Add :CFBundleLocalizations array" "$PLIST"
