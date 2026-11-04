@@ -2,6 +2,9 @@
 
 معرّف الحزمة (Bundle ID): `com.market3045.app` — **دائم ولا يمكن تغييره بعد أول رفع**.
 
+> **حساب Apple المسجَّل في البرنامج:** `laithmuaidi3045@icloud.com` (فرد — LAITH ALSERHAN، فُعّل 2026-11-04). استخدمه لـ App Store Connect وTestFlight، وليس laithmuaidi1992@icloud.com.
+
+
 ## ما يجب أن تفعله أنت (مرة واحدة)
 
 1. **اشترك في Apple Developer Program** — 99$ سنويًا: https://developer.apple.com/programs/enroll/
