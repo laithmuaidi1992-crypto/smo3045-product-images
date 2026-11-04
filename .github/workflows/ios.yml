@@ -88,17 +88,9 @@ jobs:
           set -o pipefail
           KEY=$RUNNER_TEMP/AuthKey.p8; printf '%s' "$ASC_KEY_P8" > "$KEY"
           AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
-          # sign for the App Store directly (a development profile would need a registered device)
-          set +e
+          # archive unsigned; -exportArchive signs it for the App Store with the API key (no device or dev profile needed)
           xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' \
-            -archivePath build/App.xcarchive "${AUTH[@]}" DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic \
-            CODE_SIGN_IDENTITY="Apple Distribution" archive 2>&1 | tee ../archive.log | grep -E "error:|BUILD|ARCHIVE" | tail -40
-          if [ ! -d build/App.xcarchive/Products/Applications/App.app ]; then rm -rf build/App.xcarchive
-            echo "== retry: unsigned archive, signing happens at export" | tee -a ../archive.log
-            xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' \
-              -archivePath build/App.xcarchive DEVELOPMENT_TEAM="$TEAM" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO archive 2>&1 | tee -a ../archive.log | grep -E "error:|BUILD|ARCHIVE" | tail -40
-          fi
-          set -e
+            -archivePath build/App.xcarchive DEVELOPMENT_TEAM="$TEAM" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO archive 2>&1 | tee ../archive.log | grep -E "error:|BUILD|ARCHIVE" | tail -40
           [ -d build/App.xcarchive/Products/Applications/App.app ] || { echo "archive failed"; exit 1; }
           cat > build/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
