@@ -40,7 +40,7 @@ fs.mkdirSync(out, { recursive: true });
   // demo cart from the store's real best sellers that have photos
   const picked = await p.evaluate(() => {
     const S = window.__dbg.S; const all = [...S.byId.values()].filter(x => x.sm && x.price >= 0.4 && x.price <= 6);
-    const want = [/^حليب/, /^أرز|^ارز/, /^زيت/, /^شاي/, /^سكر/, /^بيض/, /^خبز|^توست/, /^لبن/];
+    const want = [/^حليب/, /^(أرز|ارز)/, /^زيت (ذرة|دوار|نباتي|قلي|زيتون)/, /^(معكرونة|معكرونه|مكرونة|سباغيتي)/, /^سكر/, /^(لبنة|جبنة)/];
     const out = []; for (const re of want) { const x = all.find(p => re.test(p.name) && !out.includes(p)); if (x) out.push(x); if (out.length >= 5) break; }
     const qty = [2, 1, 3, 1, 2]; S.cart = {}; out.forEach((x, i) => S.cart[x.id] = qty[i]);
     try { localStorage.setItem('smo_cart', JSON.stringify(S.cart)) } catch {}
