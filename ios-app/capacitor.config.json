@@ -16,6 +16,13 @@
     },
     "LocalNotifications": {
       "iconColor": "#0B1F5C"
+    },
+    "PushNotifications": {
+      "presentationOptions": [
+        "alert",
+        "sound",
+        "badge"
+      ]
     }
   }
 }

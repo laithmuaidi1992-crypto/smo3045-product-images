@@ -395,10 +395,21 @@ const SITE=NATIVE?'https://3045orderapp.netlify.app/':'';
 const _plugs={};function plug(n){if(!NATIVE)return null;if(_plugs[n])return _plugs[n];const C=window.Capacitor;try{_plugs[n]=(C.Plugins&&C.Plugins[n])||(C.registerPlugin&&C.registerPlugin(n))||null}catch{_plugs[n]=null}return _plugs[n]}
 function haptic(kind){try{const h=plug('Haptics');if(!h)return;kind==='ok'?h.notification({type:'SUCCESS'}):h.impact({style:'LIGHT'})}catch{}}
 let _notifAsked=false;async function nativeAlert(title,body){const L=plug('LocalNotifications');if(!L)return;try{if(!_notifAsked){_notifAsked=true;const p=await L.checkPermissions();if(p.display!=='granted')await L.requestPermissions()}await L.schedule({notifications:[{id:Math.floor(Math.random()*2e9),title,body}]})}catch{}}
-function initNative(){if(!NATIVE)return;document.documentElement.classList.add('native');try{const sb=plug('StatusBar');sb&&sb.setStyle({style:'LIGHT'})}catch{}try{const sp=plug('SplashScreen');sp&&setTimeout(()=>sp.hide(),300)}catch{}}
+/* ---- push notifications (APNs via @capacitor/push-notifications) ---- */
+let _pushReady=false;
+function pushSave(){const t=ls.get('smo_push_token',null),c=S.customer;if(t&&c&&c.phone)rpc('push_register',{phone:c.phone,token:t,platform:'ios'}).catch(()=>{})}
+function pushForget(){const t=ls.get('smo_push_token',null);if(t)rpc('push_unregister',{token:t}).catch(()=>{})}
+function initPush(){const P=plug('PushNotifications');if(!P||_pushReady)return;_pushReady=true;
+  try{P.addListener('registration',t=>{if(t&&t.value){ls.set('smo_push_token',t.value);pushSave()}});
+    P.addListener('registrationError',()=>{});
+    P.addListener('pushNotificationActionPerformed',a=>{const d=(a&&a.notification&&a.notification.data)||{};if(d.order_no){S.stack=[];go('track',{order_no:d.order_no},true)}});
+    P.checkPermissions().then(p=>{if(p.receive==='granted')P.register()}).catch(()=>{})}catch{}}
+// asked after the first order, not at launch
+async function askPush(){const P=plug('PushNotifications');if(!P)return;initPush();try{let p=await P.checkPermissions();if(p.receive==='prompt'||p.receive==='prompt-with-rationale')p=await P.requestPermissions();if(p.receive==='granted')await P.register()}catch{}}
+function initNative(){if(!NATIVE)return;initPush();document.documentElement.classList.add('native');try{const sb=plug('StatusBar');sb&&sb.setStyle({style:'LIGHT'})}catch{}try{const sp=plug('SplashScreen');sp&&setTimeout(()=>sp.hide(),300)}catch{}}
 const _lastStatus=(()=>{try{return JSON.parse(localStorage.getItem('smo_last_status')||'{}')}catch{return{}}})();
 function noteStatus(o){if(!o||!o.order_no||!o.status)return;const prev=_lastStatus[o.order_no];_lastStatus[o.order_no]=o.status;try{localStorage.setItem('smo_last_status',JSON.stringify(_lastStatus))}catch{}
-  if(prev&&prev!==o.status){haptic('ok');nativeAlert('طلبك '+o.order_no,(typeof STATUS!=='undefined'&&STATUS[o.status]&&(STATUS[o.status].label||STATUS[o.status]))||o.status)}}
+  if(prev&&prev!==o.status){haptic('ok');if(!ls.get('smo_push_token',null))nativeAlert('طلبك '+o.order_no,(typeof STATUS!=='undefined'&&STATUS[o.status]&&(STATUS[o.status].label||STATUS[o.status]))||o.status)}}
 async function rpc(action,args){
   let r;
   try{r=await fetch(SB_URL+'/rest/v1/rpc/orders_app',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({action,args:args||{}})})}
@@ -406,7 +417,7 @@ async function rpc(action,args){
   if(!r.ok){let j=null;try{j=await r.json()}catch{}const msg=(j&&(j.message||j.hint))||('HTTP '+r.status);if(/bad_pin/.test(msg))throw{code:'bad_pin',message:msg};if(r.status>=500||r.status===429)throw{code:'server_unavailable',message:msg};throw{code:'tool_error',message:msg}}
   return r.json();
 }
-function registerCustomer(){const c=S.customer;if(!c||!c.phone)return;const a=c.address||{};rpc('register',{phone:c.phone,name:c.name||null,area:a.area||null,street:a.street||null,landmark:a.landmark||null,lat:a.lat||null,lng:a.lng||null,source:'web'}).catch(()=>{})}
+function registerCustomer(){const c=S.customer;if(!c||!c.phone)return;pushSave();const a=c.address||{};rpc('register',{phone:c.phone,name:c.name||null,area:a.area||null,street:a.street||null,landmark:a.landmark||null,lat:a.lat||null,lng:a.lng||null,source:'web'}).catch(()=>{})}
 function heartbeat(){const c=S.customer;if(!c||!c.phone)return;const last=ls.get('smo_seen',0);if(Date.now()-last<6*3600*1000)return;ls.set('smo_seen',Date.now());rpc('seen',{phone:c.phone,source:'web'}).catch(()=>{})}
 function staffPin(){let p=ls.get('smo_staff_pin','');if(!p){p=(prompt('رمز الموظفين:')||'').replace(/\D/g,'');if(p)ls.set('smo_staff_pin',p)}return p}
 async function staffRpc(action,args){try{return await rpc(action,{...(args||{}),pin:staffPin()})}catch(e){if(e&&e.code==='bad_pin')ls.set('smo_staff_pin','');throw e}}
@@ -737,7 +748,7 @@ async function placeOrder(){
     const r=await rpc('place_order',{order_no,customer_name:c.name,customer_phone:c.phone,customer_address:addr,lat:c.address.lat?Number(c.address.lat):null,lng:c.address.lng?Number(c.address.lng):null,notes,items,subtotal:Number(fmt(t.sub)),delivery_fee:Number(fmt(t.fee)),total:Number(fmt(t.total))});
     const row=(r&&r.order_no)?r:{order_no};
     S.mine=[row.order_no,...S.mine.filter(x=>x!==row.order_no)].slice(0,30);ls.set('smo_orders',S.mine);
-    S.cart={};S.cartMeta={};S.notes='';ls.set('smo_cart',{});ls.set('smo_cartmeta',{});
+    S.cart={};S.cartMeta={};S.notes='';ls.set('smo_cart',{});ls.set('smo_cartmeta',{});setTimeout(askPush,1500);
     S.track={id:row.id,order_no:row.order_no,status:'pending',total:t.total,items,created_at:row.created_at||new Date().toISOString(),customer_address:addr,customer_notes:notes};
     S.busy=false;S.stack=[];go('track',{order_no:row.order_no},true);toast('تم استلام طلبك');
   }catch(e){
@@ -879,7 +890,7 @@ document.addEventListener('click',async e=>{
   if(d.stf){S.stFilter=d.stf;rerender();return}
   if(d.st&&d.oid)return setStatus(d.oid,d.st);
   if(d.drv)return setDriver(d.drv);
-  if(d.logout!==undefined){S.customer=null;ls.set('smo_customer',null);render();return}
+  if(d.logout!==undefined){pushForget();S.customer=null;ls.set('smo_customer',null);render();return}
   if(d.deleteAccount!==undefined){const c=S.customer;if(!c||!c.phone)return;
     if(!confirm('حذف حسابك نهائيًا؟\nسيُحذف اسمك ورقم هاتفك وعنوانك من المتجر، ولا يمكن التراجع.'))return;
     try{await rpc('delete_account',{phone:c.phone,name:c.name||''})}catch(e){if(!/account_not_found/.test((e&&e.message)||'')){toast(errText(e));return}}
