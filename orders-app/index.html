@@ -830,7 +830,7 @@ async function setStatus(id,st){if(S.busy)return;S.busy=true;try{await staffRpc(
 async function setDriver(id){const el=$('#drv-'+CSS.escape(id));const val=el?el.value.trim():'';if(S.busy)return;S.busy=true;try{await staffRpc('set_driver',{id,driver:val});const o=S.staffOrders.find(x=>x.id===id);if(o)o.assigned_driver=val||null;render();toast('تم حفظ المندوب')}catch(e){toast(errText(e))}finally{S.busy=false}}
 
 /* ---------- render ---------- */
-function render(){
+function render(){setTimeout(resetFrameScroll,0);
   const ph=$('#phone');let el=$('#screen');
   if(!el){el=document.createElement('div');el.className='screen';el.id='screen';ph.insertBefore(el,$('#toast'))}
   const active=document.activeElement;const keep=active&&ph.contains(active)&&active.id?{id:active.id,s:active.selectionStart,e:active.selectionEnd}:null;
@@ -924,6 +924,11 @@ function installCard(){if(NATIVE||isStandalone()||ls.get('smo_installed',false)|
 async function doInstall(){if(_installEvt){const e=_installEvt;_installEvt=null;e.prompt();try{const r=await e.userChoice;if(r&&r.outcome!=='accepted')_installEvt=e}catch{}rerender();return}
   if(isIOS()){if(S.iosSteps){ls.set('smo_install_hide',Date.now()+7*864e5);S.iosSteps=false}else S.iosSteps=true;rerender()}}
 
+// iOS scrolls the whole frame up to show a field above the keyboard and leaves it there, hiding the header (and its back button).
+// Put the frame back when the keyboard closes and on every screen change; only inner .body areas should scroll.
+function resetFrameScroll(){try{if(window.scrollY)window.scrollTo(0,0);document.querySelectorAll('.phone,.screen,#root').forEach(el=>{if(el.scrollTop)el.scrollTop=0})}catch{}}
+document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(!a||!/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))resetFrameScroll()},120));
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>{if(visualViewport.height>=window.innerHeight-40)resetFrameScroll()});
 document.addEventListener('focusin',e=>{const t=e.target;if(t&&(t.id==='phoneIn'||t.id==='nameIn'))setTimeout(()=>{try{t.scrollIntoView({block:'center',behavior:'smooth'})}catch{}},250)});
 
 /* ---------- boot ---------- */
