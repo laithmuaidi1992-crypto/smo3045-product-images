@@ -44,10 +44,9 @@
 
 • تصفّح أكثر من 3,500 صنف بالصور والأسعار، مرتّبة بالأقسام.
 • ابحث عن أي منتج بكلمة واحدة.
-• المساعد الذكي: اكتب احتياجك — طبخة، ضيافة، تنظيف البيت، مستلزمات رضيع، فطور — ويجهّز لك قائمة المشتريات من رفوف المتجر.
 • حدّد عنوانك على الخريطة أو بزر «موقعي الحالي» ليصل المندوب إلى باب بيتك.
 • تابع حالة طلبك وتصلك تنبيهات عند تغيّرها: مؤكّد، قيد التجهيز، في الطريق، تم التسليم.
-• الدفع نقدًا عند الاستلام.
+• الدفع عند الاستلام: نقدًا أو بالبطاقة أو CliQ.
 • احذف حسابك وبياناتك في أي وقت من «حسابي».
 
 التوصيل متاح داخل إربد.
@@ -88,7 +87,7 @@ Data Collection: **Yes, we collect data**
 ```
 3045 is a neighborhood supermarket in Irbid, Jordan. The app lets customers browse the store's live catalog, build a cart, pin their delivery location on a map and place a cash-on-delivery order, then track its status with local notifications when it changes.
 
-To test: enter any name and a Jordanian mobile number in the format 07XXXXXXXX (e.g. 0790000000). No password or code is needed. You may place a test order; our staff will cancel orders placed during review. No payment is taken in the app (cash on delivery only).
+To test: enter any name and a Jordanian mobile number in the format 07XXXXXXXX (e.g. 0790000000). No password or code is needed. You may place a test order; our staff will cancel orders placed during review. No payment is taken in the app; the customer pays the driver on delivery (cash, card or CliQ).
 
 Account deletion: Account tab (حسابي) → "حذف حسابي".
 The app is in Arabic.

@@ -66,7 +66,7 @@ a{color:var(--navy);text-decoration:none}
 .link{color:var(--navy);font-weight:700;font-size:12.5px}
 
 /* Bottom nav */
-.nav{background:#FFFFFF;border-top:1px solid var(--line);padding:10px 12px calc(16px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;align-items:end;flex:none}
+.nav{background:#FFFFFF;border-top:1px solid var(--line);padding:10px 12px calc(16px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;align-items:end;flex:none}
 .nav button{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:10.5px;font-weight:600;padding:6px 0;min-height:44px;position:relative;text-align:center}
 .nav button[aria-current="page"]{color:var(--navy)}
 .nav button[aria-current="page"]:not(.chef)::after{content:"";width:18px;height:3px;border-radius:2px;background:var(--red);margin-top:2px}
@@ -540,7 +540,7 @@ const gmapsAddr=(txt)=>'https://www.google.com/maps/search/?api=1&query='+encode
 const addrLL=a=>a&&a.lat&&a.lng?{lat:+a.lat,lng:+a.lng}:null;
 
 /* ---------- navigation ---------- */
-function go(screen,params,replace){
+function go(screen,params,replace){if(screen==='chef')screen='home';
   if(S.trackTimer){clearInterval(S.trackTimer);S.trackTimer=null}
   if(!replace&&S.screen!==screen)S.stack.push({screen:S.screen,params:S.params});
   if(S.stack.length>12)S.stack.shift();
@@ -554,7 +554,7 @@ function cartBar(){const t=totals();if(!t.count)return'';return `<div class="ft"
 function navHTML(cur){
   const t=totals();
   const it=(k,l,ic)=>`<button data-go="${k}" ${cur===k?'aria-current="page"':''}>${ic}<span>${l}</span>${k==='cart'&&t.count?`<span class="badge">${t.count}</span>`:''}</button>`;
-  return `<nav class="nav" aria-label="التنقل الرئيسي">${it('home','الرئيسية',ICON.home)}${it('cats','الأقسام',ICON.grid)}<button class="chef" data-go="chef" aria-label="المساعد الذكي" ${cur==='chef'?'aria-current="page"':''}><span class="orb">${ICON.spark}</span><span>المساعد الذكي</span></button>${it('cart','السلة',ICON.cart)}${it('account','حسابي',ICON.user)}</nav>`;
+  return `<nav class="nav" aria-label="التنقل الرئيسي">${it('home','الرئيسية',ICON.home)}${it('cats','الأقسام',ICON.grid)}${it('cart','السلة',ICON.cart)}${it('account','حسابي',ICON.user)}</nav>`;
 }
 function head(title,sub,extra){return `<div class="hd"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button><div style="flex:1;min-width:0"><h1>${esc(title)}</h1>${sub?`<div class="sub">${sub}</div>`:''}</div>${extra||''}</div>`}
 function pcardHTML(p){return `<div class="pcard">${tileHTML(p,'',p.stock<=3?`<span class="low">متبقٍ ${p.stock}</span>`:'')}<div class="nm">${esc(p.name)}</div><div class="u">${unitLabel(p)}</div><div class="row">${jd(p.price)}${ctlHTML(p)}</div></div>`}
@@ -631,7 +631,7 @@ V.home=()=>{const c=S.customer;const addr=c&&c.address?`${c.address.area}${c.add
   <button class="addr" data-go="address"><span style="color:var(--red)">${ICON.pin}</span><div><small>التوصيل إلى</small><b>${esc(addr)} ▾</b></div></button>
   <label class="search">${ICON.search}<input id="homeQ" placeholder="ابحث عن منتج… حليب، أرز، شامبو" aria-label="ابحث عن منتج"></label></div>
   <div class="body">${dbNotice()}${S.settings.store_open===false?`<div class="alert red">${ICON.info}<span>${esc(S.settings.closed_message||'نعتذر، التوصيل متوقف مؤقتًا. سنعود قريبًا.')}</span></div>`:''}${installCard()}
-  <button class="chefcard" data-go="chef"><span class="orb">${ICON.spark}</span><div><h2>ما احتياجك اليوم؟</h2><p>طبخة، ضيافة، تنظيف البيت، مستلزمات الأطفال، فطور… اكتب احتياجك والمساعد الذكي يجهّز لك قائمة المشتريات من رفوف المتجر</p></div></button>
+
   <div class="sec"><div class="sec-h"><h2>الأقسام</h2><button class="link" data-go="cats">عرض الكل</button></div>
   ${S.ready?`<div class="cat4">${parents.map(c=>`<button data-cat="${c.id}">${catTile(c,'ic')}<span>${esc(c.name)}</span></button>`).join('')}</div>`:`<div class="cat4">${Array.from({length:4},()=>`<div class="skel" style="height:64px;border-radius:18px"></div>`).join('')}</div>`}</div>
   <div class="sec"><div class="sec-h"><h2>الأكثر طلباً في حيّك</h2><div style="display:flex;align-items:center;gap:10px">${viewToggle()}<button class="link" data-cat="">المزيد</button></div></div>${S.ready?(S.top.length?productsHTML(S.top):`<div class="empty">تظهر هنا الأصناف الأكثر مبيعاً خلال 30 يوماً من بيانات نقطة البيع.</div>`):skelGrid(4)}</div>
@@ -715,7 +715,7 @@ V.cart=()=>{const lines=cartLines();const t=totals();const c=S.customer;const mi
     <div class="card"><div class="t">ملاحظات للمتجر (اختياري)</div><textarea id="notesIn" class="hint" style="border:1px solid var(--line);border-radius:12px;padding:10px;min-height:60px;font-size:13px;color:var(--fg);background:var(--surface)" placeholder="مثال: بدون جرس، أو استبدل الصنف لو غير متوفر">${esc(S.notes||'')}</textarea></div>
     <div style="display:flex;flex-direction:column;gap:8px;padding:4px 4px 0"><div class="sum"><span>المنتجات (${t.count})</span><span>${fmt(t.sub)} د.أ</span></div><div class="sum"><span>رسوم التوصيل</span><span>${t.fee?fmt(t.fee)+' د.أ':'<span style="color:var(--green);font-weight:600">مجاناً</span>'}</span></div>${S.settings.free_delivery_from&&t.fee?`<div class="hint">التوصيل مجاني للطلبات فوق ${fmt(S.settings.free_delivery_from)} د.أ</div>`:''}<div class="hr"></div><div class="sum total"><span>الإجمالي</span><span>${fmt(t.total)} د.أ</span></div></div>
     ${under?`<div class="alert amber">${ICON.info}<span>الحد الأدنى للطلب ${fmt(min)} د.أ — أضف ${fmt(min-t.sub)} د.أ لإتمام الطلب.</span></div>`:''}<div id="orderErr"></div>`
-    :`<div class="empty"><h3>السلة فارغة</h3>أضف منتجات من الأقسام أو اطلب من المساعد الذكي قائمة لاحتياجك.</div>`;
+    :`<div class="empty"><h3>السلة فارغة</h3>أضف منتجات من الأقسام أو ابحث عن أي منتج.</div>`;
   return `<div class="hd"><button class="icon-btn" data-back aria-label="رجوع">${ICON.back}</button><h1>السلة</h1><span class="sub">${t.count?t.count+' أصناف':''}</span>${viewToggle()}${lines.length?`<button class="link" data-clear style="color:var(--red)">إفراغ</button>`:''}</div><div class="body">${body}</div>
   ${lines.length?`<div class="ft"><button class="cta" id="placeOrder" ${under||S.busy?'disabled':''}><span>${S.busy?'جارٍ إرسال الطلب…':'تأكيد الطلب'}</span>${jd(t.total)}</button></div>`:''}`+navHTML('cart')};
 function genOrderNo(){const d=new Date();const yy=String(d.getFullYear()).slice(2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=A[Math.floor(Math.random()*A.length)];return `ON-${yy}${mm}${dd}-${s}`}
@@ -848,6 +848,7 @@ window.__dbg={S,render,go};
 document.addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b)return;
   const d=b.dataset;
+  if(d.go==='chef')d.go='home';
   if(d.go!==undefined){if(d.go==='cart'||d.go==='home'||d.go==='cats'||d.go==='chef'||d.go==='account'){S.stack=[];go(d.go,{},true)}else go(d.go);return}
   if(d.back!==undefined)return back();
   if(d.view){S.view=d.view;ls.set('smo_view',S.view);rerender();return}
@@ -926,7 +927,7 @@ document.addEventListener('focusin',e=>{const t=e.target;if(t&&(t.id==='phoneIn'
 /* ---------- boot ---------- */
 S.view=ls.get('smo_view','grid');S.cart=ls.get('smo_cart',{});S.cartMeta=ls.get('smo_cartmeta',{});S.mine=ls.get('smo_orders',[]);S.customer=ls.get('smo_customer',null);S.skipped=ls.get('smo_skipped',false);
 const h=(location.hash||'').replace('#','');
-if(['home','cats','chef','cart','account','staff'].includes(h))S.screen=h;else S.screen=(S.customer&&S.customer.phone)||S.skipped?'home':'welcome';
+if(['home','cats','cart','account','staff'].includes(h))S.screen=h;else S.screen=(S.customer&&S.customer.phone)||S.skipped?'home':'welcome';
 render();
 (async()=>{
   S.mcp=true;S.sample=true;S.booted=true;
