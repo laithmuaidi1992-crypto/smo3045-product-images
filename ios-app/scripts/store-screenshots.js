@@ -11,7 +11,7 @@ fs.mkdirSync(out, { recursive: true });
 (async () => {
   const b = await chromium.launch();
   const ctx = await b.newContext({
-    viewport: { width: 440, height: 956 }, deviceScaleFactor: 3, locale: 'ar-JO',
+    viewport: { width: 440, height: 956 }, deviceScaleFactor: 3, locale: 'ar-JO', timezoneId: 'Asia/Amman',
     userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
     geolocation: { latitude: 32.5556, longitude: 35.85 }, permissions: ['geolocation'],
   });
@@ -39,8 +39,9 @@ fs.mkdirSync(out, { recursive: true });
   await p.waitForFunction(() => window.__dbg && window.__dbg.S.ready, null, { timeout: 90000 });
   // demo cart from the store's real best sellers that have photos
   const picked = await p.evaluate(() => {
-    const S = window.__dbg.S; const ids = (S.top || []).map(x => x.id).concat([...S.byId.keys()]);
-    const out = []; for (const id of ids) { const x = S.byId.get(id); if (x && x.sm && x.price >= 0.5 && x.price <= 5 && !out.find(o => o.id === id)) out.push(x); if (out.length >= 5) break; }
+    const S = window.__dbg.S; const all = [...S.byId.values()].filter(x => x.sm && x.price >= 0.4 && x.price <= 6);
+    const want = [/^حليب/, /^أرز|^ارز/, /^زيت/, /^شاي/, /^سكر/, /^بيض/, /^خبز|^توست/, /^لبن/];
+    const out = []; for (const re of want) { const x = all.find(p => re.test(p.name) && !out.includes(p)); if (x) out.push(x); if (out.length >= 5) break; }
     const qty = [2, 1, 3, 1, 2]; S.cart = {}; out.forEach((x, i) => S.cart[x.id] = qty[i]);
     try { localStorage.setItem('smo_cart', JSON.stringify(S.cart)) } catch {}
     window.__dbg.render();
@@ -55,10 +56,9 @@ fs.mkdirSync(out, { recursive: true });
   await p.evaluate(() => window.scrollTo(0, 0)); await shot('1-home', 6000);
   await p.evaluate(() => window.__dbg.go('cats')); await shot('2-categories', 5000);
   await p.evaluate(() => window.__dbg.go('cart')); await shot('3-cart', 5000);
-  await p.evaluate(() => window.__dbg.go('chef')); await p.waitForTimeout(1000);
-  const inp = await p.$('#chefIn, textarea, input[type=text]');
-  if (inp) { await inp.fill('مقلوبة لـ 6 أشخاص'); await p.keyboard.press('Enter'); }
-  await p.evaluate(() => window.scrollTo(0, 0)); await shot('4-assistant', 5000);
+  await p.evaluate(() => { const S = window.__dbg.S; const c = S.cats.find(c => !c.parent && /حلويات/.test(c.name)) || S.cats.find(c => !c.parent);
+    S.q = ''; S.catParent = c.id; S.catSub = null; S.shown = 60; window.__dbg.go('category'); window.scrollTo(0, 0); });
+  await shot('4-products', 7000);
   await p.evaluate(() => window.__dbg.go('track', { order_no: 'ON-2611-0142' })); await shot('5-tracking', 6000);
   await p.evaluate(() => window.__dbg.go('account')); await shot('6-account', 5000);
   console.log('page errors:', errs.length ? errs : 'none');
