@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>تطبيق 3045</title>
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -320,6 +320,7 @@ a{color:var(--navy);text-decoration:none}
 .toast.show{opacity:1;transform:translateX(-50%)}
 .conn{position:absolute;bottom:calc(96px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:5;font-size:11px;background:#FFFFFF;color:var(--navy);border:1px solid var(--line);border-radius:999px;padding:4px 10px;display:none;white-space:nowrap;box-shadow:var(--shadow-sm)}
 .conn.show{display:block}
+@media (pointer:coarse){input,select,textarea{font-size:16px!important}}
 </style>
 </head>
 <body>
@@ -598,7 +599,7 @@ V.signup=()=>{const c=S.customer||{};return head('إكمال الحساب')+`<fo
 V.address=()=>{const a=(S.customer&&S.customer.address)||{};const ll=S.pickLL||addrLL(a);return head('تحديد العنوان','داخل نطاق التوصيل · إربد')+`<div class="body flush"><div id="pickMap" class="pickmap"></div>
   <div class="pickbar"><button class="ghost" type="button" data-geo>${ICON.pin} استخدم موقعي الحالي</button></div>
   <p class="hint" style="margin:6px 16px 0">اسحب الدبوس إلى باب بيتك، أو اضغط على الخريطة في المكان الصحيح. يصل المندوب إلى النقطة نفسها.</p>
-  <div id="gmapStatus" style="padding:8px 16px 0">${ll?`<div class="alert green">${ICON.info}<span>الموقع محدّد · يبعد ${kmBetween(ll,STORE_LL()).toFixed(1)} كم عن المتجر · <a href="${gmapsView(ll)}" target="_blank" rel="noopener"><b>عرض على خرائط Google</b></a></span></div>`:`<div class="alert amber">${ICON.info}<span>لم يُحدَّد موقعك بعد — اضغط «استخدم موقعي الحالي» أو حرّك الدبوس.</span></div>`}</div>
+  <div id="gmapStatus" style="padding:8px 16px 0">${ll?`<div class="alert green">${ICON.info}<span>الموقع محدّد · يبعد ${kmBetween(ll,STORE_LL()).toFixed(1)} كم عن المتجر · <a href="${gmapsView(ll)}" target="_blank" rel="noopener"><b>عرض على خرائط Google</b></a></span></div>`:`<div class="alert">${ICON.info}<span>لم يُحدَّد موقعك بعد — اضغط «استخدم موقعي الحالي» أو حرّك الدبوس.</span></div>`}</div>
   <form id="addrForm" style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:14px"><div class="field"><label for="areaIn">الحي / المنطقة</label><input id="areaIn" list="areas" value="${esc(a.area||'')}" placeholder="مثال: حي الحصن"><datalist id="areas">${AREAS.map(x=>`<option value="${esc(x)}">`).join('')}</datalist></div>
   <div class="field"><label for="streetIn">الشارع والبناية</label><input id="streetIn" value="${esc(a.street||'')}" placeholder="شارع الجامعة، بناية 12، طابق 3"></div>
   <div class="field"><label for="landIn">أقرب معلم (اختياري)</label><input id="landIn" value="${esc(a.landmark||'')}" placeholder="مقابل صيدلية…"></div>

@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
       method: "POST", body: payload,
       headers: { authorization: `bearer ${jwt}`, "apns-topic": TOPIC, "apns-push-type": "alert", "apns-priority": "10", "content-type": "application/json" },
     });
-    if (r.status === 410 || r.status === 400) {
+    if (r.status !== 200) {
       const t = await r.text();
       if (r.status === 410 || /BadDeviceToken|DeviceTokenNotForTopic/.test(t)) await sb.from("push_tokens").delete().eq("token", token);
       return { status: r.status, reason: t.slice(0, 120) };
