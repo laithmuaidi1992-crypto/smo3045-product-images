@@ -15,7 +15,12 @@ jobs:
           mkdir -p out && cd out
           call() { curl -sS "$SB/rest/v1/rpc/orders_app" -H "apikey: $KEY" -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' -d "$1"; }
           call '{"action":"catalog_meta","args":{}}' > catalog_meta.json
-          for o in 0 1000 2000 3000 4000; do call "{\"action\":\"products_page\",\"args\":{\"offset\":$o,\"limit\":1000}}" > products_$o.json; done
+          after=""; i=0
+          while :; do
+            call "{\"action\":\"products_page\",\"args\":{\"after\":\"$after\"}}" > products_$i.json
+            n=$(jq length products_$i.json); [ "$n" -lt 1000 ] && break
+            after=$(jq -r '.[-1][0]' products_$i.json); i=$((i+1)); [ $i -gt 9 ] && break
+          done
           ls -la; head -c 300 catalog_meta.json
           git init -q -b qa-fixtures && git add -A
           git -c user.name=qa -c user.email=qa@users.noreply.github.com commit -qm "fixtures $(date -u +%F)"
