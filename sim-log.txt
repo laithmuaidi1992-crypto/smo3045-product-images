@@ -1,0 +1,10 @@
+2026-11-05 03:08:23.097 Df App[10780:8ff8] [com.apple.BoardServices:XPCErrors] [C:1] Alloc com.apple.frontboard.systemappservices
+2026-11-05 03:08:23.263 Df App[10780:8fc0] [com.apple.BoardServices:XPCErrors] [C:2] Alloc com.apple.backboard.hid-services.xpc
+2026-11-05 03:08:25.483 Df App[10780:8fc0] [com.apple.BoardServices:XPCErrors] [C:3] Alloc com.apple.inputservice.input-ui-host
+2026-11-05 03:08:25.949 Df App[10780:8ffe] [com.apple.xpc:connection] [0x10532f270] Re-initialization successful; calling out to event handler with XPC_ERROR_CONNECTION_INTERRUPTED
+2026-11-05 03:08:27.441 Df App[10780:8ff7] [com.apple.AppSSO:SOClient] configurationWithCompletion: success = YES, error = (null)
+2026-11-05 03:08:28.519 E  App[10780:8fc0] [com.apple.WebKit:ResourceLoadStatistics] Failed to request known fingerprinting scripts from WebPrivacy: Error Domain=WebPrivacyErrorDomain Code=1001 "List data not found" UserInfo={NSLocalizedDescription=List data not found}
+2026-11-05 03:08:28.979 E  App[10780:8ffe] [com.apple.TextInputUI:CandidateGeneration] Attempted to update accumulator from source type: 0, after completion has already been called for token:[A50BD45B]. This is an error and will be ignored.
+2026-11-05 03:08:34.813 Df App[10780:8fc0] [com.apple.WebKit:Process] 0x106844818 - [pageProxyID=7, webPageID=8, PID=10803] WebPageProxy::makeViewBlankIfUnpaintedSinceLastLoadCommit: Making the view blank because of a JS prompt before the first paint for its page
+2026-11-05 03:08:34.830 Df App[10780:8fc0] [com.apple.WebKit:Process] 0x106844818 - [pageProxyID=7, webPageID=8, PID=10803] WebPageProxy::makeViewBlankIfUnpaintedSinceLastLoadCommit: Making the view blank because of a JS prompt before the first paint for its page
+2026-11-05 03:08:35.835 Df App[10780:8fc0] [com.apple.WebKit:Loading] 0x106844818 - [pageProxyID=7, webPageID=8, PID=10803] WebPageProxy::didSameDocumentNavigationForFrameViaJS: frameID=8589934593, isMainFrame=1, type=2
