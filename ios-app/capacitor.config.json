@@ -10,7 +10,7 @@
   "plugins": {
     "SplashScreen": {
       "launchAutoHide": false,
-      "launchShowDuration": 3000,
+      "launchShowDuration": 0,
       "backgroundColor": "#FFFFFF",
       "showSpinner": false
     },
@@ -23,6 +23,10 @@
         "sound",
         "badge"
       ]
+    },
+    "Keyboard": {
+      "resize": "native",
+      "resizeOnFullScreen": true
     }
   },
   "zoomEnabled": false

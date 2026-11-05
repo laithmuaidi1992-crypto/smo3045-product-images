@@ -1,8 +1,8 @@
 {
   "name": "market3045-ios",
   "private": true,
-  "version": "1.0.0",
-  "description": "3045 — iOS app (Capacitor). The web code lives in ../orders-app; scripts/prepare-www.sh copies it into www/.",
+  "version": "2.0.0",
+  "description": "3045 Market \u2014 iOS app (Capacitor). The web code is the Angular app in ../app-v2; scripts/prepare-www.sh builds it into www/.",
   "scripts": {
     "prepare-www": "bash scripts/prepare-www.sh",
     "sync": "npm run prepare-www && npx cap sync ios"
@@ -10,12 +10,14 @@
   "dependencies": {
     "@capacitor/app": "8.1.2",
     "@capacitor/core": "8.6.0",
+    "@capacitor/geolocation": "8.2.4",
     "@capacitor/haptics": "8.0.2",
     "@capacitor/ios": "8.6.0",
+    "@capacitor/keyboard": "8.0.6",
     "@capacitor/local-notifications": "8.3.1",
+    "@capacitor/push-notifications": "8.1.3",
     "@capacitor/splash-screen": "8.0.2",
-    "@capacitor/status-bar": "8.0.4",
-    "@capacitor/push-notifications": "8.1.3"
+    "@capacitor/status-bar": "8.0.4"
   },
   "devDependencies": {
     "@capacitor/assets": "4.0.0",

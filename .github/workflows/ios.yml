@@ -14,7 +14,7 @@ on:
         default: true
   push:
     branches: [main]
-    paths: ["ios-app/**", ".github/workflows/ios.yml"]
+    paths: ["ios-app/**", "app-v2/src/**", "app-v2/package.json", ".github/workflows/ios.yml"]
 
 permissions:
   contents: write
@@ -26,7 +26,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 60
     env:
-      VERSION: "1.0.0"
+      VERSION: "2.0.0"
       BUILD: ${{ github.run_number }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
     defaults: { run: { working-directory: ios-app } }
