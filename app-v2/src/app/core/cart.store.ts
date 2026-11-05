@@ -7,6 +7,9 @@ export interface CartLine { p: Product; q: number; }
 
 const KEY = 'v2_cart';
 
+/** the most of one product a person can order: what is on the shelf (POS stock can lag, so 0/negative still allows a few), capped at 99 */
+export function maxQty(p: Product): number { return p.stock > 0 ? Math.min(p.stock, 99) : 5; }
+
 @Injectable({ providedIn: 'root' })
 export class CartStore {
   private catalog = inject(Catalog);
@@ -53,7 +56,7 @@ export class CartStore {
   of(id: string) { return this.qty()[id] || 0; }
 
   set(p: Product, q: number) {
-    const max = Math.max(0, Math.min(p.stock || 99, 99));
+    const max = maxQty(p);
     const next = Math.max(0, Math.min(q, max));
     const cur = { ...this.qty() };
     const before = cur[p.id] || 0;
@@ -70,7 +73,7 @@ export class CartStore {
     const by = this.catalog.byId(); const cur = { ...this.qty() }; let n = 0;
     for (const it of items) {
       const p = by.get(it.id); if (!p) continue;
-      cur[p.id] = Math.min(p.stock || 99, (cur[p.id] || 0) + (Number(it.qty) || 1)); n++;
+      cur[p.id] = Math.min(maxQty(p), (cur[p.id] || 0) + (Number(it.qty) || 1)); n++;
     }
     this.qty.set(cur); if (n) this.pulse.update(x => x + 1);
     return n;

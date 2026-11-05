@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonHeader, IonIcon, IonRefresher, IonRefresherContent, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { chevronBack, chevronDown, locationOutline, refreshOutline, searchOutline, timeOutline } from 'ionicons/icons';
+import { chevronForward, chevronDown, locationOutline, refreshOutline, searchOutline, timeOutline } from 'ionicons/icons';
 import { greeting } from '../../core/arabic';
 import { CartStore } from '../../core/cart.store';
 import { Catalog } from '../../core/catalog.store';
@@ -44,7 +44,7 @@ export class HomePage {
   status = STATUS;
   steps = STEPS;
 
-  constructor() { addIcons({ chevronBack, chevronDown, locationOutline, refreshOutline, searchOutline, timeOutline }); }
+  constructor() { addIcons({ chevronForward, chevronDown, locationOutline, refreshOutline, searchOutline, timeOutline }); }
 
   onScroll(ev: CustomEvent) { this.scrolled.set((ev.detail?.scrollTop || 0) > 120); }
 

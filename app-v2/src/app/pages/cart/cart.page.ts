@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { Router, RouterLink } from '@angular/router';
 import { AlertController, IonContent, IonFooter, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { bicycleOutline, chevronBack, sparklesOutline, trashOutline } from 'ionicons/icons';
-import { CartStore } from '../../core/cart.store';
+import { bicycleOutline, chevronForward, sparklesOutline, trashOutline } from 'ionicons/icons';
+import { CartStore, maxQty } from '../../core/cart.store';
 import { Catalog, Product } from '../../core/catalog.store';
 import { CustomerStore } from '../../core/customer.store';
 import { Images } from '../../core/images.service';
@@ -22,6 +22,7 @@ import { StepperComponent } from '../../ui/stepper.component';
   styleUrl: './cart.page.scss',
 })
 export class CartPage {
+  max = maxQty;
   cart = inject(CartStore);
   catalog = inject(Catalog);
   private customer = inject(CustomerStore);
@@ -39,7 +40,7 @@ export class CartPage {
     return this.catalog.top().filter(p => !inCart.has(p.id)).slice(0, 10);
   });
 
-  constructor() { addIcons({ bicycleOutline, chevronBack, sparklesOutline, trashOutline }); }
+  constructor() { addIcons({ bicycleOutline, chevronForward, sparklesOutline, trashOutline }); }
   ionViewWillEnter() { this.now = new Date(); }
 
   img(p: Product) { return this.images.url(p); }

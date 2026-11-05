@@ -3,13 +3,13 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonBackButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { calendarOutline, cardOutline, cashOutline, chevronBack, chevronDown, flashOutline, locationOutline, phonePortraitOutline } from 'ionicons/icons';
+import { calendarOutline, cardOutline, cashOutline, chevronForward, chevronDown, flashOutline, locationOutline, phonePortraitOutline } from 'ionicons/icons';
 import { errText } from '../../core/api.service';
 import { CartStore } from '../../core/cart.store';
 import { Catalog } from '../../core/catalog.store';
 import { CustomerStore } from '../../core/customer.store';
 import { Images } from '../../core/images.service';
-import { OrdersStore, PayMethod } from '../../core/orders.store';
+import { OrdersStore, PayMethod, genOrderNo } from '../../core/orders.store';
 import { Ui } from '../../core/ui.service';
 import { JodPipe } from '../../ui/price.pipe';
 import { SwipeConfirmComponent } from '../../ui/swipe-confirm.component';
@@ -57,13 +57,16 @@ export class CheckoutPage {
   notes = signal('');
   showItems = signal(false);
   busy = signal(false);
+  /** one number per checkout, reused if the person retries after a network error */
+  private orderNo = genOrderNo();
   settings = this.catalog.settings;
   thumbs = computed(() => this.cart.lines().slice(0, 5).map(l => this.images.url(l.p)).filter(Boolean) as string[]);
   ready = computed(() => this.cart.count() > 0 && this.cart.minLeft() <= 0 && this.settings().store_open && this.customer.hasAddress());
 
-  constructor() { addIcons({ calendarOutline, cardOutline, cashOutline, chevronBack, chevronDown, flashOutline, locationOutline, phonePortraitOutline }); }
+  constructor() { addIcons({ calendarOutline, cardOutline, cashOutline, chevronForward, chevronDown, flashOutline, locationOutline, phonePortraitOutline }); }
 
   ionViewWillEnter() {
+    this.catalog.refreshSettings();
     if (!this.cart.count()) this.router.navigateByUrl('/tabs/cart', { replaceUrl: true });
     else if (!this.customer.signedIn()) this.router.navigateByUrl('/welcome?next=/checkout', { replaceUrl: true });
   }
@@ -72,7 +75,7 @@ export class CheckoutPage {
     if (!this.ready() || this.busy()) return;
     this.busy.set(true);
     try {
-      const no = await this.orders.place({ pay: this.pay(), when: this.when(), slot: this.when() === 'later' ? this.slot() : undefined, notes: this.notes() });
+      const no = await this.orders.place({ no: this.orderNo, pay: this.pay(), when: this.when(), slot: this.when() === 'later' ? this.slot() : undefined, notes: this.notes() });
       this.router.navigate(['/order', no, 'placed'], { replaceUrl: true });
     } catch (e) {
       this.ui.toast(errText(e) + ' — لم يُرسل الطلب، حاول مرة أخرى', 'err', 4000);

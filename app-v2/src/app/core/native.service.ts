@@ -29,6 +29,8 @@ export class Native {
     try { await Keyboard.setAccessoryBarVisible({ isVisible: true }); } catch {}
     this.initPush();
   }
+  /** light text on dark screens (order placed), dark text everywhere else */
+  statusBar(onDark: boolean) { if (NATIVE) StatusBar.setStyle({ style: onDark ? Style.Dark : Style.Light }).catch(() => {}); }
   async hideSplash() { if (NATIVE) { try { await SplashScreen.hide({ fadeOutDuration: 200 }); } catch {} } }
 
   tap() { if (NATIVE) Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); else this.vibrate(6); }

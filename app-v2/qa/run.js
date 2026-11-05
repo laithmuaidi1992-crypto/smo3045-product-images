@@ -47,6 +47,9 @@ const server = http.createServer((req, res) => {
     geolocation: { latitude: 32.5502, longitude: 35.8571 }, permissions: ['geolocation'] });
   await ctx.route('**/rest/v1/rpc/orders_app', async route => {
     const { action, args } = JSON.parse(route.request().postData() || '{}');
+    if (action === 'place_order' && !global.failedOnce) { // saved on the server, but the reply never arrives
+      global.failedOnce = true; rpc(action, args || {}); return route.fulfill({ status: 503, body: '{}' });
+    }
     await new Promise(r => setTimeout(r, action === 'place_order' ? 700 : 120));
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(rpc(action, args || {})) });
   });
@@ -105,6 +108,7 @@ const server = http.createServer((req, res) => {
   await step('account', async () => { await page.goto('http://localhost:4310/tabs/account'); await shot('account', 2600); });
   await step('empty-cart', async () => { await page.goto('http://localhost:4310/tabs/cart'); await shot('cart-empty', 2600); });
 
+  console.log('ORDERS ON SERVER', Object.keys(orders).length);
   fs.writeFileSync(path.join(OUT, 'errors.txt'), errors.join('\n'));
   console.log('ERRORS', errors.length, '\n' + errors.slice(0, 30).join('\n'));
   await browser.close(); server.close();

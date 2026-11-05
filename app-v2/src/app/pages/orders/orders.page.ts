@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonHeader, IonIcon, IonRefresher, IonRefresherContent, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { chevronBack, receiptOutline, refreshOutline, searchOutline } from 'ionicons/icons';
+import { chevronForward, receiptOutline, refreshOutline, searchOutline } from 'ionicons/icons';
 import { CartStore } from '../../core/cart.store';
 import { Native } from '../../core/native.service';
 import { Order, OrdersStore, STATUS, isOpen } from '../../core/orders.store';
@@ -26,7 +26,7 @@ import { JodPipe } from '../../ui/price.pipe';
           <a class="live press" [routerLink]="['/order', o.order_no]">
             <div class="lt"><span class="pulse"></span><b>{{ st(o).label }}</b></div>
             <div class="bar"><i [style.width.%]="(st(o).step + 1) * 20"></i></div>
-            <div class="lb"><span dir="ltr">{{ o.order_no }}</span><span>{{ o.items.length }} صنف · <b class="price">{{ o.total | jod }}</b> د.أ</span><ion-icon name="chevron-back" /></div>
+            <div class="lb"><span dir="ltr">{{ o.order_no }}</span><span>{{ o.items.length }} صنف · <b class="price">{{ o.total | jod }}</b> د.أ</span><ion-icon name="chevron-forward" /></div>
           </a>
         }
       }
@@ -77,7 +77,7 @@ import { JodPipe } from '../../ui/price.pipe';
     .lt { display: flex; align-items: center; gap: 10px; b { font-size: 17px; } }
     .pulse { width: 10px; height: 10px; border-radius: 50%; background: #4ADE80; box-shadow: 0 0 0 0 rgba(74,222,128,.6); animation: p 1.8s infinite; }
     @keyframes p { 70% { box-shadow: 0 0 0 10px rgba(74,222,128,0); } 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); } }
-    .bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; i { display: block; height: 100%; background: #fff; border-radius: 3px; margin-inline-start: auto; } }
+    .bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; i { display: block; height: 100%; background: #fff; border-radius: 3px; } }
     .lb { display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255,255,255,.75); span:nth-child(2) { flex: 1; text-align: end; } b { color: #fff; } }
     .list { display: flex; flex-direction: column; border-radius: 24px; background: var(--aisle); overflow: hidden; }
     .row { display: flex; align-items: stretch; & + .row { border-top: 1px solid var(--aisle-2); } }
@@ -107,7 +107,7 @@ export class OrdersPage {
   past = computed(() => this.orders.list().filter(o => !isOpen(o.status)));
 
   async pull(e: Event) { await this.orders.refresh(); (e.target as HTMLIonRefresherElement).complete(); }
-  constructor() { addIcons({ chevronBack, receiptOutline, refreshOutline, searchOutline }); }
+  constructor() { addIcons({ chevronForward, receiptOutline, refreshOutline, searchOutline }); }
   ionViewWillEnter() { this.orders.refresh(); }
 
   st(o: Order) { return STATUS[o.status] || STATUS.pending; }

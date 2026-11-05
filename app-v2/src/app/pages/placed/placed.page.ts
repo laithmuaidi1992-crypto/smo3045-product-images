@@ -83,7 +83,9 @@ export class PlacedPage {
   order = signal<Order | null>(null);
   bars = Array.from({ length: 38 }, (_, i) => [1, 2, 3, 1, 2][(i * 7) % 5]);
 
+  ionViewWillLeave() { this.native.statusBar(false); }
   async ionViewWillEnter() {
+    this.native.statusBar(true);
     setTimeout(() => this.native.thud(), 2300);
     try { this.order.set(await this.orders.get(this.no())); } catch { /* the receipt still shows the number */ }
   }

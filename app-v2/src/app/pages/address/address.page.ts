@@ -46,19 +46,19 @@ function km(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
 
     <form class="form" (ngSubmit)="save()">
       <div class="field">
-        <label>الحي / المنطقة</label>
-        <input name="area" [ngModel]="area()" (ngModelChange)="area.set($event)" placeholder="اكتب الحي أو اختر" autocomplete="address-level3" />
+        <label for="a-area">الحي / المنطقة</label>
+        <input id="a-area" name="area" [ngModel]="area()" (ngModelChange)="area.set($event)" placeholder="اكتب الحي أو اختر" autocomplete="address-level3" />
         <div class="areas">
           @for (a of areas; track a) { <button type="button" class="chip" [class.on]="area() === a" (click)="area.set(a)">{{ a }}</button> }
         </div>
       </div>
       <div class="field">
-        <label>الشارع ورقم البناية</label>
-        <input name="street" [ngModel]="street()" (ngModelChange)="street.set($event)" placeholder="مثال: شارع الجامعة، بناية 12، طابق 3" autocomplete="street-address" />
+        <label for="a-street">الشارع ورقم البناية</label>
+        <input id="a-street" name="street" [ngModel]="street()" (ngModelChange)="street.set($event)" placeholder="مثال: شارع الجامعة، بناية 12، طابق 3" autocomplete="street-address" />
       </div>
       <div class="field">
-        <label>أقرب معلم <span class="opt">(اختياري)</span></label>
-        <input name="landmark" [ngModel]="landmark()" (ngModelChange)="landmark.set($event)" placeholder="مقابل مسجد، صيدلية…" />
+        <label for="a-landmark">أقرب معلم <span class="opt">(اختياري)</span></label>
+        <input id="a-landmark" name="landmark" [ngModel]="landmark()" (ngModelChange)="landmark.set($event)" placeholder="مقابل مسجد، صيدلية…" />
       </div>
       @if (err()) { <p class="err">{{ err() }}</p> }
       <div style="height: 90px"></div>
@@ -68,7 +68,7 @@ function km(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
     <button class="btn primary block" type="button" (click)="save()">حفظ العنوان</button>
   </ion-footer>`,
   styles: [`
-    .mapBox { position: relative; height: 46vh; min-height: 300px; background: var(--aisle); }
+    .mapBox { position: relative; height: 340px; background: var(--aisle); }
     .map { position: absolute; inset: 0; }
     .pin { position: absolute; left: 50%; top: 50%; z-index: 500; pointer-events: none; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; transition: transform .25s var(--ease-out); }
     .pin.lift { transform: translate(-50%, calc(-100% - 12px)); }
@@ -125,9 +125,13 @@ export class AddressPage implements OnDestroy {
       const c = this.center();
       const map = L.map(this.mapEl().nativeElement, { zoomControl: false, attributionControl: true }).setView([c.lat, c.lng], this.picked() ? 17 : 15);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
-      map.on('movestart', () => this.zone.run(() => this.moving.set(true)));
+      // only the person's own drag/zoom (or locate-me) moves the pin, never a resize from the keyboard
+      let byUser = false;
+      map.on('dragstart zoomstart', () => { byUser = true; this.zone.run(() => this.moving.set(true)); });
       map.on('moveend', () => this.zone.run(() => {
         this.moving.set(false);
+        if (!byUser) return;
+        byUser = false;
         const m = map.getCenter(); this.center.set({ lat: m.lat, lng: m.lng }); this.picked.set(true); this.native.selection();
       }));
       this.map = map;
@@ -145,6 +149,10 @@ export class AddressPage implements OnDestroy {
     } catch {
       if (!silent) this.ui.toast('لم نتمكن من تحديد موقعك. اسمح للتطبيق بالوصول للموقع أو حرّك الخريطة يدويًا', 'err', 3500);
     } finally { this.locating.set(false); }
+  }
+
+  ionViewWillEnter() {
+    if (!this.customer.signedIn()) this.router.navigateByUrl('/welcome?next=' + encodeURIComponent('/address' + (this.next() ? '?next=' + this.next() : '')), { replaceUrl: true });
   }
 
   save() {

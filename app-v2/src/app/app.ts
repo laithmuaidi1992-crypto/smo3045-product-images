@@ -42,6 +42,9 @@ export class App implements OnInit {
     const minShow = new Promise(r => setTimeout(r, reduced ? 200 : 1650));
     this.native.hideSplash();
     const load = this.catalog.load();
+    // coming back to the app: store hours/fees first, the full catalog once it is over an hour old
+    const back = () => { this.catalog.refreshSettings(); this.catalog.load(); };
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) back(); });
     // never hold people on the splash longer than ~3.5s, even on a slow network
     await Promise.race([Promise.all([minShow, load]), new Promise(r => setTimeout(r, 3500))]);
     this.leaving.set(true);

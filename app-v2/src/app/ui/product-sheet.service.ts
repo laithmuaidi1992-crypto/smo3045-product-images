@@ -8,9 +8,11 @@ export class ProductSheet {
   private modals = inject(ModalController);
   readonly current = signal<Product | null>(null);
   private open$: HTMLIonModalElement | null = null;
+  private opening = false;
 
   async open(p: Product) {
-    if (this.open$) { this.current.set(p); return; }
+    if (this.open$ || this.opening) { this.current.set(p); return; }
+    this.opening = true;
     this.current.set(p);
     const { ProductSheetComponent } = await import('./product-sheet.component');
     const m = await this.modals.create({
@@ -21,7 +23,7 @@ export class ProductSheet {
       cssClass: 'sheet',
       canDismiss: true,
     });
-    this.open$ = m;
+    this.open$ = m; this.opening = false;
     m.onDidDismiss().then(() => { this.open$ = null; this.current.set(null); });
     await m.present();
   }

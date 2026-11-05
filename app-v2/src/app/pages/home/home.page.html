@@ -47,7 +47,7 @@
       <div class="lv-top">
         <span class="pulse"></span>
         <b>{{ status[o.status].label }}</b>
-        <ion-icon name="chevron-back" />
+        <ion-icon name="chevron-forward" />
       </div>
       <div class="lv-bar"><i [style.width.%]="(stepOf(o.status) / 4) * 100"></i></div>
       <div class="lv-meta">طلب {{ o.order_no }} · {{ o.total | jod }} د.أ</div>
@@ -58,7 +58,7 @@
         @for (t of thumbs(o); track $index) { <img [src]="t" alt="" /> }
       </div>
       <div class="ag-txt"><b>اطلب نفس آخر طلب</b><span>{{ o.items.length }} أصناف · بضغطة واحدة</span></div>
-      <ion-icon name="chevron-back" />
+      <ion-icon name="chevron-forward" />
     </button>
   }
 

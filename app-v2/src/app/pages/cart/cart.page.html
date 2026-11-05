@@ -52,7 +52,7 @@
               </div>
               <div class="end">
                 <span class="price">{{ l.p.price * l.q | jod }}</span>
-                <app-stepper [qty]="l.q" [atMax]="l.q >= l.p.stock" (inc)="cart.add(l.p)" (dec)="cart.add(l.p, -1)" />
+                <app-stepper [qty]="l.q" [atMax]="l.q >= max(l.p)" (inc)="cart.add(l.p)" (dec)="cart.add(l.p, -1)" />
               </div>
             </li>
           }
@@ -88,7 +88,7 @@
       <span>متابعة الطلب</span>
       <span class="sep"></span>
       <span class="price">{{ cart.total() | jod }}<span class="cur">د.أ</span></span>
-      <ion-icon name="chevron-back" />
+      <ion-icon name="chevron-forward" />
     </button>
   </ion-footer>
 }

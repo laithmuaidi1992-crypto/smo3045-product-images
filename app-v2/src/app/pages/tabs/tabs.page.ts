@@ -33,7 +33,7 @@ import { OrdersStore, isOpen } from '../../core/orders.store';
     </ion-tab-bar>
   </ion-tabs>`,
   styles: [`
-    ion-tab-bar { height: calc(60px + env(safe-area-inset-bottom)); backdrop-filter: saturate(1.6) blur(18px); -webkit-backdrop-filter: saturate(1.6) blur(18px); border-top: 1px solid var(--line); }
+    ion-tab-bar { height: 60px; backdrop-filter: saturate(1.6) blur(18px); -webkit-backdrop-filter: saturate(1.6) blur(18px); border-top: 1px solid var(--line); }
     ion-tab-button { --color: var(--muted); --color-selected: var(--navy); font-weight: 500; }
     ion-tab-button ion-label { font-size: 10.5px; margin-top: 3px; font-weight: 600; }
     ion-tab-button ion-icon { font-size: 23px; }

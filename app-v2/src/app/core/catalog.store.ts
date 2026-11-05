@@ -101,6 +101,14 @@ export class Catalog {
     return scored.sort((a, b) => b[0] - a[0]).slice(0, limit).map(x => x[1]);
   }
 
+  /** fresh opening hours, fees and minimum before money changes hands; also on every return to the app */
+  async refreshSettings(): Promise<void> {
+    try {
+      const meta = await this.api.rpc<any>('catalog_meta', {}, 8000);
+      if (meta?.settings && typeof meta.settings === 'object') this.settings.set({ ...DEFAULTS, ...meta.settings } as StoreSettings);
+    } catch { /* keep what we have */ }
+  }
+
   async load(force = false): Promise<void> {
     const cached = store.get<CatalogCache | null>(CACHE_KEY, null);
     if (cached?.rows?.length) {
@@ -133,6 +141,7 @@ export class Catalog {
       this.error.set('');
     } catch (e: any) {
       if (!this.products().length) { this.status.set('error'); this.error.set(e?.message || 'تعذّر تحميل المنتجات'); }
+      else this.status.set('ready');
     }
   }
 

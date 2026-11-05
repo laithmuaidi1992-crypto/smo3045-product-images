@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
-import { CartStore } from '../core/cart.store';
+import { CartStore, maxQty } from '../core/cart.store';
 import { Product } from '../core/catalog.store';
 import { Images } from '../core/images.service';
 import { Ui } from '../core/ui.service';
@@ -34,7 +34,7 @@ import { StepperComponent } from './stepper.component';
         <div class="foot">
           <span class="price">{{ p().price | jod }}<span class="cur">د.أ</span></span>
           @if (q() > 0) {
-            <app-stepper [qty]="q()" [atMax]="q() >= p().stock" (inc)="addOne()" (dec)="cart.add(p(), -1)" />
+            <app-stepper [qty]="q()" [atMax]="q() >= max(p())" (inc)="addOne()" (dec)="cart.add(p(), -1)" />
           }
         </div>
       </div>
@@ -61,6 +61,7 @@ import { StepperComponent } from './stepper.component';
   `],
 })
 export class ProductCardComponent {
+  max = maxQty;
   p = input.required<Product>();
   layout = input<'grid' | 'row'>('grid');
   cart = inject(CartStore);
@@ -77,7 +78,7 @@ export class ProductCardComponent {
   addOne() {
     const before = this.q();
     this.cart.add(this.p());
-    if (before === 0) this.ui.fly(this.shot()?.nativeElement ?? null, this.broken() ? null : this.src());
+    if (before === 0 && this.q() > 0) this.ui.fly(this.shot()?.nativeElement ?? null, this.broken() ? null : this.src());
   }
   open() { this.sheet.open(this.p()); }
 }

@@ -14,7 +14,7 @@ export interface Order {
   customer_address?: string; customer_location_lat?: number | null; customer_location_lng?: number | null; customer_notes?: string | null;
 }
 export type PayMethod = 'cash' | 'card' | 'cliq';
-export interface Checkout { pay: PayMethod; when: 'now' | 'later'; slot?: string; notes?: string; }
+export interface Checkout { no?: string; pay: PayMethod; when: 'now' | 'later'; slot?: string; notes?: string; }
 
 export const STATUS: Record<OrderStatus, { label: string; short: string; step: number; tone: 'navy' | 'amber' | 'fresh' | 'red' }> = {
   pending: { label: 'بانتظار تأكيد المتجر', short: 'بانتظار التأكيد', step: 0, tone: 'amber' },
@@ -35,7 +35,7 @@ export const STEPS = [
 export const PAY_LABEL: Record<PayMethod, string> = { cash: 'كاش عند الاستلام', card: 'بطاقة عند الاستلام', cliq: 'CliQ — تحويل فوري' };
 export const isOpen = (s: OrderStatus) => s !== 'delivered' && s !== 'cancelled';
 
-function genOrderNo(): string {
+export function genOrderNo(): string {
   const d = new Date();
   const ymd = String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
   const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -99,20 +99,29 @@ export class OrdersStore {
     const a = c.address;
     const when = co.when === 'later' && co.slot ? `جدولة: ${co.slot}` : 'التوصيل الآن';
     const notes = [`الدفع: ${PAY_LABEL[co.pay]}`, when, (co.notes || '').trim()].filter(Boolean).join(' · ');
-    const order_no = genOrderNo();
-    const r = await this.api.rpc<{ order_no: string }>('place_order', {
+    const order_no = co.no || genOrderNo();
+    const payload = {
       order_no, customer_name: c.name, customer_phone: c.phone,
       customer_address: [a.area, a.street, a.landmark ? 'قرب ' + a.landmark : ''].filter(Boolean).join('، '),
       lat: a.lat ?? null, lng: a.lng ?? null, notes, items,
       subtotal: +this.cart.subtotal().toFixed(3), delivery_fee: +this.cart.fee().toFixed(3), total: +this.cart.total().toFixed(3),
-    });
-    const no = r?.order_no || order_no;
+    };
+    let no = order_no;
+    try {
+      const r = await this.api.rpc<{ order_no: string }>('place_order', payload);
+      no = r?.order_no || order_no;
+    } catch (e) {
+      // the request may have reached the store before the network dropped: same number = same order, never a second one
+      const there = await this.api.rpc<Order | null>('order_by_no', { order_no }).catch(() => null);
+      if (!there?.order_no) throw e;
+    }
     this.mine.update(m => [no, ...m.filter(x => x !== no)].slice(0, 40));
     store.set('v2_orders', this.mine());
     this.lastStatus[no] = 'pending'; store.set('v2_last_status', this.lastStatus);
     this.cart.clear();
     this.native.success();
     setTimeout(() => this.native.askPush(), 2200);
+    this.refresh();
     return no;
   }
 
@@ -125,5 +134,8 @@ export class OrdersStore {
     }
   }
 
-  forget() { this.mine.set([]); this.list.set([]); store.del('v2_orders'); }
+  forget() {
+    this.mine.set([]); this.list.set([]); this.lastStatus = {};
+    store.del('v2_orders'); store.del('smo_orders'); store.del('v2_last_status');
+  }
 }

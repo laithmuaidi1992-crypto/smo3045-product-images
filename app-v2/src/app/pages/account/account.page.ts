@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Router, RouterLink } from '@angular/router';
 import { AlertController, IonContent, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { callOutline, chevronBack, documentTextOutline, helpBuoyOutline, locationOutline, logOutOutline, notificationsOutline, personOutline, trashOutline } from 'ionicons/icons';
+import { callOutline, chevronForward, documentTextOutline, helpBuoyOutline, locationOutline, logOutOutline, notificationsOutline, personOutline, trashOutline } from 'ionicons/icons';
 import { errText } from '../../core/api.service';
 import { Catalog } from '../../core/catalog.store';
 import { CustomerStore } from '../../core/customer.store';
@@ -38,27 +38,27 @@ export const APP_VERSION = '2.0.0';
       }
 
       <nav class="group">
-        <a class="item" routerLink="/address" [queryParams]="{ next: '/tabs/account' }">
-          <ion-icon name="location-outline" /><span><b>عنوان التوصيل</b><small>{{ customer.addressLine() || 'لم تضف عنوانًا بعد' }}</small></span><ion-icon class="go" name="chevron-back" />
+        <a class="item" [routerLink]="customer.signedIn() ? '/address' : '/welcome'" [queryParams]="{ next: customer.signedIn() ? '/tabs/account' : '/address' }">
+          <ion-icon name="location-outline" /><span><b>عنوان التوصيل</b><small>{{ customer.addressLine() || 'لم تضف عنوانًا بعد' }}</small></span><ion-icon class="go" name="chevron-forward" />
         </a>
         @if (native) {
           <button class="item" type="button" (click)="push()">
-            <ion-icon name="notifications-outline" /><span><b>إشعارات الطلب</b><small>نخبرك عند كل خطوة حتى الباب</small></span><ion-icon class="go" name="chevron-back" />
+            <ion-icon name="notifications-outline" /><span><b>إشعارات الطلب</b><small>نخبرك عند كل خطوة حتى الباب</small></span><ion-icon class="go" name="chevron-forward" />
           </button>
         }
         <a class="item" routerLink="/tabs/orders">
-          <ion-icon name="document-text-outline" /><span><b>طلباتي</b><small>تتبع وتكرار الطلبات</small></span><ion-icon class="go" name="chevron-back" />
+          <ion-icon name="document-text-outline" /><span><b>طلباتي</b><small>تتبع وتكرار الطلبات</small></span><ion-icon class="go" name="chevron-forward" />
         </a>
       </nav>
 
       <nav class="group">
         @if (catalog.settings().store_phone) {
           <a class="item" [href]="'tel:' + catalog.settings().store_phone">
-            <ion-icon name="call-outline" /><span><b>اتصل بالمتجر</b><small dir="ltr">{{ catalog.settings().store_phone }}</small></span><ion-icon class="go" name="chevron-back" />
+            <ion-icon name="call-outline" /><span><b>اتصل بالمتجر</b><small dir="ltr">{{ catalog.settings().store_phone }}</small></span><ion-icon class="go" name="chevron-forward" />
           </a>
         }
-        <button class="item" type="button" (click)="nat.open(support)"><ion-icon name="help-buoy-outline" /><span><b>المساعدة والدعم</b></span><ion-icon class="go" name="chevron-back" /></button>
-        <button class="item" type="button" (click)="nat.open(privacy)"><ion-icon name="document-text-outline" /><span><b>سياسة الخصوصية</b></span><ion-icon class="go" name="chevron-back" /></button>
+        <button class="item" type="button" (click)="nat.open(support)"><ion-icon name="help-buoy-outline" /><span><b>المساعدة والدعم</b></span><ion-icon class="go" name="chevron-forward" /></button>
+        <button class="item" type="button" (click)="nat.open(privacy)"><ion-icon name="document-text-outline" /><span><b>سياسة الخصوصية</b></span><ion-icon class="go" name="chevron-forward" /></button>
       </nav>
 
       @if (customer.signedIn()) {
@@ -107,7 +107,7 @@ export class AccountPage {
   privacy = PRIVACY_URL;
   busy = signal(false);
 
-  constructor() { addIcons({ callOutline, chevronBack, documentTextOutline, helpBuoyOutline, locationOutline, logOutOutline, notificationsOutline, personOutline, trashOutline }); }
+  constructor() { addIcons({ callOutline, chevronForward, documentTextOutline, helpBuoyOutline, locationOutline, logOutOutline, notificationsOutline, personOutline, trashOutline }); }
 
   initial() { return (this.customer.firstName() || '؟').charAt(0); }
 
@@ -119,7 +119,7 @@ export class AccountPage {
   async signOut() {
     const a = await this.alerts.create({
       header: 'تسجيل الخروج؟', message: 'سلتك تبقى محفوظة على هذا الجهاز.', mode: 'ios',
-      buttons: [{ text: 'إلغاء', role: 'cancel' }, { text: 'خروج', role: 'destructive', handler: () => { this.customer.signOut(); this.ui.toast('سجّلت الخروج'); } }],
+      buttons: [{ text: 'إلغاء', role: 'cancel' }, { text: 'خروج', role: 'destructive', handler: () => { this.customer.signOut(); this.orders.forget(); this.ui.toast('سجّلت الخروج'); } }],
     });
     a.present();
   }

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, 
 import { RouterLink } from '@angular/router';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { bag, chevronBack } from 'ionicons/icons';
+import { bag, chevronForward } from 'ionicons/icons';
 import { CartStore } from '../core/cart.store';
 import { Ui } from '../core/ui.service';
 import { JodPipe } from './price.pipe';
@@ -19,7 +19,7 @@ import { JodPipe } from './price.pipe';
         <span class="n" data-cart-target>{{ cart.count() }}</span>
         <span class="t">عرض السلة</span>
         <span class="price">{{ cart.total() | jod }}<span class="cur">د.أ</span></span>
-        <ion-icon name="chevron-back" />
+        <ion-icon name="chevron-forward" />
       </a>
     }`,
   styles: [`
@@ -41,7 +41,7 @@ export class CartBarComponent {
   aboveTabs = input(false);
   private bar = viewChild<ElementRef<HTMLElement>>('bar');
   constructor() {
-    addIcons({ bag, chevronBack });
+    addIcons({ bag, chevronForward });
     effect(() => { if (this.cart.pulse()) this.ui.bump(this.bar()?.nativeElement ?? null); });
   }
 }

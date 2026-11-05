@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, injec
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, bagCheckOutline, chevronBack, closeOutline } from 'ionicons/icons';
-import { CartStore } from '../core/cart.store';
+import { add, bagCheckOutline, chevronForward, closeOutline } from 'ionicons/icons';
+import { CartStore, maxQty } from '../core/cart.store';
 import { Catalog, Product } from '../core/catalog.store';
 import { Images } from '../core/images.service';
 import { Ui } from '../core/ui.service';
@@ -32,17 +32,17 @@ import { StepperComponent } from './stepper.component';
 
         <div class="body">
           @if (aisle(); as a) {
-            <button class="crumb" type="button" (click)="goAisle(a.id)">{{ a.name }} <ion-icon name="chevron-back" /></button>
+            <button class="crumb" type="button" (click)="goAisle(a.id)">{{ a.name }} <ion-icon name="chevron-forward" /></button>
           }
           <h1 class="name">{{ p.name }}</h1>
           <div class="priceRow">
             <span class="price big">{{ p.price | jod }}<span class="cur">د.أ</span></span>
-            @if (p.stock <= 3) { <span class="low">بقي {{ p.stock }} فقط</span> }
+            @if (p.stock > 0 && p.stock <= 3) { <span class="low">بقي {{ p.stock }} فقط</span> }
           </div>
 
           <div class="buy">
             @if (q() > 0) {
-              <app-stepper [big]="true" [qty]="q()" [atMax]="q() >= p.stock" (inc)="cart.add(p)" (dec)="cart.add(p, -1)" />
+              <app-stepper [big]="true" [qty]="q()" [atMax]="q() >= max(p)" (inc)="cart.add(p)" (dec)="cart.add(p, -1)" />
               <button class="btn ghost" type="button" (click)="goCart()"><ion-icon name="bag-check-outline" /> السلة · {{ cart.total() | jod }} د.أ</button>
             } @else {
               <button class="btn primary block" type="button" (click)="addFirst()">
@@ -88,6 +88,7 @@ import { StepperComponent } from './stepper.component';
   `],
 })
 export class ProductSheetComponent {
+  max = maxQty;
   sheet = inject(ProductSheet);
   cart = inject(CartStore);
   private catalog = inject(Catalog);
@@ -112,7 +113,7 @@ export class ProductSheetComponent {
   });
 
   constructor() {
-    addIcons({ add, bagCheckOutline, chevronBack, closeOutline });
+    addIcons({ add, bagCheckOutline, chevronForward, closeOutline });
     // swapping to a related product: reset the photo state and scroll back up
     effect(() => { this.p(); this.broken.set(false); this.content()?.scrollToTop(250); });
   }
