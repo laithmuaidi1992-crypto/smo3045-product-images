@@ -1,0 +1,94 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>السلة</ion-title>
+    @if (cart.count() > 0) {
+      <button slot="end" class="clear" type="button" (click)="clear()" aria-label="إفراغ السلة"><ion-icon name="trash-outline" /></button>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense"><ion-toolbar><ion-title size="large">السلة</ion-title></ion-toolbar></ion-header>
+
+  @if (cart.count() === 0) {
+    <div class="empty">
+      <div class="bag" aria-hidden="true"><span></span></div>
+      <h2>سلتك فارغة</h2>
+      <p>أضف ما تحتاجه من الرفوف ونوصله لباب بيتك.</p>
+      <a class="btn primary" routerLink="/tabs/home">ابدأ التسوّق</a>
+    </div>
+  } @else {
+    <div class="wrap">
+      @if (+settings().free_delivery_from > 0) {
+        <div class="free" [class.done]="cart.freeLeft() <= 0">
+          <ion-icon [name]="cart.freeLeft() <= 0 ? 'sparkles-outline' : 'bicycle-outline'" />
+          <div class="ft">
+            @if (cart.freeLeft() > 0) {
+              <span>أضف <b>{{ cart.freeLeft() | jod }} د.أ</b> وصار التوصيل مجانًا</span>
+            } @else {
+              <span><b>التوصيل مجاني</b> على هذا الطلب</span>
+            }
+            <div class="track"><i [style.width.%]="cart.freeProgress() * 100"></i></div>
+          </div>
+        </div>
+      }
+
+      <!-- the receipt -->
+      <section class="receipt" aria-label="فاتورة السلة">
+        <header class="rh">
+          <app-mark [width]="88" />
+          <span class="rmeta">إربد · {{ now.toLocaleDateString('ar-JO', { weekday: 'long', day: 'numeric', month: 'long' }) }}</span>
+        </header>
+        <div class="dash"></div>
+        <ul class="lines">
+          @for (l of cart.lines(); track l.p.id) {
+            <li class="line">
+              <button class="thumb" type="button" (click)="open(l.p)" [attr.aria-label]="l.p.name">
+                @if (img(l.p); as s) { <img [src]="s" alt="" loading="lazy" /> } @else { <em>{{ l.p.emoji }}</em> }
+              </button>
+              <div class="mid">
+                <button class="nm" type="button" (click)="open(l.p)">{{ l.p.name }}</button>
+                <span class="unit">{{ l.p.price | jod }} × {{ l.q }}</span>
+              </div>
+              <div class="end">
+                <span class="price">{{ l.p.price * l.q | jod }}</span>
+                <app-stepper [qty]="l.q" [atMax]="l.q >= l.p.stock" (inc)="cart.add(l.p)" (dec)="cart.add(l.p, -1)" />
+              </div>
+            </li>
+          }
+        </ul>
+        <div class="dash"></div>
+        <dl class="sum">
+          <div><dt>المجموع ({{ cart.count() }} قطعة)</dt><dd>{{ cart.subtotal() | jod }}</dd></div>
+          <div><dt>التوصيل</dt><dd>@if (cart.fee() === 0) { <span class="freeTag">مجاني</span> } @else { {{ cart.fee() | jod }} }</dd></div>
+          <div class="tot"><dt>الإجمالي</dt><dd>{{ cart.total() | jod }} <small>د.أ</small></dd></div>
+        </dl>
+        <p class="thanks">الدفع عند الاستلام · شكرًا لتسوّقك من حيّك</p>
+      </section>
+
+      @if (suggestions().length) {
+        <section class="more">
+          <h2 class="h-sec">قد تحتاج أيضًا</h2>
+          <div class="rail">@for (p of suggestions(); track p.id) { <app-product-card [p]="p" /> }</div>
+        </section>
+      }
+      <div style="height: 120px"></div>
+    </div>
+  }
+</ion-content>
+
+@if (cart.count() > 0) {
+  <ion-footer class="go">
+    @if (!settings().store_open) {
+      <p class="warn">{{ settings().closed_message }}</p>
+    } @else if (cart.minLeft() > 0) {
+      <p class="warn">الحد الأدنى للطلب {{ +settings().min_order }} د.أ — أضف {{ cart.minLeft() | jod }} د.أ</p>
+    }
+    <button class="btn primary block cta" type="button" (click)="checkout()" [disabled]="!canCheckout()">
+      <span>متابعة الطلب</span>
+      <span class="sep"></span>
+      <span class="price">{{ cart.total() | jod }}<span class="cur">د.أ</span></span>
+      <ion-icon name="chevron-back" />
+    </button>
+  </ion-footer>
+}

@@ -7,3 +7,5 @@
   Access-Control-Allow-Origin: *
 /img/*
   Access-Control-Allow-Origin: *
+/v2/index.html
+  Cache-Control: no-cache

@@ -1,0 +1,34 @@
+.wrap { padding: 8px 20px 0; display: flex; flex-direction: column; gap: 26px; }
+.block { display: flex; flex-direction: column; gap: 12px; }
+.addr { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: var(--r-card); background: var(--aisle); color: var(--fg); text-decoration: none;
+  .ic { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--red); display: grid; place-items: center; font-size: 22px; flex: none; }
+  .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; b { font-size: 14.5px; } span { font-size: 13.5px; color: var(--fg-2); line-height: 1.5; } em { font-style: normal; font-size: 12px; color: var(--fresh); font-weight: 600; } }
+  .chg { font-size: 13px; font-weight: 700; color: var(--navy); } }
+
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  button { display: flex; align-items: center; gap: 10px; padding: 14px; border-radius: var(--r-tile); border: 0; background: var(--aisle); color: var(--fg); text-align: start; cursor: pointer; box-shadow: inset 0 0 0 2px transparent; transition: box-shadow .2s, background .2s;
+    ion-icon { font-size: 22px; color: var(--navy); } span { display: flex; flex-direction: column; b { font-size: 15px; } small { font-size: 12px; color: var(--fg-2); } } }
+  button.on { background: #fff; box-shadow: inset 0 0 0 2px var(--navy); } }
+.slots { display: grid; grid-auto-flow: column; grid-auto-columns: 128px; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; &::-webkit-scrollbar { display: none; }
+  .slot { padding: 10px 12px; border-radius: 14px; border: 0; background: var(--aisle); color: var(--fg); font-size: 13px; font-weight: 600; display: flex; flex-direction: column; gap: 2px; cursor: pointer; small { font-weight: 400; color: var(--fg-2); } }
+  .slot.on { background: var(--navy); color: #fff; small { color: rgba(255,255,255,.7); } } }
+
+.pays { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pay { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 14px 12px; border-radius: var(--r-tile); border: 0; background: var(--aisle); color: var(--fg); text-align: start; cursor: pointer; box-shadow: inset 0 0 0 2px transparent; transition: box-shadow .2s, background .2s;
+  ion-icon { font-size: 24px; color: var(--navy); margin-bottom: 4px; } b { font-size: 15px; } small { font-size: 11.5px; color: var(--fg-2); line-height: 1.45; }
+  .dot { position: absolute; top: 12px; inset-inline-end: 12px; width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--aisle-2); transition: box-shadow .2s; }
+  &.on { background: #fff; box-shadow: inset 0 0 0 2px var(--navy); .dot { box-shadow: inset 0 0 0 6px var(--navy); } } }
+
+.sum { padding: 16px; border-radius: var(--r-card); background: var(--paper); box-shadow: inset 0 0 0 1px #ECE9DF; }
+.sumHead { display: flex; align-items: center; gap: 12px; border: 0; background: none; padding: 0; color: var(--fg); cursor: pointer;
+  .th { display: flex; img { width: 36px; height: 36px; border-radius: 10px; background: #fff; object-fit: contain; padding: 3px; margin-inline-start: -10px; box-shadow: 0 0 0 2px var(--paper); &:first-child { margin-inline-start: 0; } } }
+  span { flex: 1; text-align: start; font-weight: 600; } ion-icon { transition: transform .25s; } ion-icon.up { transform: rotate(180deg); } }
+.items { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px;
+  li { display: flex; gap: 8px; span:first-child { flex: 1; color: var(--fg-2); } .q { color: var(--muted); } } }
+dl { margin: 8px 0 0; display: flex; flex-direction: column; gap: 8px;
+  div { display: flex; justify-content: space-between; font-size: 14px; color: var(--fg-2); } dt, dd { margin: 0; } dd { font-weight: 600; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .free { color: var(--fresh); }
+  .tot { border-top: 2px dashed #D9D6CB; padding-top: 12px; margin-top: 4px; dt { color: var(--fg); font-weight: 700; } dd { font-size: 22px; font-weight: 700; color: var(--navy); small { font-size: 12px; color: var(--fg-2); } } } }
+
+.go { padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.95); border-top: 1px solid var(--line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.warn { margin: 0 0 8px; text-align: center; color: var(--red); font-size: 13px; }

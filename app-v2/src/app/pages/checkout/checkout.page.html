@@ -1,0 +1,85 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/cart" /></ion-buttons>
+    <ion-title>تأكيد الطلب</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="wrap">
+    <section class="block">
+      <h2 class="h-sec">يصل إلى</h2>
+      <a class="addr press" routerLink="/address" [queryParams]="{ next: '/checkout' }">
+        <span class="ic"><ion-icon name="location-outline" /></span>
+        <div class="t">
+          <b>{{ customer.customer()?.name }} · <span dir="ltr">{{ customer.customer()?.phone }}</span></b>
+          <span>{{ customer.addressLine() }}@if (customer.customer()?.address?.landmark) {، قرب {{ customer.customer()?.address?.landmark }}}</span>
+          @if (customer.customer()?.address?.lat) { <em>موقع محدّد على الخريطة</em> }
+        </div>
+        <span class="chg">تغيير</span>
+      </a>
+    </section>
+
+    <section class="block">
+      <h2 class="h-sec">موعد التوصيل</h2>
+      <div class="seg" role="radiogroup">
+        <button type="button" role="radio" [attr.aria-checked]="when() === 'now'" [class.on]="when() === 'now'" (click)="when.set('now')">
+          <ion-icon name="flash-outline" /> <span><b>الآن</b><small>{{ settings().eta }}</small></span>
+        </button>
+        <button type="button" role="radio" [attr.aria-checked]="when() === 'later'" [class.on]="when() === 'later'" (click)="when.set('later')">
+          <ion-icon name="calendar-outline" /> <span><b>لاحقًا</b><small>اختر الساعة</small></span>
+        </button>
+      </div>
+      @if (when() === 'later') {
+        <div class="slots">
+          @for (s of slots; track s.k) {
+            <button type="button" class="slot" [class.on]="slot() === s.k" (click)="slot.set(s.k)"><small>{{ s.day }}</small>{{ s.t }}</button>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="block">
+      <h2 class="h-sec">الدفع عند الاستلام</h2>
+      <div class="pays" role="radiogroup">
+        @for (p of pays; track p.k) {
+          <button type="button" role="radio" class="pay" [attr.aria-checked]="pay() === p.k" [class.on]="pay() === p.k" (click)="pay.set(p.k)">
+            <ion-icon [name]="p.i" />
+            <b>{{ p.t }}</b>
+            <small>{{ p.s }}</small>
+            <i class="dot"></i>
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="block">
+      <h2 class="h-sec">ملاحظة للمندوب</h2>
+      <div class="field"><textarea [ngModel]="notes()" (ngModelChange)="notes.set($event)" maxlength="300" placeholder="مثال: الجرس معطّل، اتصل عند الوصول"></textarea></div>
+    </section>
+
+    <section class="block sum">
+      <button class="sumHead" type="button" (click)="showItems.set(!showItems())" [attr.aria-expanded]="showItems()">
+        <div class="th">@for (t of thumbs(); track $index) { <img [src]="t" alt="" /> }</div>
+        <span>{{ cart.count() }} قطعة</span>
+        <ion-icon name="chevron-down" [class.up]="showItems()" />
+      </button>
+      @if (showItems()) {
+        <ul class="items">
+          @for (l of cart.lines(); track l.p.id) { <li><span>{{ l.p.name }}</span><span class="q">× {{ l.q }}</span><span class="price">{{ l.p.price * l.q | jod }}</span></li> }
+        </ul>
+      }
+      <dl>
+        <div><dt>المجموع</dt><dd>{{ cart.subtotal() | jod }} د.أ</dd></div>
+        <div><dt>التوصيل</dt><dd>@if (cart.fee() === 0) { <b class="free">مجاني</b> } @else { {{ cart.fee() | jod }} د.أ }</dd></div>
+        <div class="tot"><dt>الإجمالي عند الاستلام</dt><dd>{{ cart.total() | jod }} <small>د.أ</small></dd></div>
+      </dl>
+    </section>
+    <div style="height: 120px"></div>
+  </div>
+</ion-content>
+
+<ion-footer class="go">
+  @if (!settings().store_open) { <p class="warn">{{ settings().closed_message }}</p> }
+  <app-swipe-confirm [label]="'اسحب لتأكيد الطلب · ' + (cart.total() | jod) + ' د.أ'" [disabled]="!ready()" [busy]="busy()" (confirm)="place()" />
+</ion-footer>

@@ -1,0 +1,106 @@
+<ion-header class="mini" [class.show]="scrolled()">
+  <ion-toolbar>
+    <div class="miniBar">
+      <app-mark [width]="74" />
+      <button class="miniSearch" type="button" routerLink="/search" aria-label="بحث"><ion-icon name="search-outline" /> ابحث عن منتج</button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" [scrollEvents]="true" (ionScroll)="onScroll($event)">
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content pullingIcon="refresh-outline" refreshingSpinner="crescent" />
+  </ion-refresher>
+
+  <header class="hero">
+    <div class="topline">
+      <app-mark [width]="96" />
+      <span class="open" [class.closed]="!settings().store_open">
+        <i></i>{{ settings().store_open ? 'مفتوح الآن' : 'مغلق مؤقتًا' }}
+      </span>
+    </div>
+    <h1 class="hello">{{ hello() }}</h1>
+    <button class="where press" type="button" (click)="goAddress()">
+      <ion-icon name="location-outline" />
+      <span class="lbl">التوصيل إلى</span>
+      <b>{{ customer.addressLine() || 'حدّد عنوانك' }}</b>
+      <ion-icon name="chevron-down" class="dd" />
+    </button>
+    <button class="search press" type="button" routerLink="/search">
+      <ion-icon name="search-outline" />
+      <span>ابحث بين {{ catalog.products().length || 'آلاف' }} منتج… حليب، أرز، شامبو</span>
+    </button>
+    <div class="facts">
+      <span><ion-icon name="time-outline" /> يصل خلال {{ settings().eta }}</span>
+      @if (+settings().free_delivery_from > 0) {
+        <span>توصيل مجاني فوق {{ +settings().free_delivery_from }} د.أ</span>
+      }
+    </div>
+  </header>
+
+  @if (!settings().store_open) {
+    <div class="closed">{{ settings().closed_message }}</div>
+  }
+
+  @if (liveOrder(); as o) {
+    <a class="live press" [routerLink]="['/order', o.order_no]">
+      <div class="lv-top">
+        <span class="pulse"></span>
+        <b>{{ status[o.status].label }}</b>
+        <ion-icon name="chevron-back" />
+      </div>
+      <div class="lv-bar"><i [style.width.%]="(stepOf(o.status) / 4) * 100"></i></div>
+      <div class="lv-meta">طلب {{ o.order_no }} · {{ o.total | jod }} د.أ</div>
+    </a>
+  } @else if (lastDelivered(); as o) {
+    <button class="again press" type="button" (click)="reorder()">
+      <div class="ag-thumbs">
+        @for (t of thumbs(o); track $index) { <img [src]="t" alt="" /> }
+      </div>
+      <div class="ag-txt"><b>اطلب نفس آخر طلب</b><span>{{ o.items.length }} أصناف · بضغطة واحدة</span></div>
+      <ion-icon name="chevron-back" />
+    </button>
+  }
+
+  @if (catalog.status() === 'loading' && !catalog.products().length) {
+    <div class="pad"><div class="skeleton" style="height:150px"></div></div>
+    <div class="grid pad">@for (i of [1,2,3,4]; track i) { <div class="skeleton" style="aspect-ratio:1"></div> }</div>
+  } @else if (catalog.status() === 'error') {
+    <div class="empty">
+      <h2>تعذّر تحميل المتجر</h2>
+      <p>{{ catalog.error() }}</p>
+      <button class="btn primary" type="button" (click)="catalog.load(true)">حاول مرة أخرى</button>
+    </div>
+  } @else {
+    <section class="sec">
+      <div class="sec-h"><h2 class="h-sec">الأقسام</h2><a routerLink="/tabs/aisles">كل الأقسام</a></div>
+      <div class="aisles">
+        @for (a of aisles(); track a.id) {
+          <a class="aisle press" [routerLink]="['/tabs/aisles', a.id]">
+            <span class="pill">@if (a.img) { <img [src]="a.img" alt="" loading="lazy" /> } @else { <em>{{ a.emoji }}</em> }</span>
+            <b>{{ a.name }}</b>
+          </a>
+        }
+      </div>
+    </section>
+
+    @if (top().length) {
+      <section class="sec">
+        <div class="sec-h"><h2 class="h-sec">الأكثر طلبًا في حيّك</h2></div>
+        <div class="grid pad">
+          @for (p of top(); track p.id) { <app-product-card [p]="p" /> }
+        </div>
+      </section>
+    }
+
+    @for (r of rails(); track r.aisle.id) {
+      <section class="sec">
+        <div class="sec-h"><h2 class="h-sec">{{ r.aisle.name }}</h2><a [routerLink]="['/tabs/aisles', r.aisle.id]">عرض الكل</a></div>
+        <div class="rail">
+          @for (p of r.items; track p.id) { <app-product-card [p]="p" /> }
+        </div>
+      </section>
+    }
+    <footer class="foot">3045 Market · إربد<br />سوبرماركت حيّك، مفتوح 24 ساعة</footer>
+  }
+</ion-content>
