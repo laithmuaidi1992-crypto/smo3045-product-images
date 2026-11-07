@@ -1,0 +1,34 @@
+name: fetch-assets
+on:
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: 'JSON array of {url, path}'
+        required: true
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download
+        env:
+          MANIFEST: ${{ inputs.manifest }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          for item in json.loads(os.environ['MANIFEST']):
+              os.makedirs(os.path.dirname(item['path']) or '.', exist_ok=True)
+              req = urllib.request.Request(item['url'], headers={'User-Agent': 'Mozilla/5.0'})
+              with urllib.request.urlopen(req, timeout=120) as r, open(item['path'], 'wb') as f:
+                  f.write(r.read())
+              print('ok', item['path'], os.path.getsize(item['path']))
+          PY
+      - name: Commit
+        run: |
+          git config user.name "fetch-bot"
+          git config user.email "fetch-bot@users.noreply.github.com"
+          git add -A
+          git commit -m "fetch assets" || echo "nothing to commit"
+          git push
